@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import sequelize from '../config/database.js';
-import { hashPassword } from '../utils/utility.js';
+import { hashPassword, matchPassword } from '../utils/utility.js';
+import jwt from 'jsonwebtoken'
 
 
 export const getUsersService = async () => {
@@ -20,7 +21,19 @@ export const registerUserService = async (username, email, password) => {
   return user;
 };
 
-export const loginUserService = async () => {
+export const loginUserService = async (email, password) => {
+  const existingUser = await User.findOne({ where: { email } });
+  if (!existingUser) {
+    throw new Error('User not found!');
+  }
+
+  const isMatch = await matchPassword(password, existingUser.password);
+  if (!isMatch) {
+    throw new Error('Wrong credential!');
+  }
+
+  const token = jwt.sign({ userId: existingUser.id }, process.env.JWT_KEY, { expiresIn: process.env.JWT_EXPIRY });
+  return token;
 }
 
 
