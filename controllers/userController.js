@@ -31,10 +31,10 @@ export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   if (email.length < 1) {
-    res.status(400).json({ message: 'Email must be filled' })
+    res.status(400).json({ message: 'Email must be filled' });
   }
   else if (password.length < 1) {
-    res.status(400).json({ password: 'Password must be filled' })
+    res.status(400).json({ password: 'Password must be filled' });
   }
 
   try {
