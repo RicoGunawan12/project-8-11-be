@@ -1,11 +1,25 @@
-const express = require('express');
+import express from 'express';
+import dotenv from 'dotenv';
+import userRoute from './routes/userRoute.js';
+import sequelize from './config/database.js';
+
+dotenv.config();
+
 const app = express();
-const port = 3000;
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
-});
+app.use(express.json());
+
+app.use('/api/users', userRoute);
+
+
+(async () => {
+  try {
+    await sequelize.sync();
+    app.listen(5000, () => {
+      console.log('Server running on port 5000');
+    });
+  } catch (error) {
+    console.error('Failed to sync database:', error);
+  }
+})();
