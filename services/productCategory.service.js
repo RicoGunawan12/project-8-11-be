@@ -7,6 +7,10 @@ export const getCategoriesService = async () => {
 }
 
 export const createCategoryService = async (category_name) => {
+    const existingCategory = await ProductCategory.findOne({ where: { category_name } });
+    if (existingCategory) {
+        throw new Error('Product category already exists');
+    }
     const insertedCategory = await ProductCategory.create({ category_name });
     return insertedCategory;
 }
