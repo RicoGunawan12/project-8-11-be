@@ -1,4 +1,4 @@
-import User from '../models/User.js';
+import User from '../models/user.model.js';
 import sequelize from '../config/database.js';
 import { hashPassword, matchPassword } from '../utils/utility.js';
 import jwt from 'jsonwebtoken'
@@ -33,6 +33,7 @@ export const loginUserService = async (email, password) => {
   }
 
   const token = jwt.sign({ userId: existingUser.id }, process.env.JWT_KEY, { expiresIn: process.env.JWT_EXPIRY });
+  
   return token;
 }
 
