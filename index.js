@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import userRoute from './routes/user.route.js';
 import sequelize from './config/database.js';
 import ProductCategoryRoute from './routes/productCategory.route.js';
+import ProductRoute from './routes/product.route.js';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 
 app.use('/api/users', userRoute);
 app.use('/api/categories', ProductCategoryRoute);
+app.use('/api/products', ProductRoute);
 
 
 (async () => {

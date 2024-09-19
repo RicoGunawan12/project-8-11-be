@@ -14,3 +14,11 @@ export const createCategoryService = async (category_name) => {
     const insertedCategory = await ProductCategory.create({ category_name });
     return insertedCategory;
 }
+
+export const getCategoryByName = async (category_name) => {
+    const categoryByName = await ProductCategory.findOne({ where: { category_name } });
+    if (!categoryByName) {
+        throw new Error('There is no ' + category_name + " category");
+    }
+    return categoryByName;
+}
