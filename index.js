@@ -4,12 +4,13 @@ import userRoute from './routes/user.route.js';
 import sequelize from './config/database.js';
 import ProductCategoryRoute from './routes/productCategory.route.js';
 import ProductRoute from './routes/product.route.js';
+import cors from 'cors'
 
 dotenv.config();
 
 const app = express();
 
-
+app.use(cors())
 app.use(express.json());
 
 app.use('/api/users', userRoute);
