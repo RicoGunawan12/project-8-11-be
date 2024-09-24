@@ -28,6 +28,10 @@ const ProductVariant = sequelize.define('ProductVariant', {
     product_stock: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    product_image: {
+        type: DataTypes.STRING(200),
+        allowNull: false
     }
   }, {
     tableName: 'product_variants',
