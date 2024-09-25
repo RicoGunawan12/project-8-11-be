@@ -15,7 +15,7 @@ const ProductVariant = sequelize.define('ProductVariant', {
     },
     sku: {
       type: DataTypes.STRING(100),
-      allowNull: false
+      allowNull: true
     },
     product_variant_name: {
       type: DataTypes.STRING(100),
@@ -30,7 +30,7 @@ const ProductVariant = sequelize.define('ProductVariant', {
       allowNull: false
     },
     product_image: {
-        type: DataTypes.STRING(200),
+        type: DataTypes.TEXT,
         allowNull: false
     }
   }, {
