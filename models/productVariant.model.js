@@ -1,6 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 import { v4 as uuidv4 } from 'uuid';
+import Product from "./product.model.js";
 
 const ProductVariant = sequelize.define('ProductVariant', {
     product_variant_id: {
@@ -38,8 +39,6 @@ const ProductVariant = sequelize.define('ProductVariant', {
     timestamps: false
   });
 
-  ProductVariant.associate = (models) => {
-    ProductVariant.belongsTo(models.Product, { foreignKey: 'product_id' });
-};
+ProductVariant.belongsTo(Product, { foreignKey: 'product_id' });
 
 export default ProductVariant;

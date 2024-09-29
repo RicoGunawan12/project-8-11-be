@@ -1,11 +1,12 @@
 import express from 'express';
-import { createProduct, getProducts } from '../controllers/product.controller.js';
+import { createProduct, getProductById, getProducts } from '../controllers/product.controller.js';
 import { userMiddleware, adminMiddleware } from '../middleware/auth.middleware.js';
 import { upload } from '../utils/uploader.js';
 
 const ProductRoute = express.Router();
 
 ProductRoute.get('/', getProducts);
+ProductRoute.get('/:id', getProductById);
 // ProductRoute.post('/', adminMiddleware, createProduct);
 ProductRoute.post('/', 
     userMiddleware, 
@@ -14,5 +15,7 @@ ProductRoute.post('/',
     ]), 
     createProduct
 );
+
+
 
 export default ProductRoute;

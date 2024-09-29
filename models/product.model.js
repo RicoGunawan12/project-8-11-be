@@ -25,8 +25,6 @@ const Product = sequelize.define('Product', {
     timestamps: false
   });
 
-  Product.associate = (models) => {
-    Product.belongsTo(models.ProductCategory, { foreignKey: 'category_id' });
-};
+
 
 export default Product
