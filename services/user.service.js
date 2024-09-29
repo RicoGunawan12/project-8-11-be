@@ -9,8 +9,8 @@ export const getUsersService = async () => {
   return users;
 }
 
-export const getUserByIdService = async (user_id) => {
-  const user = await User.findOne({ where: { user_id }});
+export const getUserByIdService = async (userId) => {
+  const user = await User.findOne({ where: { userId }});
   if (!user) {
     throw new Error('User not found!');
   }
@@ -41,7 +41,7 @@ export const loginUserService = async (email, password) => {
     throw new Error('Wrong credential!');
   }
   
-  const token = jwt.sign({ userId: existingUser.dataValues.user_id }, process.env.JWT_KEY, { expiresIn: process.env.JWT_EXPIRY });
+  const token = jwt.sign({ userId: existingUser.dataValues.userId }, process.env.JWT_KEY, { expiresIn: process.env.JWT_EXPIRY });
   
   return token;
 }

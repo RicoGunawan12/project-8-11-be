@@ -4,13 +4,13 @@ import { v4 as uuidv4 } from 'uuid';
 import Product from './product.model.js';
 
 const ProductCategory = sequelize.define('ProductCategory', {
-  category_id: {
+  categoryId: {
     type: DataTypes.UUID,
     primaryKey: true,
     defaultValue: uuidv4,
     allowNull: false
   },
-  category_name: {
+  categoryName: {
     type: DataTypes.STRING(100),
     allowNull: false
   }

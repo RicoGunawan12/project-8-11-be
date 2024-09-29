@@ -24,19 +24,23 @@ export const getProductById = async (req, res) => {
 
 export const createProduct = async (req, res) => {
     try {
-        const images = req.files['product_image'];
-        const { product_name, product_description, category_name, product_variants } = req.body;
-        const productVariants = JSON.parse(product_variants);
+        const images = req.files['productImage'];
+        const { productName, productDescription, categoryName, productVariants } = req.body;
+        const variants = JSON.parse(productVariants);
 
-        if (product_name.length < 1) {
+        if (productName.length < 1) {
             return res.status(400).json({ message: "Product name must be filled" })
         }
 
-        const product = await createProductService(product_name, product_description, category_name);
-        productVariants.forEach(async (variant, index) => {
+        const product = await createProductService(productName, productDescription, categoryName);
+        variants.forEach(async (variant, index) => {
             // put variant.product_image to ../assets/[date] - [name] and get the path
-            variant.product_image = `/${UPLOAD_FOLDER}${images[index].filename}`;
-            await createProductVariantService(product.product_id, variant);
+            variant.productImage = `/${UPLOAD_FOLDER}${images[index].filename}`;
+            try {
+                await createProductVariantService(product.productId, variant);
+            } catch (error) {
+                return res.status(500).json({ message: error.message });
+            }
         });
         return res.status(200).json({ message: "New product added!", product });
     } catch (error) {

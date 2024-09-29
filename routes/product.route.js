@@ -9,9 +9,9 @@ ProductRoute.get('/', getProducts);
 ProductRoute.get('/:id', getProductById);
 // ProductRoute.post('/', adminMiddleware, createProduct);
 ProductRoute.post('/', 
-    userMiddleware, 
+    adminMiddleware, 
     upload.fields([
-        { name: 'product_image', maxCount: 10 }
+        { name: 'productImage', maxCount: 10 }
     ]), 
     createProduct
 );

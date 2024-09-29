@@ -9,30 +9,30 @@ export const getProductsService = async () => {
         include: [
             {
                 model: ProductCategory,
-                attributes: ['category_name']
+                attributes: ['categoryName']
             },
             {
                 model: ProductVariant,
-                attributes: ['product_variant_id', 'sku', 'product_price', 'product_stock', 'product_image'],
+                attributes: ['productVariantId', 'sku', 'productPrice', 'productStock', 'productImage'],
             }
         ]
     });
     return products;
 }
 
-export const getProductByIdService = async (product_id) => {
+export const getProductByIdService = async (productId) => {
     const product = await Product.findOne({
         include: [
             {
-                model: ProductVariant,
-                attributes: ['product_variant_id', 'sku', 'product_price', 'product_stock', 'product_image'],
+                model: ProductCategory,
+                attributes: ['categoryName']
             },
             {
-                model: ProductCategory,
-                attributes: ['category_name']
+                model: ProductVariant,
+                attributes: ['productVariantId', 'sku', 'productPrice', 'productStock', 'productImage'],
             }
         ],
-        where: { product_id }, 
+        where: { productId }, 
     });
 
     if (!product) {
@@ -41,13 +41,13 @@ export const getProductByIdService = async (product_id) => {
     return product
 }
 
-export const createProductService = async (product_name, product_description, category_name) => {
-    const category = await getCategoryByName(category_name);
+export const createProductService = async (productName, productDescription, categoryName) => {
+    const category = await getCategoryByName(categoryName);
     if (!category) {
-        throw new Error("There is no " + category_name + " category");
+        throw new Error("There is no " + categoryName + " category");
     }
     
-    const category_id = category.category_id;
-    const product = await Product.create({ product_name, product_description, category_id });
+    const categoryId = category.categoryId;
+    const product = await Product.create({ productName, productDescription, categoryId });
     return product;
 }

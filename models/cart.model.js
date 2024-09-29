@@ -3,12 +3,12 @@ import sequelize from "../config/database.js";
 
 
 const Cart = sequelize.define('Cart', {
-    cart_id: {
+    cartId: {
       type: DataTypes.UUID,
       primaryKey: true,
       allowNull: false
     },
-    user_id: {
+    userId: {
       type: DataTypes.UUID,
       allowNull: false
     }

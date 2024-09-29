@@ -4,13 +4,13 @@ import { v4 as uuidv4 } from 'uuid';
 import Product from "./product.model.js";
 
 const ProductVariant = sequelize.define('ProductVariant', {
-    product_variant_id: {
+    productVariantId: {
       type: DataTypes.UUID,
       primaryKey: true,
       defaultValue: uuidv4,
       allowNull: false
     },
-    product_id: {
+    productId: {
       type: DataTypes.UUID,
       allowNull: false
     },
@@ -18,19 +18,19 @@ const ProductVariant = sequelize.define('ProductVariant', {
       type: DataTypes.STRING(100),
       allowNull: true
     },
-    product_variant_name: {
+    productVariantName: {
       type: DataTypes.STRING(100),
       allowNull: false
     },
-    product_price: {
+    productPrice: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    product_stock: {
+    productStock: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    product_image: {
+    productImage: {
         type: DataTypes.TEXT,
         allowNull: false
     }
@@ -38,7 +38,5 @@ const ProductVariant = sequelize.define('ProductVariant', {
     tableName: 'product_variants',
     timestamps: false
   });
-
-ProductVariant.belongsTo(Product, { foreignKey: 'product_id' });
 
 export default ProductVariant;

@@ -3,21 +3,21 @@ import sequelize from "../config/database.js";
 import { v4 as uuidv4 } from 'uuid';
 
 const Product = sequelize.define('Product', {
-    product_id: {
+    productId: {
       type: DataTypes.UUID,
       primaryKey: true,
       defaultValue: uuidv4,
       allowNull: false
     },
-    category_id: {
+    categoryId: {
       type: DataTypes.UUID,
       allowNull: false
     },
-    product_name: {
+    productName: {
       type: DataTypes.STRING(255),
       allowNull: false
     },
-    product_description: {
+    productDescription: {
       type: DataTypes.STRING(255)
     }
   }, {

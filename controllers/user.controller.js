@@ -28,7 +28,6 @@ export const getUsers = async (req, res) => {
 }
 
 export const getUserById = async (req, res) => {
-  
   const user = await getUserByIdService(req.params.id);
   return res.status(200).json(user)
 }
