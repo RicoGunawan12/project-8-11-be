@@ -1,16 +1,15 @@
-import User from '../models/user.model.js';
-import sequelize from '../config/database.js';
 import { hashPassword, matchPassword } from '../utils/utility.js';
 import jwt from 'jsonwebtoken'
+import { UserModel } from '../association/association.js';
 
 
 export const getUsersService = async () => {
-  const users = await User.findAll();
+  const users = await UserModel.findAll();
   return users;
 }
 
 export const getUserByIdService = async (userId) => {
-  const user = await User.findOne({ where: { userId }});
+  const user = await UserModel.findOne({ where: { userId }});
   if (!user) {
     throw new Error('User not found!');
   }
@@ -19,19 +18,19 @@ export const getUserByIdService = async (userId) => {
 }
 
 export const registerUserService = async (username, email, password) => {
-  const existingUser = await User.findOne({ where: { email } });
+  const existingUser = await UserModel.findOne({ where: { email } });
   if (existingUser) {
     throw new Error('User already exists');
   }
 
   const hashedPassword = await hashPassword(password);
-  const user = await User.create({ username, email, password: hashedPassword, role: 'user' });
+  const user = await UserModel.create({ username, email, password: hashedPassword, role: 'user' });
   
   return user;
 };
 
 export const loginUserService = async (email, password) => {
-  const existingUser = await User.findOne({ where: { email } });
+  const existingUser = await UserModel.findOne({ where: { email } });
   if (!existingUser) {
     throw new Error('User not found!');
   }

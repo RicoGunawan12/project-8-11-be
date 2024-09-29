@@ -13,12 +13,8 @@ const Cart = sequelize.define('Cart', {
       allowNull: false
     }
   }, {
-    tableName: 'cart',
+    tableName: 'carts',
     timestamps: false
 });
-
-Cart.associate = (models) => {
-    Cart.belongsTo(models.User, { foreignKey: 'user_id' });
-};
 
 export default Cart;

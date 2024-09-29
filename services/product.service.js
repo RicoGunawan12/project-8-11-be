@@ -1,18 +1,17 @@
 
-import { Product, ProductCategory } from "../association/product.association.js";
-import ProductVariant from "../models/productVariant.model.js";
+import { ProductModel, ProductCategoryModel, ProductVariantModel } from "../association/association.js";
 import { getCategoryByName } from "./productCategory.service.js";
 
 
 export const getProductsService = async () => {
-    const products = Product.findAll({
+    const products = ProductModel.findAll({
         include: [
             {
-                model: ProductCategory,
+                model: ProductCategoryModel,
                 attributes: ['categoryName']
             },
             {
-                model: ProductVariant,
+                model: ProductVariantModel,
                 attributes: ['productVariantId', 'sku', 'productPrice', 'productStock', 'productImage'],
             }
         ]
@@ -21,14 +20,14 @@ export const getProductsService = async () => {
 }
 
 export const getProductByIdService = async (productId) => {
-    const product = await Product.findOne({
+    const product = await ProductModel.findOne({
         include: [
             {
-                model: ProductCategory,
+                model: ProductCategoryModel,
                 attributes: ['categoryName']
             },
             {
-                model: ProductVariant,
+                model: ProductVariantModel,
                 attributes: ['productVariantId', 'sku', 'productPrice', 'productStock', 'productImage'],
             }
         ],
@@ -48,6 +47,6 @@ export const createProductService = async (productName, productDescription, cate
     }
     
     const categoryId = category.categoryId;
-    const product = await Product.create({ productName, productDescription, categoryId });
+    const product = await ProductModel.create({ productName, productDescription, categoryId });
     return product;
 }
