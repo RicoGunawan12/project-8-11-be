@@ -17,6 +17,8 @@ const ProductCategory = sequelize.define('product_categories', {
     length: 100,
     allowNull: false
   }
+},{
+  timestamps: false
 })
 
 

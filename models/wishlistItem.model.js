@@ -20,6 +20,8 @@ const WishlistItem = sequelize.define('wishlist_items', {
     type: DataTypes.UUID,
     primaryKey: false
   }
+},{
+  timestamps: false
 });
 
 export default WishlistItem;

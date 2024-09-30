@@ -21,6 +21,8 @@ const Promo = sequelize.define('promos', {
       type: DataTypes.INTEGER,
       allowNull: false
     }
+  },{
+    timestamps: false
   })
 
 export default Promo;

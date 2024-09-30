@@ -37,6 +37,8 @@ const ProductVariant = sequelize.define('product_variants', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
+},{
+  timestamps: false
 })
 
 export default ProductVariant;

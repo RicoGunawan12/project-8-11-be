@@ -42,6 +42,8 @@ const TransactionHeader = sequelize.define('transaction_headers', {
     allowNull: false,
     length: 100
   }
+},{
+  timestamps: false
 })
 
   export default TransactionHeader;

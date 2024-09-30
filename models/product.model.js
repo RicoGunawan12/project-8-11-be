@@ -27,6 +27,8 @@ const Product = sequelize.define('products', {
     allowNull: true,
     length: 255
   }
+},{
+  timestamps: false
 })
 
 

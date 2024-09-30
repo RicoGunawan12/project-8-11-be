@@ -15,6 +15,8 @@ const Cart = sequelize.define('carts', {
     field: "ref_user_id",
     type: DataTypes.UUID
   }
+},{
+  timestamps: false
 })
 
 export default Cart;

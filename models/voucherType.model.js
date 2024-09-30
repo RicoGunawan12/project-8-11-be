@@ -16,6 +16,8 @@ const VoucherType = sequelize.define('voucher_types', {
     length: 50,
     allowNull: false
   },
+},{
+  timestamps: false
 })
 
 export default VoucherType;

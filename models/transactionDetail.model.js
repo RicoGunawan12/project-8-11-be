@@ -26,6 +26,8 @@ const TransactionDetail = sequelize.define('transaction_details', {
     allowNull: false,
     length: 100
   }
+},{
+  timestamps: false
 })
 
 export default TransactionDetail;

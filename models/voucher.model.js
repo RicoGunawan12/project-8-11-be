@@ -30,5 +30,7 @@ const Voucher = sequelize.define('vouchers', {
     type: DataTypes.INTEGER,
     allowNull: true
   }
+},{
+  timestamps: false
 })
 export default Voucher

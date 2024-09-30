@@ -16,6 +16,8 @@ const PaymentMethod = sequelize.define('payment_methods', {
     length: 50,
     allowNull: false
   },
+},{
+  timestamps: false
 })
 
 
