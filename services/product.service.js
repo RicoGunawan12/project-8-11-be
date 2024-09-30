@@ -5,10 +5,11 @@ import { getCategoryByName } from "./productCategory.service.js";
 
 export const getProductsService = async () => {
     const products = ProductModel.findAll({
+        attributes: ['productId', 'productName', 'productDescription'],
         include: [
             {
                 model: ProductCategoryModel,
-                attributes: ['categoryName']
+                attributes: ['productCategoryName']
             },
             {
                 model: ProductVariantModel,
@@ -21,10 +22,11 @@ export const getProductsService = async () => {
 
 export const getProductByIdService = async (productId) => {
     const product = await ProductModel.findOne({
+        attributes: ['productId', 'productName', 'productDescription'],
         include: [
             {
                 model: ProductCategoryModel,
-                attributes: ['categoryName']
+                attributes: ['productCategoryName']
             },
             {
                 model: ProductVariantModel,
@@ -40,13 +42,14 @@ export const getProductByIdService = async (productId) => {
     return product
 }
 
-export const createProductService = async (productName, productDescription, categoryName) => {
-    const category = await getCategoryByName(categoryName);
+export const createProductService = async (productName, productDescription, productCategoryName) => {
+    const category = await getCategoryByName(productCategoryName);
     if (!category) {
-        throw new Error("There is no " + categoryName + " category");
+        throw new Error("There is no " + productCategoryName + " category");
     }
     
-    const categoryId = category.categoryId;
-    const product = await ProductModel.create({ productName, productDescription, categoryId });
+    const productCategoryId = category.productCategoryId;
+    
+    const product = await ProductModel.create({ productName, productDescription, productCategoryId });
     return product;
 }

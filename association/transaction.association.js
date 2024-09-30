@@ -18,7 +18,7 @@ User.hasMany(TransactionHeader, { foreignKey: 'ref_user_id' });
 TransactionHeader.belongsTo(User, { foreignKey: 'ref_user_id' });
 
 Wishlist.belongsTo(User, { foreignKey: 'ref_user_id' });
-User.hasMany(Wishlist, { foreignKey: 'ref_user_id' });
+User.belongsTo(Wishlist, { foreignKey: 'ref_user_id' });
 
 Wishlist.hasMany(WishlistItem, { foreignKey: 'ref_wishlist_id' });
 WishlistItem.belongsTo(Wishlist, { foreignKey: 'ref_wishlist_id' });
@@ -35,4 +35,4 @@ Voucher.hasMany(TransactionHeader, { foreignKey: 'ref_voucher_id' });
 VoucherType.hasMany(Voucher, { foreignKey: 'ref_voucher_type_id' });
 Voucher.belongsTo(VoucherType, { foreignKey: 'ref_voucher_type_id' });
 
-export { PaymentMethod, TransactionDetail, TransactionHeader, User, ProductVariant, Voucher, VoucherType }
+export { PaymentMethod, TransactionDetail, TransactionHeader, User, ProductVariant, Voucher, VoucherType, Wishlist, WishlistItem }

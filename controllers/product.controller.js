@@ -23,27 +23,26 @@ export const getProductById = async (req, res) => {
 }
 
 export const createProduct = async (req, res) => {
-    try {
+    // try {
         const images = req.files['productImage'];
-        const { productName, productDescription, categoryName, productVariants } = req.body;
+        
+        const { productName, productDescription, productCategoryName, productVariants } = req.body;
         const variants = JSON.parse(productVariants);
 
         if (productName.length < 1) {
             return res.status(400).json({ message: "Product name must be filled" })
         }
 
-        const product = await createProductService(productName, productDescription, categoryName);
-        variants.forEach(async (variant, index) => {
+        const product = await createProductService(productName, productDescription, productCategoryName);
+        const variantPromises = variants.map(async (variant, index) => {
             // put variant.product_image to ../assets/[date] - [name] and get the path
             variant.productImage = `/${UPLOAD_FOLDER}${images[index].filename}`;
-            try {
-                await createProductVariantService(product.productId, variant);
-            } catch (error) {
-                return res.status(500).json({ message: error.message });
-            }
+            await createProductVariantService(product.productId, variant);
         });
+        await Promise.all(variantPromises);
+        
         return res.status(200).json({ message: "New product added!", product });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
+    // } catch (error) {
+    //     return res.status(500).json({ message: error.message });
+    // }
 }

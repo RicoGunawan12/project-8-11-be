@@ -1,14 +1,12 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
-import { v4 as uuidv4 } from 'uuid';
-import Product from "./product.model.js";
 
 const ProductVariant = sequelize.define('product_variants', {
   productVariantId: {
     field: "product_variant_id",
     type: DataTypes.UUID,
     primaryKey: true,
-    defaultValue: uuidv4(), 
+    defaultValue: DataTypes.UUIDV4, 
     allowNull: false
   },
   productId: {
@@ -26,6 +24,11 @@ const ProductVariant = sequelize.define('product_variants', {
     type: DataTypes.STRING,
     allowNull: true,
     length: 100
+  },
+  productImage: {
+    field: "product_image",
+    type: DataTypes.TEXT,
+    allowNull: false
   },
   productPrice: {
     field: "product_price",

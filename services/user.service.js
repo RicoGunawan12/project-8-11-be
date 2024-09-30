@@ -23,8 +23,8 @@ export const registerUserService = async (username, email, password) => {
     throw new Error('User already exists');
   }
 
-  const hashedPassword = await hashPassword(password);
-  const user = await UserModel.create({ username, email, password: hashedPassword, role: 'user' });
+  // const hashedPassword = await hashPassword(password);
+  const user = await UserModel.create({ username, email, password: password, role: 'user' });
   
   return user;
 };
