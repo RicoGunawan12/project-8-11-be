@@ -3,25 +3,36 @@ import TransactionDetail from "../models/transactionDetail.model.js";
 import TransactionHeader from "../models/transactionHeader.model.js";
 import Voucher from "../models/voucher.model.js";
 import VoucherType from "../models/voucherType.model.js";
+import Wishlist from "../models/wishlist.model.js";
+import WishlistItem from "../models/wishlistItem.model.js";
 import { ProductVariant, User } from "./cart.association.js";
 
 
-PaymentMethod.hasMany(TransactionHeader, { foreignKey: 'paymentMethodId' });
-TransactionHeader.belongsTo(PaymentMethod, { foreignKey: 'paymentMethodId' });
+PaymentMethod.hasMany(TransactionHeader, { foreignKey: 'ref_payment_method_id' });
+TransactionHeader.belongsTo(PaymentMethod, { foreignKey: 'ref_payment_method_id' });
 
-TransactionHeader.hasMany(TransactionDetail, { foreignKey: 'transactionId' });
-TransactionDetail.belongsTo(TransactionHeader, { foreignKey: 'transactionId' });
+TransactionHeader.hasMany(TransactionDetail, { foreignKey: 'ref_transaction_id' });
+TransactionDetail.belongsTo(TransactionHeader, { foreignKey: 'ref_transaction_id' });
 
-User.hasMany(TransactionHeader, { foreignKey: 'userId' });
-TransactionHeader.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(TransactionHeader, { foreignKey: 'ref_user_id' });
+TransactionHeader.belongsTo(User, { foreignKey: 'ref_user_id' });
 
-ProductVariant.hasMany(TransactionDetail, { foreignKey: 'productVariantId' });
-TransactionDetail.hasMany(ProductVariant, { foreignKey: 'productVariantId' });
+Wishlist.belongsTo(User, { foreignKey: 'ref_user_id' });
+User.hasMany(Wishlist, { foreignKey: 'ref_user_id' });
 
-TransactionHeader.belongsTo(Voucher, { foreignKey: 'voucherId' });
-Voucher.belongsTo(TransactionHeader, { foreignKey: 'voucherId' });
+Wishlist.hasMany(WishlistItem, { foreignKey: 'ref_wishlist_id' });
+WishlistItem.belongsTo(Wishlist, { foreignKey: 'ref_wishlist_id' });
 
-VoucherType.hasMany(Voucher, { foreignKey: 'voucherId' });
-Voucher.belongsTo(VoucherType, { foreignKey: 'voucherId' });
+ProductVariant.hasMany(WishlistItem, { foreignKey: 'ref_product_variant_id' });
+WishlistItem.belongsTo(ProductVariant, { foreignKey: 'ref_product_variant_id' });
+
+ProductVariant.hasMany(TransactionDetail, { foreignKey: 'ref_product_variant_id' });
+TransactionDetail.belongsTo(ProductVariant, { foreignKey: 'ref_product_variant_id' });
+
+TransactionHeader.belongsTo(Voucher, { foreignKey: 'ref_voucher_id' });
+Voucher.hasMany(TransactionHeader, { foreignKey: 'ref_voucher_id' });
+
+VoucherType.hasMany(Voucher, { foreignKey: 'ref_voucher_type_id' });
+Voucher.belongsTo(VoucherType, { foreignKey: 'ref_voucher_type_id' });
 
 export { PaymentMethod, TransactionDetail, TransactionHeader, User, ProductVariant, Voucher, VoucherType }

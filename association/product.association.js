@@ -4,13 +4,13 @@ import ProductVariant from "../models/productVariant.model.js";
 import Promo from "../models/promo.model.js";
 
 
-ProductCategory.hasMany(Product, { foreignKey: 'categoryId'} )
-Product.belongsTo(ProductCategory, { foreignKey: 'categoryId' } );
+ProductCategory.hasMany(Product, { foreignKey: 'ref_product_category_id'} )
+Product.belongsTo(ProductCategory, { foreignKey: 'ref_product_category_id' } );
 
-Product.hasMany(ProductVariant, { foreignKey: 'productId' } );
-ProductVariant.belongsTo(Product, { foreignKey: 'productId' } );
+ProductVariant.belongsTo(Product, { foreignKey: 'ref_product_id' } );
+Product.hasMany(ProductVariant, { foreignKey: 'ref_product_id' } );
 
-ProductVariant.belongsTo(Promo, { foreignKey: 'productVariantId' });
-Promo.belongsTo(ProductVariant, { foreignKey: 'productVariantId' });
+ProductVariant.hasMany(Promo, { foreignKey: 'ref_product_variant_id' });
+Promo.belongsTo(ProductVariant, { foreignKey: 'ref_product_variant_id' });
 
 export { Product, ProductVariant, ProductCategory, Promo };

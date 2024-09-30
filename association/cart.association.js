@@ -3,13 +3,13 @@ import CartItem from "../models/cartItem.model.js";
 import User from "../models/user.model.js";
 import { ProductVariant } from "./product.association.js";
 
-User.belongsTo(Cart, { foreignKey: 'userId' });
-Cart.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(Cart, { foreignKey: 'ref_user_id' });
+Cart.belongsTo(User, { foreignKey: 'ref_user_id' });
 
-Cart.hasMany(CartItem, { foreignKey: 'cartId' });
-CartItem.belongsTo(Cart, { foreignKey: 'cartId' });
+Cart.hasMany(CartItem, { foreignKey: 'ref_cart_id' });
+CartItem.belongsTo(Cart, { foreignKey: 'ref_cart_id' });
 
-CartItem.belongsTo(ProductVariant, { foreignKey: 'productId'} );
-ProductVariant.belongsTo(CartItem, { foreignKey: 'productId'} );
+CartItem.belongsTo(ProductVariant, { foreignKey: 'ref_product_variant_id'} );
+ProductVariant.hasMany(CartItem, { foreignKey: 'ref_product_variant_id'} );
 
 export { User, Cart, CartItem, ProductVariant }

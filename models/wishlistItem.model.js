@@ -2,16 +2,16 @@ import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 import { v4 as uuidv4 } from 'uuid';
 
-const TransactionDetail = sequelize.define('transaction_details', {
-  transactionDetailId: {
-    field: "transaction_detail_id",
+const WishlistItem = sequelize.define('wishlist_items', {
+  wishlistItemId: {
+    field: "wishlist_item_id",
     type: DataTypes.UUID,
     defaultValue: () => uuidv4(), 
     primaryKey: true,
     allowNull: false
   },
-  transactionId: {
-    field: "ref_transaction_id",
+  wishlistId: {
+    field: "ref_wishlist_id",
     type: DataTypes.UUID,
     primaryKey: false
   },
@@ -19,13 +19,7 @@ const TransactionDetail = sequelize.define('transaction_details', {
     field: "ref_product_variant_id",
     type: DataTypes.UUID,
     primaryKey: false
-  },
-  quantity: {
-    field: "quantity",
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    length: 100
   }
-})
+});
 
-export default TransactionDetail;
+export default WishlistItem;

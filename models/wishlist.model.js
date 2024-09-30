@@ -2,19 +2,19 @@ import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 import { v4 as uuidv4 } from 'uuid';
 
-
-const Cart = sequelize.define('carts', {
-  cartId: {
-    field: "cart_id",
+const Wishlist = sequelize.define('wishlists', {
+  wishlistId: {
+    field: "wishlist_id",
     type: DataTypes.UUID,
-    defaultValue: uuidv4(), 
+    defaultValue: () => uuidv4(), 
     primaryKey: true,
     allowNull: false
   },
   userId: {
     field: "ref_user_id",
-    type: DataTypes.UUID
+    type: DataTypes.UUID,
+    primaryKey: false
   }
 })
 
-export default Cart;
+export default Wishlist;
