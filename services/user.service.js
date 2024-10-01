@@ -1,6 +1,7 @@
 import { hashPassword, matchPassword } from '../utils/utility.js';
 import jwt from 'jsonwebtoken'
 import { UserModel } from '../association/association.js';
+import { createCart } from './cart.service.js';
 
 
 export const getUsersService = async () => {
@@ -25,8 +26,9 @@ export const registerUserService = async (username, email, password) => {
 
   // const hashedPassword = await hashPassword(password);
   const user = await UserModel.create({ username, email, password: password, role: 'user' });
+  const cart = await createCart(user.userId);
   
-  return user;
+  return {user, cart};
 };
 
 export const loginUserService = async (email, password) => {

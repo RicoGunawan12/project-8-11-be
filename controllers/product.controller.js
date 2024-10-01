@@ -23,7 +23,7 @@ export const getProductById = async (req, res) => {
 }
 
 export const createProduct = async (req, res) => {
-    // try {
+    try {
         const images = req.files['productImage'];
         
         const { productName, productDescription, productCategoryName, productVariants } = req.body;
@@ -42,7 +42,7 @@ export const createProduct = async (req, res) => {
         await Promise.all(variantPromises);
         
         return res.status(200).json({ message: "New product added!", product });
-    // } catch (error) {
-    //     return res.status(500).json({ message: error.message });
-    // }
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
 }
