@@ -1,8 +1,15 @@
+import { Op } from "sequelize";
 import { ProductCategoryModel } from "../association/association.js";
 
 
-export const getCategoriesService = async () => {
-    const categories = await ProductCategoryModel.findAll();
+export const getCategoriesService = async (search) => {
+    const categories = await ProductCategoryModel.findAll({
+        where: {
+            productCategoryName: {
+                [Op.like]: `%${search}%`
+            }
+        }
+    });
     return categories;
 }
 

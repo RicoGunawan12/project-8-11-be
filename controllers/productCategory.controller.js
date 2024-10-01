@@ -2,7 +2,8 @@ import { createCategoryService, getCategoriesService } from "../services/product
 
 
 export const getCategories = async (req, res) => {
-    const categories = await getCategoriesService();
+    const { search } = req.query
+    const categories = await getCategoriesService(search);
     return res.status(200).json(categories)
 }
 
