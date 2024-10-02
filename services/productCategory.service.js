@@ -29,3 +29,33 @@ export const getCategoryByName = async (productCategoryName) => {
     }
     return categoryByName;
 }
+
+export const deleteCategoryService = async (productCategoryId) => {
+    try {
+        const category = await ProductCategoryModel.destroy({
+            where: {
+                productCategoryId: productCategoryId
+            }
+        })
+    
+        if (category === 0) {
+            throw new Error('Category not found');
+        }
+        
+    } catch (error) {
+        throw new Error(`Error deleting category: ${error.message}`);
+    }
+}
+
+export const updateCategoryService = async (productCategoryId, productCategoryName) => {
+    const category = ProductCategoryModel.findOne({ productCategoryId });
+    if (!category) {
+        throw new Error(`Category not found!`);
+    }
+    await ProductCategoryModel.update(
+        { productCategoryName: productCategoryName }, 
+        { where: { productCategoryId: productCategoryId } }
+    );
+
+    return { message: 'Category updated successfully' };
+}

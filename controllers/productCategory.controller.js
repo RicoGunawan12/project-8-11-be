@@ -1,4 +1,4 @@
-import { createCategoryService, getCategoriesService } from "../services/productCategory.service.js";
+import { createCategoryService, deleteCategoryService, getCategoriesService, updateCategoryService } from "../services/productCategory.service.js";
 
 
 export const getCategories = async (req, res) => {
@@ -21,4 +21,38 @@ export const createCategory = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 
+}
+
+export const deleteCategory = async (req, res) => {
+    const categoryId = req.params.id;
+    if (!categoryId) {
+        return res.status(400).json({ message: "Category Id must be filled" });
+    }
+
+    try {
+        await deleteCategoryService(categoryId);
+        return res.status(200).json({ message: "Category deleted!" });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const updateCategory = async (req, res) => {
+    const categoryId = req.params.id;
+    const { productCategoryName } = req.body;
+
+    if (!categoryId) {
+        return res.status(400).json({ message: "Category Id must be filled" });
+    }
+    else if (productCategoryName.length < 1) {
+        return res.status(400).json({ message: "Category name must be filled" })
+    }
+    
+
+    try {
+        const message = await updateCategoryService(categoryId, productCategoryName);
+        return res.status(200).json(message);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });   
+    }
 }
