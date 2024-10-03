@@ -4,6 +4,7 @@ import userRoute from './routes/user.route.js';
 import sequelize from './config/database.js';
 import ProductCategoryRoute from './routes/productCategory.route.js';
 import ProductRoute from './routes/product.route.js';
+import CartRoute from './routes/cart.route.js';
 import cors from 'cors'
 import morgan from 'morgan';
 import fs from 'fs'
@@ -26,6 +27,7 @@ app.use('/assets', express.static(path.join(__dirname, '/assets')));
 app.use('/api/users', userRoute);
 app.use('/api/categories', ProductCategoryRoute);
 app.use('/api/products', ProductRoute);
+app.use('/api/carts', CartRoute);
 
 
 (async () => {
