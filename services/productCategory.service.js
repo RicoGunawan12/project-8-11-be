@@ -37,23 +37,30 @@ export const deleteCategoryService = async (productCategoryId) => {
                 productCategoryId: productCategoryId
             }
         })
-    
+
         if (category === 0) {
             throw new Error('Category not found');
         }
-        
+
     } catch (error) {
         throw new Error(`Error deleting category: ${error.message}`);
     }
 }
+
 
 export const updateCategoryService = async (productCategoryId, productCategoryName) => {
     const category = ProductCategoryModel.findOne({ productCategoryId });
     if (!category) {
         throw new Error(`Category not found!`);
     }
+
+    const existingCategory = await ProductCategoryModel.findOne({ where: { productCategoryName } });
+    if (existingCategory) {
+        throw new Error('Product category already exists');
+    }
+
     await ProductCategoryModel.update(
-        { productCategoryName: productCategoryName }, 
+        { productCategoryName: productCategoryName },
         { where: { productCategoryId: productCategoryId } }
     );
 
