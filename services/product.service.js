@@ -1,4 +1,3 @@
-
 import { ProductModel, ProductCategoryModel, ProductVariantModel } from "../association/association.js";
 import { getCategoryByName } from "./productCategory.service.js";
 
@@ -52,4 +51,9 @@ export const createProductService = async (productName, productDescription, prod
     
     const product = await ProductModel.create({ productName, productDescription, productCategoryId });
     return product;
+}
+
+export const deleteProductService = async (productId) => {
+    const deletedProduct = await ProductModel.destroy({ where: { productId: productId }});
+    return deletedProduct;
 }

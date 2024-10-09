@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProduct, getProductById, getProducts } from '../controllers/product.controller.js';
+import { createProduct, deleteProduct, getProductById, getProducts } from '../controllers/product.controller.js';
 import { userMiddleware, adminMiddleware } from '../middleware/auth.middleware.js';
 import { upload } from '../utils/uploader.js';
 
@@ -15,6 +15,8 @@ ProductRoute.post('/',
     ]), 
     createProduct
 );
+
+ProductRoute.delete('/:id', adminMiddleware, deleteProduct);
 
 
 
