@@ -28,7 +28,7 @@ const ProductVariant = sequelize.define('product_variants', {
   productImage: {
     field: "product_image",
     type: DataTypes.TEXT,
-    allowNull: false
+    allowNull: true
   },
   productPrice: {
     field: "product_price",
@@ -41,7 +41,13 @@ const ProductVariant = sequelize.define('product_variants', {
     allowNull: false
   },
 },{
-  timestamps: false
+  timestamps: false,
+  indexes: [
+    {
+      unique: true,
+      fields: ['product_variant_id', 'ref_product_id']
+    }
+  ]
 })
 
 export default ProductVariant;

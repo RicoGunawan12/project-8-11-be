@@ -1,6 +1,6 @@
 
 import { Cart, CartItem } from "./cart.association.js";
-import { Product, ProductCategory, Promo } from "./product.association.js";
+import { ColorVariant, Product, ProductCategory, Promo } from "./product.association.js";
 import { PaymentMethod, ProductVariant, TransactionDetail, TransactionHeader, User, Voucher, VoucherType, Wishlist, WishlistItem } from "./transaction.association.js"
 
 const PaymentMethodModel = PaymentMethod;
@@ -21,6 +21,8 @@ const CartItemModel = CartItem
 const WishlistModel = Wishlist
 const WishlistItemModel = WishlistItem
 
+const ColorVariantModel = ColorVariant;
+
 export { 
     PaymentMethodModel, 
     TransactionDetailModel, 
@@ -35,5 +37,6 @@ export {
     CartModel, 
     CartItemModel,
     WishlistModel,
-    WishlistItemModel
+    WishlistItemModel,
+    ColorVariantModel
 };

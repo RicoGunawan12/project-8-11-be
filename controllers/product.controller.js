@@ -1,4 +1,5 @@
 import { createProductService, deleteProductService, getProductByIdService, getProductsService } from "../services/product.service.js";
+import { createProductColorService } from "../services/productColor.service.js";
 import { createProductVariantService } from "../services/productVariantService.js";
 import { BASE_URL, UPLOAD_FOLDER } from "../utils/uploader.js";
 
@@ -34,12 +35,25 @@ export const createProduct = async (req, res) => {
         }
 
         const product = await createProductService(productName, productDescription, productCategoryName);
-        const variantPromises = variants.map(async (variant, index) => {
-            // put variant.product_image to ../assets/[date] - [name] and get the path
-            variant.productImage = `/${UPLOAD_FOLDER}${images[index].filename}`;
-            await createProductVariantService(product.productId, variant);
-        });
-        await Promise.all(variantPromises);
+        if (variants.length > 0) {
+            const variantPromises = variants.map(async (variant, index) => {
+                // put variant.product_image to ../assets/[date] - [name] and get the path
+                if (variant.productColors.length === 0) {
+                    variant.productImage = `/${UPLOAD_FOLDER}${images[index].filename}`;
+                }
+                const productVariant = await createProductVariantService(product.productId, variant);
+                
+                const colors = variant.productColors;
+                if (colors.length > 0) {
+                    const colorPromises = colors.map(async (color, index) => {
+                        color.productImage = `/${UPLOAD_FOLDER}${images[index].filename}`;
+                        const productColor = await createProductColorService(productVariant.productVariantId, color);
+                    })
+                    await Promise.all(colorPromises);
+                }
+            });
+            await Promise.all(variantPromises);
+        }
         
         return res.status(200).json({ message: "New product added!", product });
     } catch (error) {
