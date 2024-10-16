@@ -34,23 +34,36 @@ export const createProduct = async (req, res) => {
             return res.status(400).json({ message: "Product name must be filled" })
         }
 
+        var idx = 0;
+        variants.forEach(variant => {
+            if (variant.productColors.length === 0) {
+                variant.productImage = `/${UPLOAD_FOLDER}${productName}/${images[idx].filename}`
+                idx++;
+            }
+            else {
+                variant.productColors.forEach(color => {
+                    color.productImage = `/${UPLOAD_FOLDER}${productName}/${images[idx].filename}`
+                    idx++;
+                })
+            }
+        })
+
         const product = await createProductService(productName, productDescription, productCategoryName);
         if (variants.length > 0) {
-            const variantPromises = variants.map(async (variant, index) => {
+            const variantPromises = variants.map(async (variant) => {
                 // put variant.product_image to ../assets/[date] - [name] and get the path
-                if (variant.productColors.length === 0) {
-                    variant.productImage = `/${UPLOAD_FOLDER}${images[index].filename}`;
-                }
+                console.log(variant);
                 const productVariant = await createProductVariantService(product.productId, variant);
                 
                 const colors = variant.productColors;
                 if (colors.length > 0) {
-                    const colorPromises = colors.map(async (color, index) => {
-                        color.productImage = `/${UPLOAD_FOLDER}${images[index].filename}`;
+                    const colorPromises = colors.map(async (color) => {
                         const productColor = await createProductColorService(productVariant.productVariantId, color);
                     })
                     await Promise.all(colorPromises);
                 }
+                console.log(images);
+                
             });
             await Promise.all(variantPromises);
         }
@@ -60,6 +73,8 @@ export const createProduct = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
+
 
 export const deleteProduct = async (req, res) => {
     const id = req.params.id;

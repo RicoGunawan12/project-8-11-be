@@ -46,6 +46,13 @@ export const createProductService = async (productName, productDescription, prod
     if (!category) {
         throw new Error("There is no " + productCategoryName + " category");
     }
+    const insertedProduct = await ProductModel.findOne({
+        where: { productName }, 
+    });
+
+    if (insertedProduct) {
+        throw new Error("Product name already exists");
+    }
     
     const productCategoryId = category.productCategoryId;
     

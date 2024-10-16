@@ -1,6 +1,7 @@
 import PaymentMethod from "../models/paymentMethod.model.js";
 import TransactionDetail from "../models/transactionDetail.model.js";
 import TransactionHeader from "../models/transactionHeader.model.js";
+import UserAddress from "../models/userAddress.model.js";
 import Voucher from "../models/voucher.model.js";
 import VoucherType from "../models/voucherType.model.js";
 import Wishlist from "../models/wishlist.model.js";
@@ -16,6 +17,9 @@ TransactionDetail.belongsTo(TransactionHeader, { foreignKey: 'ref_transaction_id
 
 User.hasMany(TransactionHeader, { foreignKey: 'ref_user_id' });
 TransactionHeader.belongsTo(User, { foreignKey: 'ref_user_id' });
+
+User.hasMany(UserAddress, { foreignKey: "ref_user_id" });
+UserAddress.belongsTo(User, { foreignKey: "ref_user_id" });
 
 Wishlist.belongsTo(User, { foreignKey: 'ref_user_id' });
 User.belongsTo(Wishlist, { foreignKey: 'ref_user_id' });

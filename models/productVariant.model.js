@@ -32,7 +32,12 @@ const ProductVariant = sequelize.define('product_variants', {
   },
   productPrice: {
     field: "product_price",
-    type: DataTypes.DECIMAL,
+    type: DataTypes.FLOAT,
+    allowNull: false
+  },
+  productWeight: {
+    field: "product_weight",
+    type: DataTypes.FLOAT,
     allowNull: false
   },
   productStock: {
@@ -40,6 +45,12 @@ const ProductVariant = sequelize.define('product_variants', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
+  productPromo: {
+    field: "product_promo",
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
+  }
 },{
   timestamps: false,
   indexes: [

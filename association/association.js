@@ -1,4 +1,5 @@
 
+import UserAddress from "../models/userAddress.model.js";
 import { Cart, CartItem } from "./cart.association.js";
 import { ColorVariant, Product, ProductCategory, Promo } from "./product.association.js";
 import { PaymentMethod, ProductVariant, TransactionDetail, TransactionHeader, User, Voucher, VoucherType, Wishlist, WishlistItem } from "./transaction.association.js"
@@ -7,6 +8,7 @@ const PaymentMethodModel = PaymentMethod;
 const TransactionDetailModel = TransactionDetail
 const TransactionHeaderModel = TransactionHeader
 const UserModel = User
+const UserAddressModel = UserAddress;
 const ProductVariantModel = ProductVariant
 const VoucherModel = Voucher
 const VoucherTypeModel = VoucherType
@@ -28,6 +30,7 @@ export {
     TransactionDetailModel, 
     TransactionHeaderModel, 
     UserModel, 
+    UserAddressModel,
     ProductVariantModel, 
     VoucherModel, 
     VoucherTypeModel, 

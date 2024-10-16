@@ -10,6 +10,7 @@ import morgan from 'morgan';
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url';
+import AddressRoute from './routes/address.route.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,6 +29,7 @@ app.use('/api/users', userRoute);
 app.use('/api/categories', ProductCategoryRoute);
 app.use('/api/products', ProductRoute);
 app.use('/api/carts', CartRoute);
+app.use('/api/addresses', AddressRoute);
 
 
 (async () => {
