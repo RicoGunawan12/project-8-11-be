@@ -50,6 +50,11 @@ const ProductVariant = sequelize.define('product_variants', {
     type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 0
+  },
+  productPromoExpiry: {
+    field: "product_promo_expiry",
+    type: DataTypes.DATE,
+    allowNull: true
   }
 },{
   timestamps: false,

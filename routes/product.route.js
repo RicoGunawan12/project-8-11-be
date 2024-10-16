@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProduct, deleteProduct, getProductById, getProducts } from '../controllers/product.controller.js';
+import { createProduct, deleteProduct, getProductById, getProducts, updatePromo } from '../controllers/product.controller.js';
 import { userMiddleware, adminMiddleware } from '../middleware/auth.middleware.js';
 import { upload } from '../utils/uploader.js';
 
@@ -17,7 +17,7 @@ ProductRoute.post('/',
 );
 
 ProductRoute.delete('/:id', adminMiddleware, deleteProduct);
-
+ProductRoute.put('/promo/:id', adminMiddleware, updatePromo)
 
 
 export default ProductRoute;

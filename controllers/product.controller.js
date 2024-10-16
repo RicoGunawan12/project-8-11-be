@@ -1,6 +1,6 @@
 import { createProductService, deleteProductService, getProductByIdService, getProductsService } from "../services/product.service.js";
 import { createProductColorService } from "../services/productColor.service.js";
-import { createProductVariantService } from "../services/productVariantService.js";
+import { createProductVariantService, updatePromoService } from "../services/productVariantService.js";
 import { BASE_URL, UPLOAD_FOLDER } from "../utils/uploader.js";
 
 export const getProducts = async (req, res) => {
@@ -89,4 +89,29 @@ export const deleteProduct = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
+}
+
+export const updatePromo = async (req, res) => {
+    const id = req.params.id;
+    const { productPromo, productPromoExpiry } = req.body
+    console.log(productPromo, productPromoExpiry);
+    if (!id) {
+        return res.status(400).json({ message: "Id is required" })
+    }
+
+    if (productPromo < 0) {
+        return res.status(400).json({ message: "Product promo cannot be minus" });
+    }
+    else if (new Date(productPromoExpiry).getTime() - new Date().getTime() < 24 * 60 * 60 * 1000) {
+        return res.status(400).json({ message: "Product promo expiry must tommorow or more" });
+    }
+
+    try {
+        const updatedProduct = await updatePromoService(id, productPromo, productPromoExpiry);
+        console.log(updatedProduct);
+        return res.status(200).json({ message: "Promo updated!" })
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+    
 }
