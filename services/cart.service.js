@@ -50,3 +50,7 @@ export const addCartItemService = async (userId, productVariantId, quantity) => 
 
     return cartItem;
 }
+
+export const removeCartItemService = async (userId, productVariantId) => {
+    
+}
