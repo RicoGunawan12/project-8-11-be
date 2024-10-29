@@ -1,5 +1,4 @@
 import { ProductModel, ProductCategoryModel, ProductVariantModel } from "../association/association.js";
-import ColorVariant from "../models/colorVariant.model.js";
 import { getCategoryByName } from "./productCategory.service.js";
 
 
@@ -14,9 +13,6 @@ export const getProductsService = async () => {
             {
                 model: ProductVariantModel,
                 attributes: ['productVariantId', 'sku', 'productPrice', 'productStock', 'productImage'],
-                include: {
-                    model: ColorVariant,
-                }
             },
             
         ]

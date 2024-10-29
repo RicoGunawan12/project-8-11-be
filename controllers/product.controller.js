@@ -1,5 +1,4 @@
 import { createProductService, deleteProductService, getProductByIdService, getProductsService } from "../services/product.service.js";
-import { createProductColorService } from "../services/productColor.service.js";
 import { createProductVariantService, updatePromoService } from "../services/productVariantService.js";
 import { BASE_URL, UPLOAD_FOLDER } from "../utils/uploader.js";
 
@@ -32,40 +31,6 @@ export const createProduct = async (req, res) => {
 
         if (productName.length < 1) {
             return res.status(400).json({ message: "Product name must be filled" })
-        }
-
-        var idx = 0;
-        variants.forEach(variant => {
-            if (variant.productColors.length === 0) {
-                variant.productImage = `/${UPLOAD_FOLDER}${productName}/${images[idx].filename}`
-                idx++;
-            }
-            else {
-                variant.productColors.forEach(color => {
-                    color.productImage = `/${UPLOAD_FOLDER}${productName}/${images[idx].filename}`
-                    idx++;
-                })
-            }
-        })
-
-        const product = await createProductService(productName, productDescription, productCategoryName);
-        if (variants.length > 0) {
-            const variantPromises = variants.map(async (variant) => {
-                // put variant.product_image to ../assets/[date] - [name] and get the path
-                console.log(variant);
-                const productVariant = await createProductVariantService(product.productId, variant);
-                
-                const colors = variant.productColors;
-                if (colors.length > 0) {
-                    const colorPromises = colors.map(async (color) => {
-                        const productColor = await createProductColorService(productVariant.productVariantId, color);
-                    })
-                    await Promise.all(colorPromises);
-                }
-                console.log(images);
-                
-            });
-            await Promise.all(variantPromises);
         }
         
         return res.status(200).json({ message: "New product added!", product });

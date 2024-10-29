@@ -25,6 +25,11 @@ const Product = sequelize.define('products', {
     type: DataTypes.STRING,
     allowNull: true,
     length: 255
+  },
+  defaultImage:  {
+    field: "default_image",
+    type: DataTypes.STRING,
+    allowNull: true,
   }
 },{
   timestamps: false

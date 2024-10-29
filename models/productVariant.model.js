@@ -13,6 +13,16 @@ const ProductVariant = sequelize.define('product_variants', {
     field: "ref_product_id",
     type: DataTypes.UUID
   },
+  productColor: {
+    field: "product_color",
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  productSize: {
+    field: "product_size",
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   sku: {
     field: "sku",
     type: DataTypes.STRING,
@@ -61,7 +71,7 @@ const ProductVariant = sequelize.define('product_variants', {
   indexes: [
     {
       unique: true,
-      fields: ['product_variant_id', 'ref_product_id']
+      fields: ['ref_product_id', 'product_color', 'product_size']
     }
   ]
 })
