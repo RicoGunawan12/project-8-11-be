@@ -1,7 +1,8 @@
-#### Get all books
+#### User Route
 
 ```http
-/api/user/login
+POST\n
+/api/users/login
 ```
 
 | Body      | Type     | Description                       |
@@ -15,6 +16,31 @@ Return Ex:
 
 
 [
-  Message: "Login Success!",
+  Message: "Login Success!",\n
   Token
 ]
+
+
+```http
+GET\n
+/api/users
+```
+User: {\n
+  userId,\n
+  username,\n
+  email,\n
+  password,\n
+  role\n
+}
+
+Return all Users
+
+Return Ex:
+
+
+[
+  User1,\n
+  User2,\n
+  ...
+]
+
