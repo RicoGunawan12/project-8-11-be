@@ -24,7 +24,7 @@ const TransactionDetail = sequelize.define('transaction_details', {
     type: DataTypes.INTEGER,
     allowNull: false,
     length: 100
-  }
+  },
 },{
   timestamps: false
 })

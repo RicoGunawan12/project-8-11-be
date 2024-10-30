@@ -25,13 +25,36 @@ export const getProductById = async (req, res) => {
 export const createProduct = async (req, res) => {
     try {
         const images = req.files['productImage'];
-        
         const { productName, productDescription, productCategoryName, productVariants } = req.body;
-        const variants = JSON.parse(productVariants);
-
+        
+        const hash = new Map();
+        images.forEach((image) => {
+            console.log("img: " + image.originalname.substring(0, image.originalname.length - 4));
+            
+            hash.set(image.originalname.substring(0, image.originalname.length - 4), `/${UPLOAD_FOLDER}${productName}/${image.filename}`);
+        });
+        
+        
         if (productName.length < 1) {
             return res.status(400).json({ message: "Product name must be filled" })
         }
+
+        const variants = JSON.parse(productVariants);
+        variants.forEach((variant) => {
+            console.log(productName + " - " + variant.productSize + " - " + variant.productColor);
+            
+            console.log("hash: " + hash.get(productName + " - " + variant.productSize + " - " + variant.productColor));
+            
+            variant.productImage = hash.get(productName + " - " + variant.productSize + " - " + variant.productColor);
+        });
+
+        const product = await createProductService(productName, productDescription, productCategoryName);
+        const insertVariantPromise = variants.map(async (variant) => {
+            console.log("product id: " + product.productId);
+            
+            await createProductVariantService(product.productId, variant);
+        })
+        await Promise.all(insertVariantPromise);
         
         return res.status(200).json({ message: "New product added!", product });
     } catch (error) {

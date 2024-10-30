@@ -29,12 +29,6 @@ const ProductVariant = sequelize.define('product_variants', {
     length: 100,
     allowNull: false
   },
-  productVariantName: {
-    field: "product_variant_name",
-    type: DataTypes.STRING,
-    allowNull: true,
-    length: 100
-  },
   productImage: {
     field: "product_image",
     type: DataTypes.TEXT,
