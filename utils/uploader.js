@@ -24,3 +24,20 @@ const storage = multer.diskStorage({
 });
 
 export const upload = multer({ storage: storage });
+
+
+export const deleteDirectory = (productName) => {
+  const dirPath = path.join(__dirname, "../", UPLOAD_FOLDER + productName);
+
+  console.log(dirPath);
+  
+
+  fs.rm(dirPath, { recursive: true, force: true }, (err) => {
+      if (err) {
+          console.error("Error deleting directory:", err);
+          return { success: false, message: "Directory not found or error deleting directory" };
+      }
+      console.log("Directory deleted successfully");
+      return { success: true, message: "Directory deleted successfully" };
+  });
+};

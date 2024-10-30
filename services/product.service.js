@@ -1,4 +1,5 @@
 import { ProductModel, ProductCategoryModel, ProductVariantModel } from "../association/association.js";
+import { deleteDirectory } from "../utils/uploader.js";
 import { getCategoryByName } from "./productCategory.service.js";
 
 
@@ -62,6 +63,9 @@ export const createProductService = async (productName, productDescription, prod
 }
 
 export const deleteProductService = async (productId) => {
+    const product = await ProductModel.findOne({ where: { productId }});
+    deleteDirectory(product.productName);
+
     const deletedProduct = await ProductModel.destroy({ where: { productId: productId }});
     return deletedProduct;
 }
