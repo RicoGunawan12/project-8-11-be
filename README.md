@@ -6,10 +6,10 @@
 
 | Body      | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
-| `email`      | `usize` | **Required**.|
-| `password`      | `usize` | **Required**.|
+| `email`      | `string` | **Required**.|
+| `password`      | `string` | **Required**.|
 
-Return array of books
+Return message and token
 
 Return Ex:
 
