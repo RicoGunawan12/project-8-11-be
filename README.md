@@ -1,7 +1,7 @@
 ## User Route
 
 
-#### Register User (POST)
+### Register User (POST)
 ```http
 /api/users/register
 ```
@@ -23,7 +23,7 @@ Return Ex:
 
 
 
-#### Login User (POST)
+### Login User (POST)
 ```http
 /api/users/login
 ```
@@ -43,7 +43,7 @@ Return Ex:
 ]
 
 
-#### Get All User (GET)
+### Get All User (GET)
 ```http
 /api/users
 ```
@@ -67,7 +67,7 @@ Return Ex:
 
 
 
-#### Get User By Id (GET)
+### Get User By Id (GET)
 ```http
 /api/users/:id
 ```
@@ -96,7 +96,7 @@ Return Ex:
 
 ## Product Category Route
 
-#### Create Category (POST)
+### Create Category (POST)
 ```http
 /api/categories
 ```
@@ -118,7 +118,7 @@ Return Ex:
 ]
 
 
-#### Get All Category (GET)
+### Get All Category (GET)
 ```http
 /api/categories
 ```
@@ -139,7 +139,7 @@ Return Ex:
 ]
 
 
-#### Update Category (PUT)
+### Update Category (PUT)
 ```http
 /api/categories/:id
 ```
@@ -165,7 +165,7 @@ Return Ex:
 ]
 
 
-#### Delete Category (DELETE)
+### Delete Category (DELETE)
 ```http
 /api/categories/:id
 ```
@@ -184,4 +184,99 @@ Return Ex:
 
 [
   message
+]
+
+## Product Route
+
+
+### Create Product (POST)
+```http
+/api/products
+```
+
+#### Request Body (Get Request Body Using Form Data)
+| Body      | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `productName`      | `string` | **Required**.|
+| `productDescription`      | `string` | **Optional**.|
+| `productCategoryName`      | `string` | **Required**.|
+| `productVariants`      | `array of Variant` | **Required**. Parse the json to string and insert to form data|
+| `productImage`      | `array of image files` | **Required**. Change the product image name to `productName - productSize - productColor`|
+
+
+#### Variant Model
+
+| Body      | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `productColor`      | `string` | **Optional**.|
+| `productSize`      | `string` | **Optional**.|
+| `sku`      | `string` | **Optional**.|
+| `productPrice`      | `float` | **Required**.|
+| `productWeight`      | `float` | **Required**.|
+| `productStock`      | `int` | **Required**.|
+
+#### Authorization
+| Auth           | Type     | Description                       |
+| :------------- | :------- | :-------------------------------- |
+| `Bearer Token` | `string` | **Required**.|
+
+
+
+Request Body Example:
+
+{
+
+    productName: "test",
+    productDescription: "",
+    productCategoryName: "test",
+    productVariants: [
+
+        {
+            productColor: "Red",
+            productSize: "Big",
+            productPrice: 5.5,
+            productWeight: 1.2,
+            productStock: 23
+        },
+        {
+            productColor: "White",
+            productSize: "Big",
+            productPrice: 5.5,
+            productWeight: 1.2,
+            productStock: 23
+        },
+        {
+            productColor: "Red",
+            productSize: "Small",
+            productPrice: 5.5,
+            productWeight: 1.2,
+            productStock: 23
+        }{
+            productColor: "White",
+            productSize: "Small",
+            productPrice: 5.5,
+            productWeight: 1.2,
+            productStock: 23
+        }
+    
+    ]
+    
+}
+
+
+Return success message and Product
+
+Return Ex:
+
+[
+
+    message,
+    product: {
+  
+        productName,
+        productDescription,
+        productCategoryName
+    
+    }
+  
 ]
