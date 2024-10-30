@@ -1,7 +1,7 @@
 #### User Route
 
+POST
 ```http
-POST\n
 /api/users/login
 ```
 
@@ -14,33 +14,31 @@ Return message and token
 
 Return Ex:
 
-
 [
-  Message: "Login Success!",\n
+  Message: "Login Success!",
   Token
 ]
 
 
+GET
 ```http
-GET\n
 /api/users
 ```
-User: {\n
-  userId,\n
-  username,\n
-  email,\n
-  password,\n
-  role\n
+User: {
+  userId,
+  username,
+  email,
+  password,
+  role
 }
 
 Return all Users
 
 Return Ex:
 
-
 [
-  User1,\n
-  User2,\n
+  User1,
+  User2,
   ...
 ]
 
