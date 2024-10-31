@@ -1,4 +1,4 @@
-import { addCartItemService, getCartItemsByUserService, removeCartItemService } from "../services/cart.service.js";
+import { addCartItemService, getCartItemsByUserService, removeCartItemService, updateCartItemService } from "../services/cart.service.js";
 
 
 export const getCartItemsByUser = async (req, res) => {
@@ -30,6 +30,18 @@ export const removeCartItem = async (req, res) => {
     try {
         const removeCartItem = await removeCartItemService(cartItemId);
         res.status(200).json({ message: "Product removed from the cart!" });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const updateCartItem = async (req, res) => {
+    const cartItemId = req.params.id;
+    const { quantity } = req.body;
+
+    try {
+        const updatedCartItem = await updateCartItemService(cartItemId, quantity);
+        res.status(200).json({ message: "Product updated from the cart!" });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

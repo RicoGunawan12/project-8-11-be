@@ -1,4 +1,5 @@
 import { CartItemModel, CartModel, ProductVariantModel } from "../association/association.js"
+import ProductVariant from "../models/productVariant.model.js";
 
 
 export const createCart = async (userId) => {
@@ -26,7 +27,7 @@ export const getCartItemsByUserService = async (userId) => {
                 model: ProductVariantModel
             }
         ],
-        attributes: ['cartItemId', 'productVariantId']
+        attributes: ['cartItemId', 'productVariantId', 'quantity']
     });
     return cartItem;
 }
@@ -73,4 +74,25 @@ export const removeCartItemService = async (cartItemId) => {
         where: { cartItemId }
     })
     return removedCartItem;
+}
+
+export const updateCartItemService = async (cartItemId, quantity) => {
+
+    const getProductVariant = await CartItemModel.findOne({
+        where: { cartItemId },
+        include: {
+            model: ProductVariantModel
+        }
+    })
+    console.log(getProductVariant);
+
+    if (getProductVariant.product_variant.productStock < quantity) {
+        throw new Error("There are only " + getProductVariant.product_variant.productStock + " stock");
+    }
+
+    const updateCartItem = await CartItemModel.update(
+        { quantity: quantity },
+        { where: { cartItemId }
+    })
+    return updateCartItem;
 }
