@@ -107,7 +107,7 @@ Return Ex:
 
 | Auth           | Type     | Description                       |
 | :------------- | :------- | :-------------------------------- |
-| `Bearer Token` | `string` | **Required**.|
+| `Bearer Token` | `string` | **Required**. Admin token |
 
 Return success message
 
@@ -154,7 +154,7 @@ Return Ex:
 
 | Auth           | Type     | Description                       |
 | :------------- | :------- | :-------------------------------- |
-| `Bearer Token` | `string` | **Required**.|
+| `Bearer Token` | `string` | **Required**. Admin token |
 
 Return success message
 
@@ -176,7 +176,7 @@ Return Ex:
 
 | Auth           | Type     | Description                       |
 | :------------- | :------- | :-------------------------------- |
-| `Bearer Token` | `string` | **Required**.|
+| `Bearer Token` | `string` | **Required**. Admin token |
 
 Return success message
 
@@ -218,7 +218,7 @@ Return Ex:
 #### Authorization
 | Auth           | Type     | Description                       |
 | :------------- | :------- | :-------------------------------- |
-| `Bearer Token` | `string` | **Required**.|
+| `Bearer Token` | `string` | **Required**. Admin token |
 
 
 
@@ -391,7 +391,7 @@ Return Ex:
 
 | Auth           | Type     | Description                       |
 | :------------- | :------- | :-------------------------------- |
-| `Bearer Token` | `string` | **Required**.|
+| `Bearer Token` | `string` | **Required**. Admin token |
 
 Return success message and deleted product
 
@@ -427,7 +427,7 @@ Return Ex:
 
 | Auth           | Type     | Description                       |
 | :------------- | :------- | :-------------------------------- |
-| `Bearer Token` | `string` | **Required**.|
+| `Bearer Token` | `string` | **Required**. User token |
 
 Return success message and deleted product
 
@@ -456,7 +456,7 @@ Return Ex:
 
 | Auth           | Type     | Description                       |
 | :------------- | :------- | :-------------------------------- |
-| `Bearer Token` | `string` | **Required**.|
+| `Bearer Token` | `string` | **Required**. User token |
 
 Return all the cart item in user (get user from the bearer token)
 
@@ -488,7 +488,7 @@ Return Ex:
 
 
 
-### Delete Product (DELETE)
+### Remove Product from Cart (DELETE)
 ```http
 /api/carts/:id
 ```
@@ -499,7 +499,7 @@ Return Ex:
 
 | Auth           | Type     | Description                       |
 | :------------- | :------- | :-------------------------------- |
-| `Bearer Token` | `string` | **Required**.|
+| `Bearer Token` | `string` | **Required**. User token |
 
 Return success message
 
@@ -516,5 +516,81 @@ Return Ex:
         "productDescription": "",
     
     }
+  
+]
+
+
+### Update Product in Cart (PUT)
+```http
+/api/carts/:id
+```
+
+| Parameter      | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id`      | `string` | **Required**. Cart item Id|
+
+
+| Body      | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `quantity`      | `int` | **Required**.|
+
+| Auth           | Type     | Description                       |
+| :------------- | :------- | :-------------------------------- |
+| `Bearer Token` | `string` | **Required**. User token |
+
+Return success message
+
+Return Ex:
+
+[
+  
+    message
+  
+]
+
+
+
+
+## Transaction Route
+
+
+### Get All Transactions (GET)
+```http
+/api/transactions
+```
+
+| Auth           | Type     | Description                       |
+| :------------- | :------- | :-------------------------------- |
+| `Bearer Token` | `string` | **Required**. Admin token |
+
+Return success message
+
+Return Ex:
+
+[
+  
+    message,
+    transactions
+  
+]
+
+
+### Get Transactions By User (GET)
+```http
+/api/transactions/user
+```
+
+| Auth           | Type     | Description                       |
+| :------------- | :------- | :-------------------------------- |
+| `Bearer Token` | `string` | **Required**. User token |
+
+Return success message
+
+Return Ex:
+
+[
+  
+    message,
+    transactions
   
 ]
