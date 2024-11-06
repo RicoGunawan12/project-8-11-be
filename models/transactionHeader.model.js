@@ -14,20 +14,26 @@ const TransactionHeader = sequelize.define('transaction_headers', {
     type: DataTypes.UUID,
     primaryKey: false
   },
-  paymentMethodId: {
-    field: "ref_payment_method_id",
+  addressId: {
+    field: "ref_address_id",
     type: DataTypes.UUID,
     primaryKey: false
   },
   voucherId: {
     field: "ref_voucher_id",
     type: DataTypes.UUID,
-    primaryKey: false
+    primaryKey: false,
+    allowNull: true
   },
   transactionDate: {
     field: "transaction_date",
     type: DataTypes.DATE,
     allowNull: false
+  },
+  paymentMethod: {
+    field: "payment_method",
+    type: DataTypes.STRING,
+    primaryKey: false
   },
   gatewayResponse: {
     field: "gateway_response",
@@ -40,6 +46,11 @@ const TransactionHeader = sequelize.define('transaction_headers', {
     type: DataTypes.STRING,
     allowNull: false,
     length: 100
+  },
+  paymentDeadline: {
+    field: "payment_deadline",
+    type: DataTypes.DATE,
+    allowNull: true, 
   }
 },{
   timestamps: false
