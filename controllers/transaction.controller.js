@@ -1,3 +1,4 @@
+import { getCartItemsByUserService } from "../services/cart.service.js";
 import { getAllTransactionsService, getTransactionsByUserService } from "../services/transaction.service.js";
 
 
@@ -21,7 +22,7 @@ export const getTransactionsByUser = async (req, res) => {
 }
 
 export const createTransaction = async (req, res) => {
-    const { addressId, paymentMethod } = req.body;
+    const { addressId, paymentMethod, voucherId } = req.body;
     const userId = req.user.userId;
 
     if (!addressId) {
@@ -32,7 +33,39 @@ export const createTransaction = async (req, res) => {
     }
 
     try {
+        // get all item from user cart
+        const userCart = await getCartItemsByUserService(userId);
+        const productsInCart = userCart.product_variants;
+
+        // calculate the total price
+        // calculate the total weight
+        var totalPrice = 0;
+        var totalWeight = 0;
+        productsInCart.map(product => {
+            const itemTotal = product.price * product.quantity;
+            totalPrice += itemTotal;
+            totalWeight += product.weight;
+        });
         
+        // calculate the delivery fee
+        
+
+        // set transaction date to now
+        // set gateway response to null
+        // set status to Wait for payment
+        // set payment deadline to now + 1 day 
+        // insert transaction header and get the id
+
+        // insert transaction detail
+        const transactionDetails = products.map(product => {
+            return {
+                transactionId: transactionId,
+                productId: product.productId,
+                quantity: product.quantity,
+                price: product.price,
+            };
+        });
+        // 
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

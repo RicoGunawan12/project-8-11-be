@@ -47,6 +47,11 @@ const TransactionHeader = sequelize.define('transaction_headers', {
     allowNull: false,
     length: 100
   },
+  deliveryFee: {
+    field: "delivery_fee",
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
   paymentDeadline: {
     field: "payment_deadline",
     type: DataTypes.DATE,

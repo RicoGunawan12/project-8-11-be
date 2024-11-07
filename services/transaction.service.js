@@ -33,5 +33,5 @@ export const getTransactionsByUserService = async (userId) => {
 }
 
 export const createTransactionService = async () => {
-    
+    // TransactionDetailModel.bulkCreate()
 }
