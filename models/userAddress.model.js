@@ -1,12 +1,18 @@
-import { DataTypes, UUID } from "sequelize";
+import { DataTypes, UUIDV4 } from "sequelize";
 import sequelize from "../config/database.js";
 
 
 const UserAddress = sequelize.define('user_addresses', {
     addressId: {
       field: "address_id",
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
+      defaultValue: UUIDV4,
       primaryKey: true,
+      allowNull: false
+    },
+    komshipAddressId: {
+      field: "komship_address_id",
+      type: DataTypes.INTEGER,
       allowNull: false
     },
     userId: {

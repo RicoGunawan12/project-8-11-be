@@ -1,4 +1,4 @@
-import { createAddresService, getAddresByUserIdService } from "../services/address.service.js";
+import { calculateDeliveryFeeService, createAddresService, getAddresByUserIdService, searchDestinationService } from "../services/address.service.js";
 
 
 export const getAddressByUserId = async (req, res) => {
@@ -14,13 +14,35 @@ export const getAddressByUserId = async (req, res) => {
 }
 
 export const createAddress = async (req, res) => {
-    const { addressId, addressDistrict, addressDetail } = req.body;
+    const { komshipAddressId, addressLabel, addressDetail } = req.body;
     const userId = req.user.userId;
     
     try {
-        const insertedAddress = await createAddresService(addressId, userId, addressDistrict, addressDetail);
+        const insertedAddress = await createAddresService(komshipAddressId, userId, addressLabel, addressDetail);
         return res.status(200).json(insertedAddress);
     } catch (error) {
         return res.status(500).json({ message: error.message });
+    }
+}
+
+export const searchDestination = async (req, res) => {
+    const { keyword } = req.query;
+    
+    try {
+        const searchResult = await searchDestinationService(keyword);
+        return res.status(200).json({ message: "Fetch success!", searchResult });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });   
+    }
+}
+
+export const calculateDeliveryFee = async (req, res) => {
+    const { shipperDestinationId, receiverDestinationId, weight, itemValue, cod } = req.query;
+    
+    try {
+        const calculationResult = await calculateDeliveryFeeService(shipperDestinationId, receiverDestinationId, weight, itemValue, cod);
+        return res.status(200).json({ message: "Fetch success!", calculationResult });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });   
     }
 }

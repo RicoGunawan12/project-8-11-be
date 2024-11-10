@@ -1,3 +1,4 @@
+import { calculateDeliveryFeeService } from "../services/address.service.js";
 import { getCartItemsByUserService } from "../services/cart.service.js";
 import { getAllTransactionsService, getTransactionsByUserService } from "../services/transaction.service.js";
 
@@ -48,7 +49,7 @@ export const createTransaction = async (req, res) => {
         });
         
         // calculate the delivery fee
-        
+        const deliveryFee = await calculateDeliveryFeeService(addressId, addressId, totalWeight, totalPrice, "no");
 
         // set transaction date to now
         // set gateway response to null
