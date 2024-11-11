@@ -1,6 +1,8 @@
+import { createCreditCardTransactionXendit } from "../integration/xendit.integration.js";
 import { calculateDeliveryFeeService } from "../services/address.service.js";
 import { getCartItemsByUserService } from "../services/cart.service.js";
 import { getAllTransactionsService, getTransactionsByUserService } from "../services/transaction.service.js";
+// import { validateCreditCard } from "../utils/xendit.validation.js";
 
 
 export const getAllTransactions = async (req, res) => {
@@ -23,7 +25,25 @@ export const getTransactionsByUser = async (req, res) => {
 }
 
 export const createTransaction = async (req, res) => {
-    const { addressId, paymentMethod, voucherId } = req.body;
+    const { 
+        addressId, 
+        paymentMethod, 
+        voucherId, 
+        expedition, 
+        deliveryFee, 
+        notes,
+        amount,
+        card_number,
+        card_exp_month,
+        card_exp_year,
+        card_cvn,
+        is_multiple_use,
+        should_authenticate,
+        card_holder_email,
+        card_holder_first_name,
+        card_holder_last_name,
+        card_holder_phone_number
+    } = req.body;
     const userId = req.user.userId;
 
     if (!addressId) {
@@ -33,23 +53,74 @@ export const createTransaction = async (req, res) => {
         return res.status(400).json({ message: "Payment method must be filled" });
     }
 
+    const xenditResponse = await createCreditCardTransactionXendit(amount,
+        card_number,
+        card_exp_month,
+        card_exp_year,
+        card_cvn,
+        is_multiple_use,
+        should_authenticate,
+        card_holder_email,
+        card_holder_first_name,
+        card_holder_last_name,
+        card_holder_phone_number
+    )
+
+    console.log(xenditResponse);
+    return res.status(200).json({ xenditResponse })
+
     try {
         // get all item from user cart
-        const userCart = await getCartItemsByUserService(userId);
-        const productsInCart = userCart.product_variants;
+        // const userCart = await getCartItemsByUserService(userId);
+        // const productsInCart = userCart.product_variants;
 
-        // calculate the total price
-        // calculate the total weight
-        var totalPrice = 0;
-        var totalWeight = 0;
-        productsInCart.map(product => {
-            const itemTotal = product.price * product.quantity;
-            totalPrice += itemTotal;
-            totalWeight += product.weight;
-        });
-        
-        // calculate the delivery fee
-        const deliveryFee = await calculateDeliveryFeeService(addressId, addressId, totalWeight, totalPrice, "no");
+        // // calculate the total price
+        // // calculate the total weight
+        // var totalPrice = deliveryFee;
+        // var totalWeight = 0;
+        // productsInCart.map(product => {
+        //     const itemTotal = product.price * product.quantity;
+        //     totalPrice += itemTotal;
+        //     totalWeight += product.weight;
+        // });
+
+        if (voucherId) {
+            // minus the totalprice
+        }
+
+        // const { status, message } = validateCreditCard(
+        //     amount,
+        //     card_number,
+        //     card_exp_month,
+        //     card_exp_year,
+        //     card_cvn,
+        //     is_multiple_use,
+        //     should_authenticate,
+        //     card_holder_email,
+        //     card_holder_first_name,
+        //     card_holder_last_name,
+        //     card_holder_phone_number
+        // )
+
+        // if (status === 400) {
+        //     throw new Error(message);
+        // }
+
+        // const xenditResponse = await createCreditCardTransactionXendit(amount,
+        //     card_number,
+        //     card_exp_month,
+        //     card_exp_year,
+        //     card_cvn,
+        //     is_multiple_use,
+        //     should_authenticate,
+        //     card_holder_email,
+        //     card_holder_first_name,
+        //     card_holder_last_name,
+        //     card_holder_phone_number
+        // )
+
+        // console.log(xenditResponse);
+        // return res.status(200).json({ xenditResponse })
 
         // set transaction date to now
         // set gateway response to null
@@ -58,14 +129,14 @@ export const createTransaction = async (req, res) => {
         // insert transaction header and get the id
 
         // insert transaction detail
-        const transactionDetails = products.map(product => {
-            return {
-                transactionId: transactionId,
-                productId: product.productId,
-                quantity: product.quantity,
-                price: product.price,
-            };
-        });
+        // const transactionDetails = products.map(product => {
+        //     return {
+        //         transactionId: transactionId,
+        //         productId: product.productId,
+        //         quantity: product.quantity,
+        //         price: product.price,
+        //     };
+        // });
         // 
     } catch (error) {
         return res.status(500).json({ message: error.message });

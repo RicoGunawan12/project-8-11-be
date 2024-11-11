@@ -33,7 +33,7 @@ const TransactionHeader = sequelize.define('transaction_headers', {
   paymentMethod: {
     field: "payment_method",
     type: DataTypes.STRING,
-    primaryKey: false
+    allowNull: false
   },
   gatewayResponse: {
     field: "gateway_response",
@@ -55,6 +55,11 @@ const TransactionHeader = sequelize.define('transaction_headers', {
   paymentDeadline: {
     field: "payment_deadline",
     type: DataTypes.DATE,
+    allowNull: false, 
+  },
+  notes: {
+    field: "notes",
+    type: DataTypes.STRING,
     allowNull: true, 
   }
 },{
