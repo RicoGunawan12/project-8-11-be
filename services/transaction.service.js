@@ -1,5 +1,5 @@
 import { ProductModel, ProductVariantModel, TransactionDetailModel, TransactionHeaderModel } from "../association/association.js"
-import { createCreditCardTransactionXendit } from "../integration/xendit.integration.js";
+import { createCreditCardTransactionXendit, createQrisTransactionXendit } from "../integration/xendit.integration.js";
 
 
 export const getAllTransactionsService = async () => {
@@ -85,7 +85,7 @@ export const createTransactionDetailService = async (products) => {
     return transactionDetails;
 }
 
-export const checkOutTransactionService = async (
+export const checkOutCreditTransactionService = async (
     transactionId,
     amount,
     card_number,
@@ -113,5 +113,10 @@ export const checkOutTransactionService = async (
         card_holder_last_name,
         card_holder_phone_number
     )
+    return response;
+}
+
+export const checkOutQrisTransactionService = async (transactionId, amount) => {
+    const response = await createQrisTransactionXendit(transactionId, amount);
     return response;
 }

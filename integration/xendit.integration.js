@@ -84,18 +84,56 @@ export const createCreditCardTransactionXendit = async (
         },
         callback_url: "http://localhost:5000/api/transactions/test"
     });
-    // ({
-    //     amount: amount,
-    //     card_number: card_number,
-    //     card_exp_month: card_exp_month,
-    //     card_exp_year: card_exp_year,
-    //     card_cvn: card_cvn,
-    //     is_multiple_use: is_multiple_use,
-    //     should_authenticate: should_authenticate,
-    //     card_holder_email: card_holder_email,
-    //     card_holder_first_name: card_holder_first_name,
-    //     card_holder_last_name: card_holder_last_name,
-    //     card_holder_phone_number: card_holder_phone_number
-    // });
     return tokenResponse
+}
+
+
+export const createQrisTransactionXendit = async (transactionId, amount) => {
+    const data = {
+        amount : amount,
+        paymentMethod : {
+            qrCode : {
+                channelCode : "QRIS"
+            },
+            reusability : "ONE_TIME_USE",
+            type : "QR_CODE"
+        },
+        currency : "IDR",
+        referenceId : transactionId
+    }
+    
+    const response = await xenditPaymentRequestClient.createPaymentRequest({
+        data
+    })
+
+    return response;
+}
+
+export const createVATransactionXendit = async (req, res) => {
+    const data = {
+        country : "ID",
+        amount : 15000,
+        metadata : {
+            sku : "example-sku-1234"
+        },
+        paymentMethod : {
+            reusability : "ONE_TIME_USE",
+            type : "VIRTUAL_ACCOUNT",
+            virtualAccount : {
+                channelProperties : {
+                    customerName : "csfskhskdh",
+                    expiresAt : new Date("2025-01-03T17:00:00Z")
+                },
+                channelCode : "BNI"
+            },
+            referenceId : "example-1234"
+        },
+        currency : "IDR",
+        referenceId : "example-ref-1234"
+    }
+      
+    const response = await xenditPaymentRequestClient.createPaymentRequest({
+        data
+    })
+    return res.status(200).json({ response });
 }

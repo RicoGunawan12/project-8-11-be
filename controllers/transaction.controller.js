@@ -1,8 +1,6 @@
-import { createCreditCardTransactionXendit } from "../integration/xendit.integration.js";
-import { calculateDeliveryFeeService } from "../services/address.service.js";
-import { getCartItemsByUserService } from "../services/cart.service.js";
-import { checkOutTransactionService, createTransactionDetailService, createTransactionService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService } from "../services/transaction.service.js";
-// import { validateCreditCard } from "../utils/xendit.validation.js";
+import { createQrisTransactionXendit } from "../integration/xendit.integration.js";
+import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
+import { checkOutCreditTransactionService, checkOutQrisTransactionService, createTransactionDetailService, createTransactionService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService } from "../services/transaction.service.js";
 
 
 export const getAllTransactions = async (req, res) => {
@@ -39,20 +37,8 @@ export const createTransaction = async (req, res) => {
         addressId, 
         paymentMethod, 
         voucherId, 
-        expedition, 
         deliveryFee, 
-        notes,
-        amount,
-        card_number,
-        card_exp_month,
-        card_exp_year,
-        card_cvn,
-        is_multiple_use,
-        should_authenticate,
-        card_holder_email,
-        card_holder_first_name,
-        card_holder_last_name,
-        card_holder_phone_number
+        notes
     } = req.body;
     const userId = req.user.userId;
 
@@ -62,22 +48,6 @@ export const createTransaction = async (req, res) => {
     else if (paymentMethod.length <= 0) {
         return res.status(400).json({ message: "Payment method must be filled" });
     }
-
-    // const xenditResponse = await createCreditCardTransactionXendit(amount,
-    //     card_number,
-    //     card_exp_month,
-    //     card_exp_year,
-    //     card_cvn,
-    //     is_multiple_use,
-    //     should_authenticate,
-    //     card_holder_email,
-    //     card_holder_first_name,
-    //     card_holder_last_name,
-    //     card_holder_phone_number
-    // )
-
-    // console.log(xenditResponse);
-    // return res.status(200).json({ xenditResponse })
 
     try {
         // get all item from user cart
@@ -100,40 +70,6 @@ export const createTransaction = async (req, res) => {
         if (voucherId) {
             // minus the totalprice
         }
-
-        // const { status, message } = validateCreditCard(
-        //     amount,
-        //     card_number,
-        //     card_exp_month,
-        //     card_exp_year,
-        //     card_cvn,
-        //     is_multiple_use,
-        //     should_authenticate,
-        //     card_holder_email,
-        //     card_holder_first_name,
-        //     card_holder_last_name,
-        //     card_holder_phone_number
-        // )
-
-        // if (status === 400) {
-        //     throw new Error(message);
-        // }
-
-        // const xenditResponse = await createCreditCardTransactionXendit(amount,
-        //     card_number,
-        //     card_exp_month,
-        //     card_exp_year,
-        //     card_cvn,
-        //     is_multiple_use,
-        //     should_authenticate,
-        //     card_holder_email,
-        //     card_holder_first_name,
-        //     card_holder_last_name,
-        //     card_holder_phone_number
-        // )
-
-        // console.log(xenditResponse);
-        // return res.status(200).json({ xenditResponse })
 
         // set transaction date to now 
         // set gateway response to null
@@ -166,6 +102,7 @@ export const createTransaction = async (req, res) => {
             };
         });
         const insertedTransactionDetails = await createTransactionDetailService(transactionDetails);
+        const deletedCartItem = await removeAllCartItemInUserService(userId);
         return res.status(200).json({ message: "Transaction created!", transaction, insertedTransactionDetails });
         
     } catch (error) {
@@ -174,7 +111,7 @@ export const createTransaction = async (req, res) => {
 }
 
 
-export const checkOutTransaction = async (req, res) => {
+export const checkOutCreditTransaction = async (req, res) => {
     const {
         transactionId,
         amount,
@@ -191,7 +128,7 @@ export const checkOutTransaction = async (req, res) => {
     } = req.body;
 
     try {
-        const response = await checkOutTransactionService(
+        const response = await checkOutCreditTransactionService(
             transactionId,
             amount,
             card_number,
@@ -206,6 +143,19 @@ export const checkOutTransaction = async (req, res) => {
             card_holder_phone_number
         );
         return res.status(200).json({ message: "Transaction paid!", response })
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const checkOutQrisTransaction = async (req, res) => {
+    const {
+        transactionId,
+        amount,
+    } = req.body;
+    try {
+        const response = await checkOutQrisTransactionService(transactionId, amount);
+        return res.status(200).json({ message: "Fetch QRIS Success!", response })
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

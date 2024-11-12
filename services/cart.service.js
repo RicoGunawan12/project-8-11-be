@@ -96,3 +96,14 @@ export const updateCartItemService = async (cartItemId, quantity) => {
     })
     return updateCartItem;
 }
+
+
+export const removeAllCartItemInUserService = async (userId) => {
+    const userCart = await getCart(userId);
+    const deletedCartItem = await CartItemModel.destroy({
+        where: {
+            cartId: userCart.cartId
+        }
+    });
+    return deletedCartItem;
+}
