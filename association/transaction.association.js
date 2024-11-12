@@ -9,10 +9,10 @@ import WishlistItem from "../models/wishlistItem.model.js";
 import { ProductVariant, User } from "./cart.association.js";
 
 
-PaymentMethod.hasMany(TransactionHeader, { foreignKey: 'ref_payment_method_id' });
-TransactionHeader.belongsTo(PaymentMethod, { foreignKey: 'ref_payment_method_id' });
+// PaymentMethod.hasMany(TransactionHeader, { foreignKey: 'ref_payment_method_id' });
+// TransactionHeader.belongsTo(PaymentMethod, { foreignKey: 'ref_payment_method_id' });
 
-TransactionHeader.hasMany(TransactionDetail, { foreignKey: 'ref_transaction_id' });
+TransactionHeader.hasMany(TransactionDetail, { foreignKey: 'ref_transaction_id', onDelete: 'CASCADE' });
 TransactionDetail.belongsTo(TransactionHeader, { foreignKey: 'ref_transaction_id' });
 
 User.hasMany(TransactionHeader, { foreignKey: 'ref_user_id' });

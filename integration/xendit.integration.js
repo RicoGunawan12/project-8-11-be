@@ -7,6 +7,7 @@ const xenditPaymentRequestClient = new PaymentRequestClient({secretKey: process.
 
 
 export const createCreditCardTransactionXendit = async (
+    transactionId,
     amount,
     card_number,
     card_exp_month,
@@ -53,7 +54,7 @@ export const createCreditCardTransactionXendit = async (
     // const tokenResponse = await xenditPaymentRequestClient.createPaymentRequest({data});
     const tokenResponse = await xenditPaymentRequestClient.createPaymentRequest({
         data: {
-            amount: 15000,
+            amount: amount,
             currency: "IDR", // e.g., "IDR" for Indonesian Rupiah
             country: "ID",
             paymentMethod: {
@@ -63,25 +64,26 @@ export const createCreditCardTransactionXendit = async (
                         failureReturnUrl: "https://redirect.me/failed"
                     },
                     cardInformation: {
-                        expiryMonth: "11",
-                        expiryYear: "2035",
-                        cardNumber: card_number
-                        // cardHolderName: card_holder_name
+                        expiryMonth: card_exp_month,
+                        expiryYear: card_exp_year,
+                        cardNumber: card_number,
+                        cardHolderName: card_holder_first_name + " " + card_holder_last_name
                     },
                     channelCode: "BBL_CARD_INSTALLMENT"
                 },
-                reusability: "ONE_TIME_USE",
+                channelProperties: {
+                    cvv: card_cvn
+                },
+                reusability: is_multiple_use ? "MULTIPLE_USE" : "ONE_TIME_USE",
                 type: "CARD"
             },
-            referenceId : "example-ref-15zshsudhfuisxc34"
+            referenceId : transactionId,
+            // customer: {
+            //     mobileNumber: card_holder_phone_number
+            // }
         },
+        callback_url: "http://localhost:5000/api/transactions/test"
     });
-    console.log(tokenResponse.status);
-    
-    if (tokenResponse.status === "SUCCEEDED") {
-        console.log("asdxczxcasdsfd");
-        
-    }
     // ({
     //     amount: amount,
     //     card_number: card_number,

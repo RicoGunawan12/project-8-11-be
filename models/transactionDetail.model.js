@@ -29,7 +29,6 @@ const TransactionDetail = sequelize.define('transaction_details', {
     field: "paid_product_price",
     type: DataTypes.FLOAT,
     allowNull: false,
-    length: 100
   },
   realizedPromo: {
     field: "realized_promo",

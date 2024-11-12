@@ -43,7 +43,7 @@ const TransactionHeader = sequelize.define('transaction_headers', {
   },
   status: {
     field: "status",
-    type: DataTypes.STRING,
+    type: DataTypes.ENUM('UNPAID', 'PAID'),
     allowNull: false,
     length: 100
   },
@@ -57,11 +57,21 @@ const TransactionHeader = sequelize.define('transaction_headers', {
     type: DataTypes.DATE,
     allowNull: false, 
   },
+  totalPrice: {
+    field: "total_price",
+    type: DataTypes.FLOAT,
+    allowNull: false, 
+  },
+  totalWeight: {
+    field: "total_weight",
+    type: DataTypes.FLOAT,
+    allowNull: false, 
+  },
   notes: {
     field: "notes",
     type: DataTypes.STRING,
     allowNull: true, 
-  }
+  },
 },{
   timestamps: false
 })
