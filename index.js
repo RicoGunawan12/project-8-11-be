@@ -36,7 +36,7 @@ app.use('/api/transactions', TransactionRoute);
 
 (async () => {
   try {
-    await sequelize.sync({ force: true });
+    await sequelize.sync();
     app.listen(5000, () => {
       console.log('Server running on port 5000');
     });

@@ -261,7 +261,7 @@ export const updateTransactionStatus = async (req, res) => {
         const updatedTransaction = await updateTransactionStatusService(reference_id, req.body);
         return res.redirect('/');
     } catch (error) {
-        
+        return res.status(500).json({ message: error.message });
     }
 
 }

@@ -127,10 +127,10 @@ export const checkOutVATransactionService = async (transactionId, amount, bank) 
 }
 
 export const updateTransactionStatusService = async (transactionId, gatewayResponse) => {
-    TransactionHeaderModel.update(
+    const updatedTransaction = TransactionHeaderModel.update(
         {
             status: 'PAID',
-            gatewayResponse: gatewayResponse.stringify()
+            gatewayResponse: JSON.stringify(gatewayResponse)
         },
         {
             where: {
@@ -138,4 +138,5 @@ export const updateTransactionStatusService = async (transactionId, gatewayRespo
             },
         }
     )
+    return updatedTransaction;
 }
