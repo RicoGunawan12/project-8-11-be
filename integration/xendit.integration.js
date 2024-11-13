@@ -109,10 +109,10 @@ export const createQrisTransactionXendit = async (transactionId, amount) => {
     return response;
 }
 
-export const createVATransactionXendit = async (req, res) => {
+export const checkOutVATransactionXendit = async (transactionId, amount, bank) => {
     const data = {
         country : "ID",
-        amount : 15000,
+        amount : amount,
         metadata : {
             sku : "example-sku-1234"
         },
@@ -124,16 +124,16 @@ export const createVATransactionXendit = async (req, res) => {
                     customerName : "csfskhskdh",
                     expiresAt : new Date("2025-01-03T17:00:00Z")
                 },
-                channelCode : "BNI"
+                channelCode : bank
             },
-            referenceId : "example-1234"
+            referenceId : transactionId
         },
         currency : "IDR",
-        referenceId : "example-ref-1234"
+        referenceId : transactionId
     }
       
     const response = await xenditPaymentRequestClient.createPaymentRequest({
         data
     })
-    return res.status(200).json({ response });
+    return response
 }

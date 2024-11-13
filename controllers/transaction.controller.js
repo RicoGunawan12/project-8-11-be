@@ -1,6 +1,6 @@
 import { createQrisTransactionXendit } from "../integration/xendit.integration.js";
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
-import { checkOutCreditTransactionService, checkOutQrisTransactionService, createTransactionDetailService, createTransactionService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService } from "../services/transaction.service.js";
+import { checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, createTransactionDetailService, createTransactionService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, updateTransactionStatusService } from "../services/transaction.service.js";
 
 
 export const getAllTransactions = async (req, res) => {
@@ -161,33 +161,107 @@ export const checkOutQrisTransaction = async (req, res) => {
     }
 }
 
+export const checkOutVATransaction = async (req, res) => {
+
+    const {
+        transactionId, 
+        amount, 
+        bank
+    } = req.body
+
+    try {
+        const response = await checkOutVATransactionService(transactionId, amount, bank);
+        return res.status(200).json({ message: "VA Created!", response })
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+
+
+
+// Req body
+// {
+//     "created": "2024-11-12T07:45:11.134Z",
+//     "business_id": "66cc3af7b141ca768e852751",
+//     "event": "payment.succeeded",
+//     "data": {
+//         "id": "ca_67330775950a4a001656b419",
+//         "items": null,
+//         "amount": 50000,
+//         "status": "SUCCEEDED",
+//         "country": "ID",
+//         "created": "2024-11-12T07:44:53.655Z",
+//         "updated": "2024-11-12T07:45:08.653Z",
+//         "currency": "IDR",
+//         "metadata": null,
+//         "customer_id": null,
+//         "description": null,
+//         "failure_code": null,
+//         "reference_id": "9ade2902-39f8-4374-805d-38499e9a9e2b",
+//         "payment_detail": null,
+//         "payment_method": {
+//             "id": "pm-088f4f0a-a43a-4161-b998-f6857ca648ca",
+//             "card": {
+//                 "currency": "IDR",
+//                 "card_data_id": "60af646628b731002236ec87",
+//                 "card_information": {
+//                     "type": "CREDIT",
+//                     "issuer": "BRI",
+//                     "country": "ID",
+//                     "network": "VISA",
+//                     "expiry_year": "2025",
+//                     "fingerprint": "60af646628b731002236ec87",
+//                     "expiry_month": "12",
+//                     "cardholder_name": null,
+//                     "masked_card_number": "400000XXXXXX1091"
+//                 },
+//                 "channel_properties": {
+//                     "cardonfile_type": null,
+//                     "failure_return_url": "https://redirect.me/failed",
+//                     "success_return_url": "https://redirect.me/success",
+//                     "skip_three_d_secure": null
+//                 },
+//                 "card_verification_results": null
+//             },
+//             "type": "CARD",
+//             "status": "ACTIVE",
+//             "created": "2024-11-12T07:44:53.259624Z",
+//             "ewallet": null,
+//             "qr_code": null,
+//             "updated": "2024-11-12T07:44:53.259624Z",
+//             "metadata": null,
+//             "description": null,
+//             "reusability": "MULTIPLE_USE",
+//             "direct_debit": null,
+//             "reference_id": "a7ed1fb4-9be7-41d2-8621-7ac79675db9b",
+//             "virtual_account": null,
+//             "over_the_counter": null,
+//             "billing_information": {
+//                 "city": null,
+//                 "country": "",
+//                 "postal_code": null,
+//                 "street_line1": null,
+//                 "street_line2": null,
+//                 "province_state": null
+//             },
+//             "direct_bank_transfer": null
+//         },
+//         "channel_properties": null,
+//         "payment_request_id": "pr-4e1dbce0-94da-4e85-9784-859c10e55278"
+//     },
+//     "api_version": null
+// }
 export const updateTransactionStatus = async (req, res) => {
     const {
-        updated,
-        created,
-        payment_id,
-        callback_virtual_account_id,
-        owner_id,
-        external_id,
-        account_number,
-        bank_code,
-        amount,
-        transaction_timestamp,
-        merchant_code,
-        id
-    } = req.body;
-    console.log(
-        updated,
-        created,
-        payment_id,
-        callback_virtual_account_id,
-        owner_id,
-        external_id,
-        account_number,
-        bank_code,
-        amount,
-        transaction_timestamp,
-        merchant_code,
-        id
-    );
+        reference_id
+    } = req.body.data;
+    
+    try {
+        const updatedTransaction = await updateTransactionStatusService(reference_id, req.body);
+        return res.redirect('/');
+    } catch (error) {
+        
+    }
+
 }

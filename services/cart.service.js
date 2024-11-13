@@ -92,8 +92,8 @@ export const updateCartItemService = async (cartItemId, quantity) => {
 
     const updateCartItem = await CartItemModel.update(
         { quantity: quantity },
-        { where: { cartItemId }
-    })
+        { where: { cartItemId }}
+    )
     return updateCartItem;
 }
 

@@ -29,7 +29,7 @@ export const createProduct = async (req, res) => {
         
         const hash = new Map();
         images.forEach((image) => {
-            console.log("img: " + image.originalname.substring(0, image.originalname.length - 4));
+            console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
             
             hash.set(image.originalname.substring(0, image.originalname.length - 4), `/${UPLOAD_FOLDER}${productName}/${image.filename}`);
         });
