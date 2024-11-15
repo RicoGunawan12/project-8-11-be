@@ -14,6 +14,12 @@ const Voucher = sequelize.define('vouchers', {
     type: DataTypes.UUID,
     primaryKey: false
   },
+  voucherCode: {
+    field: "voucher_code",
+    type: DataTypes.STRING,
+    length: 50,
+    allowNull: false
+  },
   voucherEndDate: {
     field: "voucher_end_date",
     type: DataTypes.DATE,

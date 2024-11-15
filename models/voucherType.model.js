@@ -9,6 +9,13 @@ const VoucherType = sequelize.define('voucher_types', {
     primaryKey: true,
     allowNull: false
   },
+  voucherTypeCode: {
+    field: "voucher_type_code",
+    type: DataTypes.STRING,
+    allowNull: false,
+    length: 50,
+    unique: true
+  },
   voucherTypeName: {
     field: "voucher_type_name",
     type: DataTypes.STRING,

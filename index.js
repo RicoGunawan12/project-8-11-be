@@ -10,6 +10,8 @@ import morgan from 'morgan';
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url';
+import VoucherRoute from './routes/voucher.route.js';
+import VoucherTypeRoute from './routes/voucherType.route.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,11 +30,13 @@ app.use('/api/users', userRoute);
 app.use('/api/categories', ProductCategoryRoute);
 app.use('/api/products', ProductRoute);
 app.use('/api/carts', CartRoute);
+app.use('/api/vouchers', VoucherRoute);
+app.use('/api/voucherTypes', VoucherTypeRoute);
 
 
 (async () => {
   try {
-    await sequelize.sync();
+    await sequelize.sync({force:true});
     app.listen(5000, () => {
       console.log('Server running on port 5000');
     });

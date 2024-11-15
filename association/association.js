@@ -1,5 +1,6 @@
 
 import { Cart, CartItem } from "./cart.association.js";
+import { ContentDetail, ContentHeader, Page } from "./content.association.js";
 import { Product, ProductCategory, Promo } from "./product.association.js";
 import { PaymentMethod, ProductVariant, TransactionDetail, TransactionHeader, User, Voucher, VoucherType, Wishlist, WishlistItem } from "./transaction.association.js"
 
@@ -20,6 +21,10 @@ const CartModel = Cart
 const CartItemModel = CartItem
 const WishlistModel = Wishlist
 const WishlistItemModel = WishlistItem
+
+const ContentHeaderModel = ContentHeader
+const ContentDetailModel = ContentDetail
+const PageModel = Page
 
 export { 
     PaymentMethodModel, 
