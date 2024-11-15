@@ -14,11 +14,11 @@ export const getAddressByUserId = async (req, res) => {
 }
 
 export const createAddress = async (req, res) => {
-    const { komshipAddressId, addressLabel, addressDetail } = req.body;
+    const { province, city, subdistrict, postalCode, addressDetail } = req.body;
     const userId = req.user.userId;
     
     try {
-        const insertedAddress = await createAddresService(komshipAddressId, userId, addressLabel, addressDetail);
+        const insertedAddress = await createAddresService(province, city, subdistrict, postalCode, userId, addressDetail);
         return res.status(200).json(insertedAddress);
     } catch (error) {
         return res.status(500).json({ message: error.message });
