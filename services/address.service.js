@@ -4,10 +4,9 @@ import { getAllCityRajaOngkir, getAllProvinceRajaOngkir, getAllSubdistrictRajaOn
 
 
 export const getAddresByUserIdService = async (ref_user_id) => {
-    const userAddresses = await UserAddressModel.findOne(
+    const userAddresses = await UserAddressModel.findAll(
         { 
             where: { ref_user_id }, 
-            attributes: ['addressId', 'komshipAddressId', 'userId', 'addressDistrict', 'addressDetail']
         }
     );
     return userAddresses;
