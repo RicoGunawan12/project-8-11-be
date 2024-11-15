@@ -1,5 +1,5 @@
-
 import { ProductModel, ProductCategoryModel, ProductVariantModel } from "../association/association.js";
+import { deleteDirectory } from "../utils/uploader.js";
 import { getCategoryByName } from "./productCategory.service.js";
 
 
@@ -14,7 +14,8 @@ export const getProductsService = async () => {
             {
                 model: ProductVariantModel,
                 attributes: ['productVariantId', 'sku', 'productPrice', 'productStock', 'productImage'],
-            }
+            },
+            
         ]
     });
     return products;
@@ -47,9 +48,24 @@ export const createProductService = async (productName, productDescription, prod
     if (!category) {
         throw new Error("There is no " + productCategoryName + " category");
     }
+    const insertedProduct = await ProductModel.findOne({
+        where: { productName }, 
+    });
+
+    if (insertedProduct) {
+        throw new Error("Product name already exists");
+    }
     
     const productCategoryId = category.productCategoryId;
     
     const product = await ProductModel.create({ productName, productDescription, productCategoryId });
     return product;
+}
+
+export const deleteProductService = async (productId) => {
+    const product = await ProductModel.findOne({ where: { productId }});
+    deleteDirectory(product.productName);
+
+    const deletedProduct = await ProductModel.destroy({ where: { productId: productId }});
+    return deletedProduct;
 }

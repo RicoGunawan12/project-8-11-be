@@ -13,26 +13,35 @@ const ProductVariant = sequelize.define('product_variants', {
     field: "ref_product_id",
     type: DataTypes.UUID
   },
+  productColor: {
+    field: "product_color",
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  productSize: {
+    field: "product_size",
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   sku: {
     field: "sku",
     type: DataTypes.STRING,
     length: 100,
     allowNull: false
   },
-  productVariantName: {
-    field: "product_variant_name",
-    type: DataTypes.STRING,
-    allowNull: true,
-    length: 100
-  },
   productImage: {
     field: "product_image",
     type: DataTypes.TEXT,
-    allowNull: false
+    allowNull: true
   },
   productPrice: {
     field: "product_price",
-    type: DataTypes.DECIMAL,
+    type: DataTypes.FLOAT,
+    allowNull: false
+  },
+  productWeight: {
+    field: "product_weight",
+    type: DataTypes.FLOAT,
     allowNull: false
   },
   productStock: {
@@ -40,8 +49,25 @@ const ProductVariant = sequelize.define('product_variants', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
+  productPromo: {
+    field: "product_promo",
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
+  },
+  productPromoExpiry: {
+    field: "product_promo_expiry",
+    type: DataTypes.DATE,
+    allowNull: true
+  }
 },{
-  timestamps: false
+  timestamps: false,
+  indexes: [
+    {
+      unique: true,
+      fields: ['ref_product_id', 'product_color', 'product_size']
+    }
+  ]
 })
 
 export default ProductVariant;

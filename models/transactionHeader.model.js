@@ -14,19 +14,25 @@ const TransactionHeader = sequelize.define('transaction_headers', {
     type: DataTypes.UUID,
     primaryKey: false
   },
-  paymentMethodId: {
-    field: "ref_payment_method_id",
+  addressId: {
+    field: "ref_address_id",
     type: DataTypes.UUID,
     primaryKey: false
   },
   voucherId: {
     field: "ref_voucher_id",
     type: DataTypes.UUID,
-    primaryKey: false
+    primaryKey: false,
+    allowNull: true
   },
   transactionDate: {
     field: "transaction_date",
     type: DataTypes.DATE,
+    allowNull: false
+  },
+  paymentMethod: {
+    field: "payment_method",
+    type: DataTypes.STRING,
     allowNull: false
   },
   gatewayResponse: {
@@ -37,10 +43,35 @@ const TransactionHeader = sequelize.define('transaction_headers', {
   },
   status: {
     field: "status",
-    type: DataTypes.STRING,
+    type: DataTypes.ENUM('UNPAID', 'PAID'),
     allowNull: false,
     length: 100
-  }
+  },
+  deliveryFee: {
+    field: "delivery_fee",
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  paymentDeadline: {
+    field: "payment_deadline",
+    type: DataTypes.DATE,
+    allowNull: false, 
+  },
+  totalPrice: {
+    field: "total_price",
+    type: DataTypes.FLOAT,
+    allowNull: false, 
+  },
+  totalWeight: {
+    field: "total_weight",
+    type: DataTypes.FLOAT,
+    allowNull: false, 
+  },
+  notes: {
+    field: "notes",
+    type: DataTypes.STRING,
+    allowNull: true, 
+  },
 },{
   timestamps: false
 })

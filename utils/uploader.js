@@ -11,15 +11,33 @@ export const UPLOAD_FOLDER = process.env.FOLDER_PATH || 'assets/';
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER);
+        const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + req.body.productName);
+
         if (!fs.existsSync(uploadPath)) {
-        fs.mkdirSync(uploadPath, { recursive: true });
+          fs.mkdirSync(uploadPath, { recursive: true });
         }
         cb(null, uploadPath);
     },
     filename: function (req, file, cb) {
-      cb(null, `${Date.now()}-${file.originalname}`);
+      cb(null, `${Date.now()}-${req.body.productName}.png`);
     }
 });
 
 export const upload = multer({ storage: storage });
+
+
+export const deleteDirectory = (productName) => {
+  const dirPath = path.join(__dirname, "../", UPLOAD_FOLDER + productName);
+
+  console.log(dirPath);
+  
+
+  fs.rm(dirPath, { recursive: true, force: true }, (err) => {
+      if (err) {
+          console.error("Error deleting directory:", err);
+          return { success: false, message: "Directory not found or error deleting directory" };
+      }
+      console.log("Directory deleted successfully");
+      return { success: true, message: "Directory deleted successfully" };
+  });
+};

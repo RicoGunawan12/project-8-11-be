@@ -1,4 +1,5 @@
 import { CartItemModel, CartModel, ProductVariantModel } from "../association/association.js"
+import ProductVariant from "../models/productVariant.model.js";
 
 
 export const createCart = async (userId) => {
@@ -6,19 +7,36 @@ export const createCart = async (userId) => {
     return cart
 }
 
-export const getCartItemsByUserService = async (userId) => {
-    const cart = await CartItemModel.findAll({
-        include: {
-            model: CartModel,
-            where: { userId: userId },
-        }
-    });
+export const getCart = async (userId) => {
+    const cart = await CartModel.findOne({
+        where: { userId: userId }
+    })
     return cart;
+}
+
+export const getCartItemsByUserService = async (userId) => {
+
+    const cartItem = await CartItemModel.findAll({
+        include: [
+            {
+                model: CartModel,
+                where: { userId: userId },
+                attributes: []
+            },
+            {
+                model: ProductVariantModel
+            }
+        ],
+        attributes: ['cartItemId', 'productVariantId', 'quantity']
+    });
+    return cartItem;
 }
 
 export const addCartItemService = async (userId, productVariantId, quantity) => {
 
     const productVariant = await ProductVariantModel.findOne({ where: { productVariantId } });
+    console.log(productVariant);
+    
     if (productVariant.productStock < quantity) {
         throw new Error("There are only " + productVariant.productStock + " stock");
     }
@@ -49,4 +67,43 @@ export const addCartItemService = async (userId, productVariantId, quantity) => 
     const cartItem = await CartItemModel.create({ cartId, productVariantId, quantity });
 
     return cartItem;
+}
+
+export const removeCartItemService = async (cartItemId) => {
+    const removedCartItem = await CartItemModel.destroy({
+        where: { cartItemId }
+    })
+    return removedCartItem;
+}
+
+export const updateCartItemService = async (cartItemId, quantity) => {
+
+    const getProductVariant = await CartItemModel.findOne({
+        where: { cartItemId },
+        include: {
+            model: ProductVariantModel
+        }
+    })
+    console.log(getProductVariant);
+
+    if (getProductVariant.product_variant.productStock < quantity) {
+        throw new Error("There are only " + getProductVariant.product_variant.productStock + " stock");
+    }
+
+    const updateCartItem = await CartItemModel.update(
+        { quantity: quantity },
+        { where: { cartItemId }}
+    )
+    return updateCartItem;
+}
+
+
+export const removeAllCartItemInUserService = async (userId) => {
+    const userCart = await getCart(userId);
+    const deletedCartItem = await CartItemModel.destroy({
+        where: {
+            cartId: userCart.cartId
+        }
+    });
+    return deletedCartItem;
 }

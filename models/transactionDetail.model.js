@@ -24,6 +24,17 @@ const TransactionDetail = sequelize.define('transaction_details', {
     type: DataTypes.INTEGER,
     allowNull: false,
     length: 100
+  },
+  paidProductPrice: {
+    field: "paid_product_price",
+    type: DataTypes.FLOAT,
+    allowNull: false,
+  },
+  realizedPromo: {
+    field: "realized_promo",
+    type: DataTypes.FLOAT,
+    allowNull: false,
+    length: 100
   }
 },{
   timestamps: false

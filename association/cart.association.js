@@ -9,7 +9,7 @@ Cart.belongsTo(User, { foreignKey: 'ref_user_id' });
 Cart.hasMany(CartItem, { foreignKey: 'ref_cart_id' });
 CartItem.belongsTo(Cart, { foreignKey: 'ref_cart_id' });
 
-CartItem.belongsTo(ProductVariant, { foreignKey: 'ref_product_variant_id'} );
+CartItem.belongsTo(ProductVariant, { foreignKey: 'ref_product_variant_id', onDelete: 'CASCADE'} );
 ProductVariant.hasMany(CartItem, { foreignKey: 'ref_product_variant_id'} );
 
 export { User, Cart, CartItem, ProductVariant }
