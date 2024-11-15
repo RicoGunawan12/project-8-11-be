@@ -1,4 +1,4 @@
-import { calculateDeliveryFeeService, createAddresService, getAddresByUserIdService, searchDestinationService } from "../services/address.service.js";
+import { calculateDeliveryFeeService, createAddresService, getAddresByUserIdService, getAllCityService, getAllProvinceService, getAllSubdistrictService, searchDestinationService } from "../services/address.service.js";
 
 
 export const getAddressByUserId = async (req, res) => {
@@ -24,6 +24,35 @@ export const createAddress = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
+export const getAllProvince = async (req, res) => {
+    try {
+        const provinces = await getAllProvinceService();
+        return res.status(200).json({ provinces });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+} 
+
+export const getAllCity = async (req, res) => {
+    const { province } = req.query;
+    try {
+        const cities = await getAllCityService(province);
+        return res.status(200).json({ cities });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+} 
+
+export const getAllSubdistrict = async (req, res) => {
+    const { city } = req.query;
+    try {
+        const subdistrict = await getAllSubdistrictService(city);
+        return res.status(200).json({ subdistrict });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+} 
 
 export const searchDestination = async (req, res) => {
     const { keyword } = req.query;

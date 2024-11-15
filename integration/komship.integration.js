@@ -1,8 +1,8 @@
 
+const myHeaders = new Headers();
+myHeaders.append("x-api-key", process.env.KOMSHIP_API);
 
 export const searchDestinationKomship = async (keyword) => {
-    const myHeaders = new Headers();
-    myHeaders.append("x-api-key", process.env.KOMSHIP_API);
 
     if (keyword === undefined) {
         keyword = ""
@@ -30,9 +30,6 @@ export const searchDestinationKomship = async (keyword) => {
 }
 
 export const calculateDeliveryFeeKomship = async (shipperDestinationId, receiverDestinationId, weight, itemValue, cod) => {
-    const myHeaders = new Headers();
-    myHeaders.append("x-api-key", process.env.KOMSHIP_API);
-
     const requestOptions = {
         method: 'GET',
         headers: myHeaders,

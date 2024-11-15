@@ -1,5 +1,6 @@
 import { UserAddressModel } from "../association/association.js"
 import { calculateDeliveryFeeKomship, searchDestinationKomship } from "../integration/komship.integration.js";
+import { getAllCityRajaOngkir, getAllProvinceRajaOngkir, getAllSubdistrictRajaOngkir } from "../integration/rajaongkir.integeration.js";
 
 
 export const getAddresByUserIdService = async (ref_user_id) => {
@@ -15,6 +16,21 @@ export const getAddresByUserIdService = async (ref_user_id) => {
 export const createAddresService = async (komshipAddressId, userId, addressDistrict, addressDetail) => {
     const insertedAddress = await UserAddressModel.create({ userId, addressDistrict, addressDetail, komshipAddressId });
     return insertedAddress;
+}
+
+export const getAllProvinceService = async () => {
+    const provinces = await getAllProvinceRajaOngkir();
+    return provinces
+}
+
+export const getAllCityService = async (province) => {
+    const cities = await getAllCityRajaOngkir(province);
+    return cities;
+}
+
+export const getAllSubdistrictService = async (city) => {
+    const subdistricts = await getAllSubdistrictRajaOngkir(city);
+    return subdistricts;
 }
 
 export const searchDestinationService = async (keyword) => {
