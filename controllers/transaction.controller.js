@@ -308,7 +308,7 @@ export const requestPickupTransaction = async (req, res) => {
     const { transactionId } = req.body;
     try {
         const getTransactionById = await getTransactionsByIdService(transactionId);
-
+        
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

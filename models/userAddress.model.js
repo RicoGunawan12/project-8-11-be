@@ -15,6 +15,18 @@ const UserAddress = sequelize.define('user_addresses', {
         type: DataTypes.UUID,
         allowNull: false
     },
+    receiverName: {
+        field: "receiver_name",
+        type: DataTypes.STRING,
+        length: 50,
+        allowNull: false
+    },
+    receiverPhoneNumber: {
+        field: "receiver_phone_number",
+        type: DataTypes.STRING,
+        length: 20,
+        allowNull: false
+    },
     komshipAddressId: {
       field: "komship_address_id",
       type: DataTypes.STRING,

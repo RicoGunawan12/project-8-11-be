@@ -12,7 +12,7 @@ export const getAddresByUserIdService = async (ref_user_id) => {
     return userAddresses;
 }
 
-export const createAddresService = async (addressProvince, addressCity, addressSubdistrict, postalCode, userId, addressDetail) => {
+export const createAddresService = async (receiverName, receiverPhoneNumber, addressProvince, addressCity, addressSubdistrict, postalCode, userId, addressDetail) => {
     addressProvince = addressProvince.toUpperCase();
     addressCity = addressCity.toUpperCase();
     addressSubdistrict = addressSubdistrict.toUpperCase();
@@ -22,7 +22,7 @@ export const createAddresService = async (addressProvince, addressCity, addressS
     var komshipAddressId = destination.data[0].id;
     var komshipLabel = destination.data[0].label;
 
-    const insertedAddress = await UserAddressModel.create({ userId, komshipAddressId, komshipLabel, addressProvince, addressCity, addressSubdistrict, postalCode, addressDetail });
+    const insertedAddress = await UserAddressModel.create({ userId, receiverName, receiverPhoneNumber, komshipAddressId, komshipLabel, addressProvince, addressCity, addressSubdistrict, postalCode, addressDetail });
     return insertedAddress;
 }
 
