@@ -1,23 +1,30 @@
-import { ProductModel, ProductVariantModel, TransactionDetailModel, TransactionHeaderModel } from "../association/association.js"
+import { ProductModel, ProductVariantModel, TransactionDetailModel, TransactionHeaderModel, UserModel } from "../association/association.js"
 import { checkOutVATransactionXendit, createCreditCardTransactionXendit, createQrisTransactionXendit } from "../integration/xendit.integration.js";
 
 
-export const getAllTransactionsService = async () => {
+export const getAllTransactionsService = async (status) => {
     const transactions = await TransactionHeaderModel.findAll({
-        include: {
-            model: TransactionDetailModel,
-            include: {
-                model: ProductVariantModel,
+        include: [
+            {
+                model: TransactionDetailModel,
                 include: {
-                    model: ProductModel
+                    model: ProductVariantModel,
+                    include: {
+                        model: ProductModel
+                    }
                 }
+            },
+            {
+                model: UserModel,
+                attributes: ['userId', 'username', 'email']
             }
-        }
+        ],
+        where: { status: status }
     })
     return transactions;
 }
 
-export const getTransactionsByUserService = async (userId) => {
+export const getTransactionsByUserService = async (userId, status) => {
     const transactions = await TransactionHeaderModel.findAll({
         include: {
             model: TransactionDetailModel,
@@ -28,22 +35,29 @@ export const getTransactionsByUserService = async (userId) => {
                 }
             }
         },
-        where: { userId: userId }
+        where: { userId: userId, status: status }
     })
     return transactions;
 }
 
 export const getTransactionsByIdService = async (transactionId) => {
     const transactions = await TransactionHeaderModel.findAll({
-        include: {
-            model: TransactionDetailModel,
-            include: {
-                model: ProductVariantModel,
+        include: [
+            {
+                model: TransactionDetailModel,
                 include: {
-                    model: ProductModel
+                    model: ProductVariantModel,
+                    include: {
+                        model: ProductModel
+                    }
                 }
+            },
+            {
+                model: UserModel,
+                attributes: ['userId', 'username', 'email']
+
             }
-        },
+        ],
         where: { transactionId: transactionId }
     })
     return transactions;
@@ -57,6 +71,8 @@ export const createTransactionService = async (
     paymentMethod,
     gatewayResponse,
     status,
+    expedition,
+    shippingType,
     deliveryFee,
     paymentDeadline,
     notes,
@@ -71,6 +87,8 @@ export const createTransactionService = async (
         paymentMethod,
         gatewayResponse,
         status,
+        expedition,
+        shippingType,
         deliveryFee,
         paymentDeadline,
         notes,
@@ -129,7 +147,7 @@ export const checkOutVATransactionService = async (transactionId, amount, bank) 
 export const updateTransactionStatusService = async (transactionId, gatewayResponse) => {
     const updatedTransaction = TransactionHeaderModel.update(
         {
-            status: 'PAID',
+            status: 'Waiting for shipping',
             gatewayResponse: JSON.stringify(gatewayResponse)
         },
         {

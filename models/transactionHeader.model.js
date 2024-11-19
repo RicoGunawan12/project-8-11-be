@@ -43,9 +43,21 @@ const TransactionHeader = sequelize.define('transaction_headers', {
   },
   status: {
     field: "status",
-    type: DataTypes.ENUM('UNPAID', 'PAID'),
+    type: DataTypes.ENUM('Unpaid', 'Waiting for shipping', 'Shipping', 'Done', 'Cancelled'),
     allowNull: false,
     length: 100
+  },
+  expedition: {
+    field: "expedition",
+    type: DataTypes.STRING,
+    length: 50,
+    allowNull: false
+  },
+  expeditionType: {
+    field: "expedition_type",
+    type: DataTypes.STRING,
+    length: 50,
+    allowNull: false
   },
   deliveryFee: {
     field: "delivery_fee",

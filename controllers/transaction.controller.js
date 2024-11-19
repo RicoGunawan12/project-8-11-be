@@ -4,8 +4,9 @@ import { checkOutCreditTransactionService, checkOutQrisTransactionService, check
 
 
 export const getAllTransactions = async (req, res) => {
+    const { status } = req.query
     try {
-        const transactions = await getAllTransactionsService();
+        const transactions = await getAllTransactionsService(status);
         return res.status(200).json({ message: "Transaction fetched successfully", transactions })
     } catch (error) {
         return res.status(500).json({ message: error.message })
@@ -13,9 +14,10 @@ export const getAllTransactions = async (req, res) => {
 }
 
 export const getTransactionsByUser = async (req, res) => {
+    const { status } = req.query
     const userId = req.user.userId;
     try {
-        const transactions = await getTransactionsByUserService(userId);
+        const transactions = await getTransactionsByUserService(userId, status);
         return res.status(200).json({ message: "Transaction fetched successfully", transactions })
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -37,6 +39,8 @@ export const createTransaction = async (req, res) => {
         addressId, 
         paymentMethod, 
         voucherId, 
+        expedition,
+        shippingType,
         deliveryFee, 
         notes
     } = req.body;
@@ -83,7 +87,9 @@ export const createTransaction = async (req, res) => {
             new Date(), 
             paymentMethod, 
             null, 
-            "Unpaid", 
+            "Unpaid",
+            expedition, 
+            shippingType,
             deliveryFee, 
             new Date(Date.now() + 1 * 60 * 60 * 1000), 
             notes,
@@ -178,8 +184,6 @@ export const checkOutVATransaction = async (req, res) => {
 }
 
 
-
-
 // Req body
 // {
 //     "created": "2024-11-12T07:45:11.134Z",
@@ -264,4 +268,48 @@ export const updateTransactionStatus = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 
+}
+
+// "order_date": "2024-05-29 23:59:59",
+// "brand_name": "Komship",
+// "shipper_name": "Toko Official Komship",
+// "shipper_phone": "6281234567689",
+// "shipper_destination_id": 17588,
+// "shipper_address": "order address detail",
+// "shipper_email":"test@gmail.com",
+// "receiver_name": "Buyer A",
+// "receiver_phone": "6281209876543",
+// "receiver_destination_id": 17589,
+// "receiver_address": "order destination address detail",
+// "shipping": "JNT",
+// "shipping_type": "EZ",
+// "payment_method": "COD",
+// "shipping_cost":22000,
+// "shipping_cashback":10000,
+// "service_fee":2500,
+// "additional_cost":1000,
+// "grand_total":317000,
+// "cod_value":317000,
+// "insurance_value": 1000,
+// "order_details": [
+//     {
+//         "product_name": "Komship package",
+//         "product_variant_name": "Komship variant product",
+//         "product_price": 500000,
+//         "product_width": 5,
+//         "product_height": 2,
+//         "product_weight": 5100,
+//         "product_length": 20,
+//         "qty": 1,
+//         "subtotal": 500000
+//     }
+// ]
+export const requestPickupTransaction = async (req, res) => {
+    const { transactionId } = req.body;
+    try {
+        const getTransactionById = await getTransactionsByIdService(transactionId);
+
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
 }
