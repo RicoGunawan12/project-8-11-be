@@ -1,10 +1,13 @@
 import { createQrisTransactionXendit } from "../integration/xendit.integration.js";
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
-import { checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, createTransactionDetailService, createTransactionService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, updateTransactionStatusService } from "../services/transaction.service.js";
+import { checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, createTransactionDetailService, createTransactionService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, requestPickupTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
 
 
 export const getAllTransactions = async (req, res) => {
-    const { status } = req.query
+    var { status } = req.query
+    if (status === undefined) {
+        status = ""
+    }
     try {
         const transactions = await getAllTransactionsService(status);
         return res.status(200).json({ message: "Transaction fetched successfully", transactions })
@@ -14,8 +17,11 @@ export const getAllTransactions = async (req, res) => {
 }
 
 export const getTransactionsByUser = async (req, res) => {
-    const { status } = req.query
+    var { status } = req.query
     const userId = req.user.userId;
+    if (status === undefined) {
+        status = ""
+    }
     try {
         const transactions = await getTransactionsByUserService(userId, status);
         return res.status(200).json({ message: "Transaction fetched successfully", transactions })
@@ -74,7 +80,6 @@ export const createTransaction = async (req, res) => {
         if (voucherId) {
             // minus the totalprice
         }
-
         // set transaction date to now 
         // set gateway response to null
         // set status to Wait for payment
@@ -270,45 +275,14 @@ export const updateTransactionStatus = async (req, res) => {
 
 }
 
-// "order_date": "2024-05-29 23:59:59",
-// "brand_name": "Komship",
-// "shipper_name": "Toko Official Komship",
-// "shipper_phone": "6281234567689",
-// "shipper_destination_id": 17588,
-// "shipper_address": "order address detail",
-// "shipper_email":"test@gmail.com",
-// "receiver_name": "Buyer A",
-// "receiver_phone": "6281209876543",
-// "receiver_destination_id": 17589,
-// "receiver_address": "order destination address detail",
-// "shipping": "JNT",
-// "shipping_type": "EZ",
-// "payment_method": "COD",
-// "shipping_cost":22000,
-// "shipping_cashback":10000,
-// "service_fee":2500,
-// "additional_cost":1000,
-// "grand_total":317000,
-// "cod_value":317000,
-// "insurance_value": 1000,
-// "order_details": [
-//     {
-//         "product_name": "Komship package",
-//         "product_variant_name": "Komship variant product",
-//         "product_price": 500000,
-//         "product_width": 5,
-//         "product_height": 2,
-//         "product_weight": 5100,
-//         "product_length": 20,
-//         "qty": 1,
-//         "subtotal": 500000
-//     }
-// ]
 export const requestPickupTransaction = async (req, res) => {
     const { transactionId } = req.body;
     try {
         const getTransactionById = await getTransactionsByIdService(transactionId);
-        
+        const response = await requestPickupTransactionService(getTransactionById[0]);
+        // console.log(response);
+
+        return res.status(200).json({ message: "Success!", response });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

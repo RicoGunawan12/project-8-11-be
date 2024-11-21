@@ -15,6 +15,7 @@ import VoucherTypeRoute from './routes/voucherType.route.js';
 import AddressRoute from './routes/address.route.js';
 import TransactionRoute from './routes/transaction.route.js';
 import FAQRoute from './routes/faq.route.js';
+import { registerUserService } from './services/user.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,9 +40,9 @@ app.use('/api/addresses', AddressRoute);
 app.use('/api/transactions', TransactionRoute);
 app.use('/api/faqs', FAQRoute);
 
-
 (async () => {
   try {
+    // await sequelize.sync({ force:true, alter: true });
     await sequelize.sync();
     app.listen(5000, () => {
       console.log('Server running on port 5000');

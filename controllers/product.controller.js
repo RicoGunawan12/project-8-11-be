@@ -3,7 +3,8 @@ import { createProductVariantService, updatePromoService } from "../services/pro
 import { BASE_URL, UPLOAD_FOLDER } from "../utils/uploader.js";
 
 export const getProducts = async (req, res) => {
-    const products = await getProductsService();
+    const { search } = req.query;
+    const products = await getProductsService(search);
     return res.status(200).json(products) ;
 }
 

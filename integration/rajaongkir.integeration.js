@@ -8,7 +8,7 @@ export const getAllProvinceRajaOngkir = async () => {
             headers: myHeaders,
             redirect: "follow"
         };
-        const response = await fetch("https://pro.rajaongkir.com/api/province", requestOptions);
+        const response = await fetch(process.env.RAJAONGKIR_URL + "/api/province", requestOptions);
         if (!response.ok) {
             throw new Error(`Error: ${response.statusText}`);
         }
@@ -29,7 +29,8 @@ export const getAllCityRajaOngkir = async (province) => {
         if (province === undefined) {
             province = "";
         }
-        const response = await fetch("https://pro.rajaongkir.com/api/city?province=" + province, requestOptions);
+        
+        const response = await fetch(process.env.RAJAONGKIR_URL + "/api/city?province=" + province, requestOptions);
         if (!response.ok) {
             throw new Error(`Error: ${response.statusText}`);
         }
@@ -50,7 +51,7 @@ export const getAllSubdistrictRajaOngkir = async (city) => {
         if (city === undefined) {
             city = "";
         }
-        const response = await fetch("https://pro.rajaongkir.com/api/subdistrict?city=" + city, requestOptions);
+        const response = await fetch(process.env.RAJAONGKIR_URL + "/api/subdistrict?city=" + city, requestOptions);
         if (!response.ok) {
             throw new Error(`Error: ${response.statusText}`);
         }

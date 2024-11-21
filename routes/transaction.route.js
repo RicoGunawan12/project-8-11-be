@@ -1,5 +1,5 @@
 import express from 'express';
-import { checkOutCreditTransaction, checkOutQrisTransaction, checkOutVATransaction, createTransaction, getAllTransactions, getTransactionById, getTransactionsByUser, updateTransactionStatus } from '../controllers/transaction.controller.js';
+import { checkOutCreditTransaction, checkOutQrisTransaction, checkOutVATransaction, createTransaction, getAllTransactions, getTransactionById, getTransactionsByUser, requestPickupTransaction, updateTransactionStatus } from '../controllers/transaction.controller.js';
 import { adminMiddleware, userMiddleware } from '../middleware/auth.middleware.js';
 
 const TransactionRoute = express.Router();
@@ -18,6 +18,8 @@ TransactionRoute.post('/checkout-qris', userMiddleware, checkOutQrisTransaction)
 
 TransactionRoute.post('/checkout-va', userMiddleware, checkOutVATransaction);
 
-TransactionRoute.post('/test', userMiddleware, updateTransactionStatus);
+TransactionRoute.post('/update-status', userMiddleware, updateTransactionStatus);
+
+TransactionRoute.post('/pickup', adminMiddleware, requestPickupTransaction);
 
 export default TransactionRoute;

@@ -1,9 +1,10 @@
+import { Op } from "sequelize";
 import { ProductModel, ProductCategoryModel, ProductVariantModel } from "../association/association.js";
 import { deleteDirectory } from "../utils/uploader.js";
 import { getCategoryByName } from "./productCategory.service.js";
 
 
-export const getProductsService = async () => {
+export const getProductsService = async (search) => {
     const products = ProductModel.findAll({
         attributes: ['productId', 'productName', 'productDescription'],
         include: [
@@ -14,9 +15,11 @@ export const getProductsService = async () => {
             {
                 model: ProductVariantModel,
                 attributes: ['productVariantId', 'sku', 'productPrice', 'productStock', 'productImage'],
-            },
-            
-        ]
+            },   
+        ],
+        where: {
+            [Op.like]: `%${search}%`
+        }
     });
     return products;
 }

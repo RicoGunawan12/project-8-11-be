@@ -1,6 +1,7 @@
-import { ProductModel, ProductVariantModel, TransactionDetailModel, TransactionHeaderModel, UserModel } from "../association/association.js"
+import { ProductModel, ProductVariantModel, TransactionDetailModel, TransactionHeaderModel, UserAddressModel, UserModel } from "../association/association.js"
+import { createOrderKomship } from "../integration/komship.integration.js";
 import { checkOutVATransactionXendit, createCreditCardTransactionXendit, createQrisTransactionXendit } from "../integration/xendit.integration.js";
-
+import { Op } from "sequelize";
 
 export const getAllTransactionsService = async (status) => {
     const transactions = await TransactionHeaderModel.findAll({
@@ -16,26 +17,47 @@ export const getAllTransactionsService = async (status) => {
             },
             {
                 model: UserModel,
-                attributes: ['userId', 'username', 'email']
+                attributes: ['userId', 'username', 'email'],
+                include: {
+                    model: UserAddressModel,
+                }
             }
         ],
-        where: { status: status }
+        where: { 
+            status: {
+                [Op.like]: `%${status}%`
+            } 
+        }
     })
     return transactions;
 }
 
 export const getTransactionsByUserService = async (userId, status) => {
     const transactions = await TransactionHeaderModel.findAll({
-        include: {
-            model: TransactionDetailModel,
-            include: {
-                model: ProductVariantModel,
+        include: [
+            {
+                model: TransactionDetailModel,
                 include: {
-                    model: ProductModel
+                    model: ProductVariantModel,
+                    include: {
+                        model: ProductModel
+                    }
+                }
+            },
+            {
+                model: UserModel,
+                attributes: ['userId', 'username', 'email'],
+                include: {
+                    model: UserAddressModel,
                 }
             }
-        },
-        where: { userId: userId, status: status }
+        ],
+        where: { 
+            userId: userId, 
+            status: {
+                [Op.like]: `%${status}%`
+            } 
+        }
     })
     return transactions;
 }
@@ -54,9 +76,12 @@ export const getTransactionsByIdService = async (transactionId) => {
             },
             {
                 model: UserModel,
-                attributes: ['userId', 'username', 'email']
-
-            }
+                attributes: ['userId', 'username', 'email'],
+                include: {
+                    model: UserAddressModel,
+                }
+            },
+            
         ],
         where: { transactionId: transactionId }
     })
@@ -145,7 +170,7 @@ export const checkOutVATransactionService = async (transactionId, amount, bank) 
 }
 
 export const updateTransactionStatusService = async (transactionId, gatewayResponse) => {
-    const updatedTransaction = TransactionHeaderModel.update(
+    const updatedTransaction = await TransactionHeaderModel.update(
         {
             status: 'Waiting for shipping',
             gatewayResponse: JSON.stringify(gatewayResponse)
@@ -157,4 +182,21 @@ export const updateTransactionStatusService = async (transactionId, gatewayRespo
         }
     )
     return updatedTransaction;
+}
+
+export const requestPickupTransactionService = async (transaction) => {
+
+    const createdKomshipOrder = await createOrderKomship(transaction);
+    // console.log(transaction);
+    const updatedTransaction = await TransactionHeaderModel.update(
+        {
+            status: 'Shipping'
+        },
+        {
+            where: {
+                transactionId: transaction.transactionId
+            },
+        }
+    )
+    return createdKomshipOrder
 }

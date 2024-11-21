@@ -122,7 +122,7 @@ export const checkOutVATransactionXendit = async (transactionId, amount, bank) =
             virtualAccount : {
                 channelProperties : {
                     customerName : "csfskhskdh",
-                    expiresAt : new Date("2025-01-03T17:00:00Z")
+                    expiresAt : new Date().getDate() + 1
                 },
                 channelCode : bank
             },

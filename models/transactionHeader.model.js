@@ -53,8 +53,8 @@ const TransactionHeader = sequelize.define('transaction_headers', {
     length: 50,
     allowNull: false
   },
-  expeditionType: {
-    field: "expedition_type",
+  shippingType: {
+    field: "shipping_type",
     type: DataTypes.STRING,
     length: 50,
     allowNull: false

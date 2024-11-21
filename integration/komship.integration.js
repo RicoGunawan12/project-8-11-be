@@ -1,7 +1,10 @@
 import { response } from "express";
+import { body } from "express-validator";
+import { formatDateToString } from "../utils/utility.js";
 
 const myHeaders = new Headers();
 myHeaders.append("x-api-key", process.env.KOMSHIP_API);
+myHeaders.append("Content-Type", "application/json");
 
 export const searchDestinationKomship = async (keyword) => {
 
@@ -16,7 +19,7 @@ export const searchDestinationKomship = async (keyword) => {
     };
 
     try {
-        const response = await fetch("https://api.collaborator.komerce.my.id/tariff/api/v1/destination/search?keyword=" + keyword, requestOptions);
+        const response = await fetch(process.env.KOMSHIP_URL + "/tariff/api/v1/destination/search?keyword=" + keyword, requestOptions);
         
         if (!response.ok) {
             throw new Error(`Error: ${response.statusText}`);
@@ -39,7 +42,8 @@ export const calculateDeliveryFeeKomship = async (shipperDestinationId, receiver
 
     
     try {
-        const komshipResponse = await fetch(`https://api.collaborator.komerce.my.id/tariff/api/v1/calculate?shipper_destination_id=${shipperDestinationId}&receiver_destination_id=${receiverDestinationId}&weight=${weight}&item_value=${itemValue}&cod=${cod}`, requestOptions);
+        
+        const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/tariff/api/v1/calculate?shipper_destination_id=${shipperDestinationId}&receiver_destination_id=${receiverDestinationId}&weight=${weight}&item_value=${itemValue}&cod=${cod}`, requestOptions);
         if (!komshipResponse.ok) {
             throw new Error("Failed to calculate delivery fee: " + komshipResponse.statusText);
         }
@@ -74,18 +78,114 @@ export const calculateDeliveryFeeKomship = async (shipperDestinationId, receiver
 // "cod_value":317000,
 // "insurance_value": 1000,
 // "order_details": [
-//     {
-//         "product_name": "Komship package",
-//         "product_variant_name": "Komship variant product",
-//         "product_price": 500000,
-//         "product_width": 5,
-//         "product_height": 2,
-//         "product_weight": 5100,
-//         "product_length": 20,
-//         "qty": 1,
-//         "subtotal": 500000
-//     }
+    // {
+    //     "product_name": "Komship package",
+    //     "product_variant_name": "Komship variant product",
+    //     "product_price": 500000,
+    //     "product_width": 5,
+    //     "product_height": 2,
+    //     "product_weight": 5100,
+    //     "product_length": 20,
+    //     "qty": 1,
+    //     "subtotal": 500000
+    // }
 // ]
-export const createOrderKomship = async () => {
+export const createOrderKomship = async (transaction) => {
+    const transactionDetails = transaction.transaction_details.map((det) => {
+        return {
+            product_name: det.product_variant.product.productName, 
+            product_variant_name: 
+                (det.product_variant.productSize ?? "") + 
+                " - " + 
+                (det.product_variant.productColor ?? ""), 
+            product_price: det.product_variant.productPrice, 
+            product_width: 5, 
+            product_height: 5, 
+            product_weight: Math.ceil(det.product_variant.productWeight), 
+            product_length: 5, 
+            qty: det.quantity, 
+            subtotal: det.quantity * det.product_variant.productPrice
+        };
+    });
+    console.log(transactionDetails);
 
+    const requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        redirect: 'follow',
+        body: JSON.stringify({
+            order_date: formatDateToString(new Date()),
+            brand_name: "Tyeso",
+            shipper_name: "Toko Official Tyeso",
+            shipper_phone: "6281234567689",
+            shipper_destination_id: 17588,
+            shipper_address: "test 123123",
+            shipper_email: "test@gmail.com",
+            receiver_name: transaction.user.username, //ambil dari transaction
+            receiver_phone: transaction.user.user_addresses[0].receiverPhoneNumber, //ambil dari transaction
+            receiver_destination_id: parseInt(transaction.user.user_addresses[0].komshipAddressId), //ambil dari transaction,
+            receiver_address: transaction.user.user_addresses[0].addressDetail, // ambil dari transaction
+            shipping: transaction.expedition, // ambil dari transaction,
+            shipping_type: transaction.shippingType, // ambil dari transaction
+            payment_method: "BANK TRANSFER",
+            shipping_cost: transaction.deliveryFee, // ambil dari transaction
+            shipping_cashback: 2500,
+            service_fee: 0,
+            additional_cost: 0,
+            grand_total: transaction.totalPrice + transaction.deliveryFee,
+            cod_value: 0,
+            insurance_value: 0,
+            order_details: transactionDetails
+        })
+        // body: JSON.stringify({
+        //     order_date: "2024-11-19 17:59:59",
+        //     brand_name: "Komship",
+        //     shipper_name: "Toko Official Komship",
+        //     shipper_phone: "6281234567689",
+        //     shipper_destination_id: 17588,
+        //     shipper_address: "order address detail",
+        //     shipper_email:"test@gmail.com",
+        //     receiver_name: "Buyer A",
+        //     receiver_phone: "6281209876543",
+        //     receiver_destination_id: 17589,
+        //     receiver_address: "order destination address detail",
+        //     shipping: "JNT",
+        //     shipping_type: "EZ",
+        //     payment_method: "BANK TRANSFER",
+        //     shipping_cost:22000,
+        //     shipping_cashback:10000,
+        //     service_fee:0,
+        //     additional_cost:1000,
+        //     grand_total:317000,
+        //     cod_value:317000,
+        //     insurance_value: 1000,
+        //     order_details: [
+        //         {
+        //             product_name: "Komship package",
+        //             product_variant_name: "Komship variant product",
+        //             product_price: 500000,
+        //             product_width: 5,
+        //             product_height: 2,
+        //             product_weight: 5100,
+        //             product_length: 20,
+        //             qty: 1,
+        //             subtotal: 500000
+        //         }
+        //     ]
+        // })
+    };
+    console.log(requestOptions);
+    try {
+        const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/store`, requestOptions);
+        console.log(komshipResponse);
+        
+        if (!komshipResponse.ok) {
+            throw new Error("Failed to store order: " + komshipResponse.statusText);
+        }
+    
+        return { komshipResponse: "Order created successfully" };
+    } catch (error) {
+        throw new Error(error.message);
+    }
+    
 }
