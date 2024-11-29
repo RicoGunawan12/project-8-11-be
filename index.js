@@ -16,6 +16,7 @@ import AddressRoute from './routes/address.route.js';
 import TransactionRoute from './routes/transaction.route.js';
 import FAQRoute from './routes/faq.route.js';
 import PostRoute from './routes/post.route.js';
+import { storeAllCityService, storeAllProvinceService } from './services/address.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,6 +28,9 @@ const app = express();
 app.use(cors())
 app.use(express.json());
 app.use(morgan('dev'));
+
+await storeAllProvinceService();
+await storeAllCityService();
 
 app.use('/assets', express.static(path.join(__dirname, '/assets')));
 

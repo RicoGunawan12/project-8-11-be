@@ -63,7 +63,7 @@ export const getTransactionsByUserService = async (userId, status) => {
 }
 
 export const getTransactionsByIdService = async (transactionId) => {
-    const transactions = await TransactionHeaderModel.findAll({
+    const transactions = await TransactionHeaderModel.findOne({
         include: [
             {
                 model: TransactionDetailModel,
@@ -99,6 +99,7 @@ export const createTransactionService = async (
     expedition,
     shippingType,
     deliveryFee,
+    deliveryCashback,
     paymentDeadline,
     notes,
     totalPrice,
@@ -115,6 +116,7 @@ export const createTransactionService = async (
         expedition,
         shippingType,
         deliveryFee,
+        deliveryCashback,
         paymentDeadline,
         notes,
         totalPrice,
@@ -184,12 +186,13 @@ export const updateTransactionStatusService = async (transactionId, gatewayRespo
     return updatedTransaction;
 }
 
-export const requestPickupTransactionService = async (transaction) => {
+export const createKomshipOrderService = async (transaction) => {
 
     const createdKomshipOrder = await createOrderKomship(transaction);
-    // console.log(transaction);
     const updatedTransaction = await TransactionHeaderModel.update(
         {
+            komshipOrderNumber: createdKomshipOrder.komshipResponse.data.order_no,
+            komshipOrderId: createdKomshipOrder.komshipResponse.data.order_id,
             status: 'Shipping'
         },
         {
@@ -198,5 +201,10 @@ export const requestPickupTransactionService = async (transaction) => {
             },
         }
     )
+
     return createdKomshipOrder
+}
+
+export const requestPickupTransactionService = async (transaction) => {
+    
 }

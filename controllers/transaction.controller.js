@@ -1,6 +1,6 @@
 import { createQrisTransactionXendit } from "../integration/xendit.integration.js";
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
-import { checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, createTransactionDetailService, createTransactionService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, requestPickupTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
+import { checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, createKomshipOrderService, createTransactionDetailService, createTransactionService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, requestPickupTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
 
 
 export const getAllTransactions = async (req, res) => {
@@ -48,6 +48,7 @@ export const createTransaction = async (req, res) => {
         expedition,
         shippingType,
         deliveryFee, 
+        deliveryCashback,
         notes
     } = req.body;
     const userId = req.user.userId;
@@ -62,6 +63,9 @@ export const createTransaction = async (req, res) => {
     try {
         // get all item from user cart
         const userCart = await getCartItemsByUserService(userId);
+        if (userCart.length === 0) {
+            return res.status(400).json({ message: "There is no items in cart!" });
+        }
         const productsInCart = userCart;
         console.log(userCart);
 
@@ -96,6 +100,7 @@ export const createTransaction = async (req, res) => {
             expedition, 
             shippingType,
             deliveryFee, 
+            deliveryCashback,
             new Date(Date.now() + 1 * 60 * 60 * 1000), 
             notes,
             totalPrice,
@@ -268,6 +273,9 @@ export const updateTransactionStatus = async (req, res) => {
     
     try {
         const updatedTransaction = await updateTransactionStatusService(reference_id, req.body);
+        const getTransactionById = await getTransactionsByIdService(reference_id);
+        const response = await createKomshipOrderService(getTransactionById);
+        // return res.status(200).json({ response });
         return res.redirect('/');
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -278,9 +286,7 @@ export const updateTransactionStatus = async (req, res) => {
 export const requestPickupTransaction = async (req, res) => {
     const { transactionId } = req.body;
     try {
-        const getTransactionById = await getTransactionsByIdService(transactionId);
-        const response = await requestPickupTransactionService(getTransactionById[0]);
-        // console.log(response);
+        
 
         return res.status(200).json({ message: "Success!", response });
     } catch (error) {

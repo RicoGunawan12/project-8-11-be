@@ -64,6 +64,11 @@ const TransactionHeader = sequelize.define('transaction_headers', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
+  deliveryCashback: {
+    field: "delivery_cashback",
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
   paymentDeadline: {
     field: "payment_deadline",
     type: DataTypes.DATE,
@@ -84,6 +89,16 @@ const TransactionHeader = sequelize.define('transaction_headers', {
     type: DataTypes.STRING,
     allowNull: true, 
   },
+  komshipOrderNumber: {
+    field: "komship_order_number",
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  komshipOrderId: {
+    field: "komship_order_id",
+    type: DataTypes.INTEGER,
+    allowNull: true
+  }
 },{
   timestamps: false
 })

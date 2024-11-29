@@ -121,7 +121,7 @@ export const createOrderKomship = async (transaction) => {
             shipper_destination_id: 17588,
             shipper_address: "test 123123",
             shipper_email: "test@gmail.com",
-            receiver_name: transaction.user.username, //ambil dari transaction
+            receiver_name: transaction.user.user_addresses[0].receiverName, //ambil dari transaction
             receiver_phone: transaction.user.user_addresses[0].receiverPhoneNumber, //ambil dari transaction
             receiver_destination_id: parseInt(transaction.user.user_addresses[0].komshipAddressId), //ambil dari transaction,
             receiver_address: transaction.user.user_addresses[0].addressDetail, // ambil dari transaction
@@ -129,10 +129,10 @@ export const createOrderKomship = async (transaction) => {
             shipping_type: transaction.shippingType, // ambil dari transaction
             payment_method: "BANK TRANSFER",
             shipping_cost: transaction.deliveryFee, // ambil dari transaction
-            shipping_cashback: 2500,
+            shipping_cashback: transaction.deliveryCashback,
             service_fee: 0,
             additional_cost: 0,
-            grand_total: transaction.totalPrice + transaction.deliveryFee,
+            grand_total: transaction.totalPrice,
             cod_value: 0,
             insurance_value: 0,
             order_details: transactionDetails
@@ -182,10 +182,21 @@ export const createOrderKomship = async (transaction) => {
         if (!komshipResponse.ok) {
             throw new Error("Failed to store order: " + komshipResponse.statusText);
         }
-    
-        return { komshipResponse: "Order created successfully" };
+        
+        const result = await komshipResponse.json();
+        return { response: "Order created successfully", komshipResponse: result };
     } catch (error) {
         throw new Error(error.message);
     }
     
+}
+
+
+export const requestPickUpKomship = async (orderNumber) => {
+    const requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        redirect: 'follow',
+        body:
+    }
 }

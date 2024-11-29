@@ -48,9 +48,7 @@ export const getAllSubdistrictRajaOngkir = async (city) => {
             headers: myHeaders,
             redirect: "follow"
         };
-        if (city === undefined) {
-            city = "";
-        }
+        
         const response = await fetch(process.env.RAJAONGKIR_URL + "/api/subdistrict?city=" + city, requestOptions);
         if (!response.ok) {
             throw new Error(`Error: ${response.statusText}`);

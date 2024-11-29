@@ -46,6 +46,11 @@ export const getAllCity = async (req, res) => {
 
 export const getAllSubdistrict = async (req, res) => {
     const { city } = req.query;
+    
+    if (city === undefined) {
+        city = "";
+    }
+    
     try {
         const subdistrict = await getAllSubdistrictService(city);
         return res.status(200).json({ subdistrict });
