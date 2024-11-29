@@ -4,13 +4,14 @@ import { deleteDirectory } from "../utils/uploader.js";
 import { getCategoryByName } from "./productCategory.service.js";
 
 
-export const getProductsService = async (search) => {
+export const getProductsService = async (search, category) => {
     const products = ProductModel.findAll({
         attributes: ['productId', 'productName', 'productDescription'],
         include: [
             {
                 model: ProductCategoryModel,
-                attributes: ['productCategoryName']
+                attributes: ['productCategoryName'],
+                where: category ? { productCategoryName: category } : undefined,
             },
             {
                 model: ProductVariantModel,
@@ -18,7 +19,7 @@ export const getProductsService = async (search) => {
             },   
         ],
         where: {
-            [Op.like]: `%${search}%`
+            productName: {  [Op.like]: `%${search}%` }
         }
     });
     return products;

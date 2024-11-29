@@ -3,9 +3,20 @@ import { createProductVariantService, updatePromoService } from "../services/pro
 import { BASE_URL, UPLOAD_FOLDER } from "../utils/uploader.js";
 
 export const getProducts = async (req, res) => {
-    const { search } = req.query;
-    const products = await getProductsService(search);
-    return res.status(200).json(products) ;
+    var { search, category } = req.query;
+    if (!search) {
+        search = ""
+    }
+    if (!category) {
+        category = ""
+    }
+    try {
+        const products = await getProductsService(search, category);
+        
+        return res.status(200).json(products) ;
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
 }
 
 export const getProductById = async (req, res) => {
