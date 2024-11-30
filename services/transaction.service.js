@@ -167,7 +167,9 @@ export const checkOutQrisTransactionService = async (transactionId, amount) => {
 }
 
 export const checkOutVATransactionService = async (transactionId, amount, bank) => {
-    const response = await checkOutVATransactionXendit(transactionId, amount, bank);
+    const getTransaction = await getTransactionsByIdService(transactionId);
+
+    const response = await checkOutVATransactionXendit(transactionId, amount, bank, getTransaction.user.username);
     return response;
 }
 

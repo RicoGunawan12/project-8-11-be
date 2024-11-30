@@ -109,7 +109,11 @@ export const createQrisTransactionXendit = async (transactionId, amount) => {
     return response;
 }
 
-export const checkOutVATransactionXendit = async (transactionId, amount, bank) => {
+export const checkOutVATransactionXendit = async (transactionId, amount, bank, customerName) => {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    
     const data = {
         country : "ID",
         amount : amount,
@@ -121,8 +125,9 @@ export const checkOutVATransactionXendit = async (transactionId, amount, bank) =
             type : "VIRTUAL_ACCOUNT",
             virtualAccount : {
                 channelProperties : {
-                    customerName : "csfskhskdh",
-                    expiresAt : new Date().getDate() + 1
+                    customerName : customerName,
+                    // expiresAt : expiredDate
+                    expiresAt : tomorrow
                 },
                 channelCode : bank
             },
