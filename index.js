@@ -29,9 +29,6 @@ app.use(cors())
 app.use(express.json());
 app.use(morgan('dev'));
 
-await storeAllProvinceService();
-await storeAllCityService();
-
 app.use('/assets', express.static(path.join(__dirname, '/assets')));
 
 app.use('/api/users', userRoute);
@@ -49,6 +46,9 @@ app.use('/api/posts', PostRoute);
   try {
     // await sequelize.sync({ force:true, alter: true });
     await sequelize.sync();
+    
+    await storeAllProvinceService();
+    await storeAllCityService();
     app.listen(5000, () => {
       console.log('Server running on port 5000');
     });

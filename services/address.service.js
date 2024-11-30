@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { Op, where } from "sequelize";
 import { UserAddressModel } from "../association/association.js"
 import { calculateDeliveryFeeKomship, searchDestinationKomship } from "../integration/komship.integration.js";
 import { getAllCityRajaOngkir, getAllProvinceRajaOngkir, getAllSubdistrictRajaOngkir } from "../integration/rajaongkir.integeration.js";
@@ -29,19 +29,59 @@ export const createAddresService = async (receiverName, receiverPhoneNumber, add
     return insertedAddress;
 }
 
+export const deleteAddressService = async (addressId) => {
+    const deletedAddress = await UserAddressModel.destroy({
+        where: { addressId }
+    })
+    
+    if (deletedAddress == 0) {
+        throw new Error("Address not found!");
+    }
+    return deletedAddress;
+}
+
+export const updateAddresService = async (addressId, receiverName, receiverPhoneNumber, addressProvince, addressCity, addressSubdistrict, postalCode, addressDetail) => {
+    addressProvince = addressProvince.toUpperCase();
+    addressCity = addressCity.toUpperCase();
+    addressSubdistrict = addressSubdistrict.toUpperCase();
+    
+    const destination = await searchDestinationKomship(postalCode);
+    
+    var komshipAddressId = destination.data[0].id;
+    var komshipLabel = destination.data[0].label;
+
+    const updatedAddress = await UserAddressModel.update(
+        {
+            receiverName: receiverName,
+            receiverPhoneNumber: receiverPhoneNumber,
+            addressProvince: addressProvince,
+            addressCity: addressCity,
+            addressSubdistrict: addressSubdistrict,
+            postalCode: postalCode,
+            addressDetail: addressDetail,
+            komshipAddressId: komshipAddressId,
+            komshipLabel: komshipLabel
+        },
+        { where: { addressId } }
+    );
+    if (updatedAddress[0] === 0) {
+        throw new Error("Address not found!");
+    }
+    return updatedAddress;
+}
+
 export const getAllProvinceService = async () => {
     const provinces = await RajaOngkirProvince.findAll();
     return provinces
 }
 
 export const getAllCityService = async (province) => {
-    const cities = await RajaOngkirCity.findAll({
+    const cities = await RajaOngkirCity.findAll( province != "" ? {
         where: {
-            province_id: {
-                [Op.like]: `%${province}%`
-            }
+            province_id: province
         }
-    });
+        
+    } : {});
     return cities;
 }
 

@@ -84,7 +84,6 @@ export const updateCartItemService = async (cartItemId, quantity) => {
             model: ProductVariantModel
         }
     })
-    console.log(getProductVariant);
 
     if (getProductVariant.product_variant.productStock < quantity) {
         throw new Error("There are only " + getProductVariant.product_variant.productStock + " stock");

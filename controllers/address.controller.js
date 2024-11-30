@@ -1,4 +1,4 @@
-import { calculateDeliveryFeeService, createAddresService, getAddresByUserIdService, getAllCityService, getAllProvinceService, getAllSubdistrictService, searchDestinationService } from "../services/address.service.js";
+import { calculateDeliveryFeeService, createAddresService, deleteAddressService, getAddresByUserIdService, getAllCityService, getAllProvinceService, getAllSubdistrictService, searchDestinationService, updateAddresService } from "../services/address.service.js";
 
 
 export const getAddressByUserId = async (req, res) => {
@@ -20,6 +20,33 @@ export const createAddress = async (req, res) => {
     try {
         const insertedAddress = await createAddresService(receiverName, receiverPhoneNumber, province, city, subdistrict, postalCode, userId, addressDetail);
         return res.status(200).json(insertedAddress);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const deleteAddress = async (req, res) => {
+    const addressId = req.params.id;
+    if (!addressId) {
+        return res.status(400).json({ message: "Address id must not null" })
+    }
+    try {
+        const deletedAddress = await deleteAddressService(addressId);
+        return res.status(200).json({ message: "Address deleted!" , deletedAddress});
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const updateAddress = async (req, res) => {
+    const { receiverName, receiverPhoneNumber, province, city, subdistrict, postalCode, addressDetail } = req.body;
+    const addressId = req.params.id;
+    if (!addressId) {
+        return res.status(400).json({ message: "Address id must not null" })
+    }
+    try {
+        const updatedAddress = await updateAddresService(addressId, receiverName, receiverPhoneNumber, province, city, subdistrict, postalCode, addressDetail);
+        return res.status(200).json({ message: "Address updated!" , updatedAddress });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

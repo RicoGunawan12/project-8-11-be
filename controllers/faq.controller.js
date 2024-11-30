@@ -21,6 +21,9 @@ export const createFAQ = async (req, res) => {
 
 export const deleteFAQ = async (req, res) => {
     const faqId = req.params.id;
+    if (!faqId) {
+        return res.status(400).json({ message: "FAQ id must not null" })
+    }
     try {
         const deletedFAQ = await deleteFAQService(faqId);
         return res.status(200).json({ message: "FAQ deleted!", deletedFAQ });
@@ -32,6 +35,9 @@ export const deleteFAQ = async (req, res) => {
 export const updateFAQ = async (req, res) => {
     const { faqQuestion, faqAnswer } = req.body;
     const faqId = req.params.id;
+    if (!faqId) {
+        return res.status(400).json({ message: "FAQ id must not null" })
+    }
 
     try {
         const updatedFAQ = await updateFAQService(faqId, faqQuestion, faqAnswer);

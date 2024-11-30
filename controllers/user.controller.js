@@ -23,13 +23,26 @@ export const registerUser = async (req, res) => {
 };
 
 export const getUsers = async (req, res) => {
-  const users = await getUsersService();
-  return res.status(200).json(users)
+  try {
+    const users = await getUsersService();
+    return res.status(200).json(users)
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 }
 
 export const getUserById = async (req, res) => {
-  const user = await getUserByIdService(req.params.id);
-  return res.status(200).json(user)
+  const userId = req.params.id;
+  if (userId) {
+    return res.status(400).json({ message: "User id is required" });
+  }
+
+  try {
+    const user = await getUserByIdService(userId);
+    return res.status(200).json(user)
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 }
 
 export const loginUser = async (req, res) => {

@@ -197,6 +197,72 @@ export const requestPickUpKomship = async (orderNumber) => {
         method: 'POST',
         headers: myHeaders,
         redirect: 'follow',
-        body:
+        body: JSON.stringify(
+            {
+                pickup_date: new Date().toISOString().slice(0, 10),
+                pickup_time: "20:00:00",
+                pickup_vehicle: "Motor",
+                orders: [
+                    {
+                        order_no: orderNumber
+                    }
+                ]
+            }
+        )
+    }
+    
+    try {
+        const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/pickup/request`, requestOptions);
+        console.log(komshipResponse);
+        if (!komshipResponse.ok) {
+            throw new Error(`Error: ${komshipResponse.statusText}`);
+        }
+        const result = await komshipResponse.json();
+        return result;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+export const deliveryDetailKomship = async (orderNumber) => {
+    const requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+    }
+
+    try {
+        const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/detail?order_no=${orderNumber}`, requestOptions);
+        console.log(komshipResponse);
+        
+        if (!komshipResponse.ok) {
+            throw new Error(`Error: ${komshipResponse.statusText}`);
+        }
+
+        const result = await komshipResponse.json();
+        return result;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+export const printLabelKomship = async (orderNumber) => {
+    const requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+    }
+
+    try {
+        const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/print-label?order_no=${orderNumber}&page=page_1`, requestOptions);
+        
+        if (!komshipResponse.ok) {
+            throw new Error(`Error: ${komshipResponse.statusText}`);
+        }
+
+        const result = await komshipResponse.json();
+        return result;
+    } catch (error) {
+        throw new Error(error.message);
     }
 }
