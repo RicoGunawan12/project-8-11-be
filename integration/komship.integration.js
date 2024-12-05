@@ -248,7 +248,7 @@ export const deliveryDetailKomship = async (orderNumber) => {
 
 export const printLabelKomship = async (orderNumber) => {
     const requestOptions = {
-        method: 'GET',
+        method: 'POST',
         headers: myHeaders,
         redirect: 'follow'
     }
