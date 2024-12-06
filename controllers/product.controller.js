@@ -37,6 +37,7 @@ export const getProductById = async (req, res) => {
 export const createProduct = async (req, res) => {
     try {
         const images = req.files['productImage'];
+        const defaultImage = req.files['displayImage']
         const { productName, productDescription, productCategoryName, productVariants } = req.body;
         
         const hash = new Map();
@@ -60,7 +61,8 @@ export const createProduct = async (req, res) => {
             variant.productImage = hash.get(productName + " - " + variant.productSize + " - " + variant.productColor);
         });
 
-        const product = await createProductService(productName, productDescription, productCategoryName);
+        const defaultImageString = `/${UPLOAD_FOLDER}${productName}/${defaultImage.filename}`
+        const product = await createProductService(productName, productDescription, productCategoryName, defaultImageString);
         const insertVariantPromise = variants.map(async (variant) => {
             console.log("product id: " + product.productId);
             

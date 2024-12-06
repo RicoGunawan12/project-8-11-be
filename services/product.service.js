@@ -47,7 +47,7 @@ export const getProductByIdService = async (productId) => {
     return product
 }
 
-export const createProductService = async (productName, productDescription, productCategoryName) => {
+export const createProductService = async (productName, productDescription, productCategoryName, defaultImage) => {
     const category = await getCategoryByName(productCategoryName);
     if (!category) {
         throw new Error("There is no " + productCategoryName + " category");
@@ -62,7 +62,7 @@ export const createProductService = async (productName, productDescription, prod
     
     const productCategoryId = category.productCategoryId;
     
-    const product = await ProductModel.create({ productName, productDescription, productCategoryId });
+    const product = await ProductModel.create({ productName, productDescription, productCategoryId, defaultImage });
     return product;
 }
 
