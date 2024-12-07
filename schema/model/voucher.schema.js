@@ -1,4 +1,5 @@
 
+
 export const voucherSchema = {
   voucherTypeCode: {
     isString: true,
@@ -13,17 +14,25 @@ export const voucherSchema = {
     },
   },
   voucherEndDate: {
-    isISO8601: true,
+    custom: {
+      options: (value) => value === null || isISO8601(value),
+      errorMessage: 'Voucher End Date must be a valid ISO date or null',
+    },
+    optional: true, 
     toDate: true,
-    errorMessage: 'Voucher End Date must be a valid ISO date',
   },
   maxDiscount: {
-    isFloat: {
-      options: { min: 0, max: 100 },
-      errorMessage: 'Max Discount must be a valid number with two decimal places',
-    },
     optional: true,
-    toFloat: true,
+    custom: {
+      options: (value) => {
+        if (value === null || value === undefined) {
+          return true; 
+        }
+        const floatValue = parseFloat(value);
+        return !isNaN(floatValue) && floatValue >= 0;
+      },
+      errorMessage: 'Max Discount must be a number between 0 and 100 or empty',
+    },
   },
   discount: {
     isFloat: {
