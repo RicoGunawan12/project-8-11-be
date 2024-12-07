@@ -1,6 +1,6 @@
 import { createQrisTransactionXendit } from "../integration/xendit.integration.js";
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
-import { checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, createKomshipOrderService, createTransactionDetailService, createTransactionService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, requestPickupTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
+import { checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, printLabelService, requestPickupTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
 
 
 export const getAllTransactions = async (req, res) => {
@@ -32,6 +32,9 @@ export const getTransactionsByUser = async (req, res) => {
 
 export const getTransactionById = async (req, res) => {
     const transactionId = req.params.id;
+    if (!transactionId) {
+        return res.status(400).json({ message: "Transaction id is required" })
+    }
     try {
         const transaction = await getTransactionsByIdService(transactionId);
         return res.status(200).json({ message: "Transaction fetched successfully", transaction })
@@ -286,9 +289,31 @@ export const updateTransactionStatus = async (req, res) => {
 export const requestPickupTransaction = async (req, res) => {
     const { transactionId } = req.body;
     try {
-        
-
+        const getTransactionById = await getTransactionsByIdService(transactionId);
+        const response = await requestPickupTransactionService(getTransactionById);
         return res.status(200).json({ message: "Success!", response });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const deliveryDetail = async (req, res) => {
+    const { orderNumber } = req.body;
+
+    try {
+        const detail = await deliveryDetailService(orderNumber);
+        return res.status(200).json({ message: "Success!", detail });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const printLabel = async (req, res) => {
+    const { orderNumber } = req.body;
+
+    try {
+        const label = await printLabelService(orderNumber);
+        return res.status(200).json({ message: "Success!", label });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

@@ -1,4 +1,4 @@
-import { CartItemModel, CartModel, ProductVariantModel } from "../association/association.js"
+import { CartItemModel, CartModel, ProductModel, ProductVariantModel } from "../association/association.js"
 import ProductVariant from "../models/productVariant.model.js";
 
 
@@ -24,7 +24,13 @@ export const getCartItemsByUserService = async (userId) => {
                 attributes: []
             },
             {
-                model: ProductVariantModel
+                model: ProductVariantModel,
+                include: [
+                    {
+                        model: ProductModel,
+                        attributes: ['productName']
+                    }
+                ]
             }
         ],
         attributes: ['cartItemId', 'productVariantId', 'quantity']
@@ -84,7 +90,6 @@ export const updateCartItemService = async (cartItemId, quantity) => {
             model: ProductVariantModel
         }
     })
-    console.log(getProductVariant);
 
     if (getProductVariant.product_variant.productStock < quantity) {
         throw new Error("There are only " + getProductVariant.product_variant.productStock + " stock");

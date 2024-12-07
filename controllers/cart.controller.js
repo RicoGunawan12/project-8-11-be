@@ -28,6 +28,10 @@ export const addCartItem = async (req, res) => {
 export const removeCartItem = async (req, res) => {
     const cartItemId = req.params.id;
 
+    if (!cartItemId) {
+        return res.status(400).json({ message: "Cart item id must not null" })
+    }
+
     try {
         const removeCartItem = await removeCartItemService(cartItemId);
         res.status(200).json({ message: "Product removed from the cart!" });
@@ -39,6 +43,13 @@ export const removeCartItem = async (req, res) => {
 export const updateCartItem = async (req, res) => {
     const cartItemId = req.params.id;
     const { quantity } = req.body;
+
+    if (!cartItemId) {
+        return res.status(400).json({ message: "Cart item id must not null" })
+    }
+    else if (!quantity || quantity <= 0) {
+        return res.status(400).json({ message: "Quantity must ber more than 0" })
+    }
 
     try {
         const updatedCartItem = await updateCartItemService(cartItemId, quantity);

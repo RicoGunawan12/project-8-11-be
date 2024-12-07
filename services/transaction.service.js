@@ -1,5 +1,5 @@
 import { ProductModel, ProductVariantModel, TransactionDetailModel, TransactionHeaderModel, UserAddressModel, UserModel } from "../association/association.js"
-import { createOrderKomship } from "../integration/komship.integration.js";
+import { createOrderKomship, deliveryDetailKomship, printLabelKomship, requestPickUpKomship } from "../integration/komship.integration.js";
 import { checkOutVATransactionXendit, createCreditCardTransactionXendit, createQrisTransactionXendit } from "../integration/xendit.integration.js";
 import { Op } from "sequelize";
 
@@ -167,7 +167,9 @@ export const checkOutQrisTransactionService = async (transactionId, amount) => {
 }
 
 export const checkOutVATransactionService = async (transactionId, amount, bank) => {
-    const response = await checkOutVATransactionXendit(transactionId, amount, bank);
+    const getTransaction = await getTransactionsByIdService(transactionId);
+
+    const response = await checkOutVATransactionXendit(transactionId, amount, bank, getTransaction.user.username);
     return response;
 }
 
@@ -206,5 +208,16 @@ export const createKomshipOrderService = async (transaction) => {
 }
 
 export const requestPickupTransactionService = async (transaction) => {
-    
+    const pickupResponse = await requestPickUpKomship(transaction.komshipOrderNumber);
+    return pickupResponse;
+}
+
+export const deliveryDetailService = async (orderNumber) => {
+    const deliveryDetail = await deliveryDetailKomship(orderNumber);
+    return deliveryDetail;
+}
+
+export const printLabelService = async (orderNumber) => {
+    const komshipLabel = await printLabelKomship(orderNumber);
+    return komshipLabel;
 }

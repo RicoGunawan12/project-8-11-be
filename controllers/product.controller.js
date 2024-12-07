@@ -1,9 +1,9 @@
 import { createProductService, deleteProductService, getProductByIdService, getProductsService } from "../services/product.service.js";
-import { createProductVariantService, updatePromoService } from "../services/productVariantService.js";
+import { createProductVariantService, updateProductQuantityService, updatePromoService } from "../services/productVariantService.js";
 import { BASE_URL, UPLOAD_FOLDER } from "../utils/uploader.js";
 
 export const getProducts = async (req, res) => {
-    var { search, category } = req.query;
+    var { search, category, limit } = req.query;
     if (!search) {
         search = ""
     }
@@ -11,7 +11,7 @@ export const getProducts = async (req, res) => {
         category = ""
     }
     try {
-        const products = await getProductsService(search, category);
+        const products = await getProductsService(search, category, limit);
         
         return res.status(200).json(products) ;
     } catch (error) {
@@ -23,7 +23,7 @@ export const getProductById = async (req, res) => {
     const id = req.params.id;
     
     if (!id) {
-        return res.status(400).json({ message: "Id is required" })
+        return res.status(400).json({ message: "Product id is required" })
     }
 
     try {
@@ -37,6 +37,7 @@ export const getProductById = async (req, res) => {
 export const createProduct = async (req, res) => {
     try {
         const images = req.files['productImage'];
+        const defaultImage = req.files['displayImage']
         const { productName, productDescription, productCategoryName, productVariants } = req.body;
         
         const hash = new Map();
@@ -60,7 +61,8 @@ export const createProduct = async (req, res) => {
             variant.productImage = hash.get(productName + " - " + variant.productSize + " - " + variant.productColor);
         });
 
-        const product = await createProductService(productName, productDescription, productCategoryName);
+        const defaultImageString = `/${UPLOAD_FOLDER}${productName}/${defaultImage.filename}`
+        const product = await createProductService(productName, productDescription, productCategoryName, defaultImageString);
         const insertVariantPromise = variants.map(async (variant) => {
             console.log("product id: " + product.productId);
             
@@ -80,7 +82,7 @@ export const deleteProduct = async (req, res) => {
     const id = req.params.id;
 
     if (!id) {
-        return res.status(400).json({ message: "Id is required" })
+        return res.status(400).json({ message: "Product id is required" })
     }
 
     try {
@@ -91,12 +93,31 @@ export const deleteProduct = async (req, res) => {
     }
 }
 
+export const updateProductQuantity = async (req, res) => {
+    const productVariantId = req.params.id;
+    const { quantity } = req.body;
+    
+    if (!productVariantId) {
+        return res.status(400).json({ message: "Product id is required!" });
+    }
+    else if (!quantity && quantity <= 0) {
+        return res.status(400).json({ message: "Quantity must be more thant 0" });    
+    }
+    
+    try {
+        const updatedProduct = await updateProductQuantityService(productVariantId, quantity);
+        return res.status(200).json({ message: "Quantity updated!", updatedProduct });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
 export const updatePromo = async (req, res) => {
     const id = req.params.id;
     const { productPromo, productPromoExpiry } = req.body
     console.log(productPromo, productPromoExpiry);
     if (!id) {
-        return res.status(400).json({ message: "Id is required" })
+        return res.status(400).json({ message: "Product id is required" })
     }
 
     if (productPromo < 0) {

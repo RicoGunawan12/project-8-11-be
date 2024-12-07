@@ -4,7 +4,7 @@ import { deleteDirectory } from "../utils/uploader.js";
 import { getCategoryByName } from "./productCategory.service.js";
 
 
-export const getProductsService = async (search, category) => {
+export const getProductsService = async (search, category, limit) => {
     const products = ProductModel.findAll({
         attributes: ['productId', 'productName', 'productDescription'],
         include: [
@@ -20,7 +20,8 @@ export const getProductsService = async (search, category) => {
         ],
         where: {
             productName: {  [Op.like]: `%${search}%` }
-        }
+        },
+        limit: parseInt(limit) || null,
     });
     return products;
 }
@@ -47,7 +48,7 @@ export const getProductByIdService = async (productId) => {
     return product
 }
 
-export const createProductService = async (productName, productDescription, productCategoryName) => {
+export const createProductService = async (productName, productDescription, productCategoryName, defaultImage) => {
     const category = await getCategoryByName(productCategoryName);
     if (!category) {
         throw new Error("There is no " + productCategoryName + " category");
@@ -62,7 +63,7 @@ export const createProductService = async (productName, productDescription, prod
     
     const productCategoryId = category.productCategoryId;
     
-    const product = await ProductModel.create({ productName, productDescription, productCategoryId });
+    const product = await ProductModel.create({ productName, productDescription, productCategoryId, defaultImage });
     return product;
 }
 

@@ -2,7 +2,10 @@ import { createCategoryService, deleteCategoryService, getCategoriesService, upd
 
 
 export const getCategories = async (req, res) => {
-    const { search } = req.query
+    var { search } = req.query
+    if (!search) {
+        search = '';
+    }
     const categories = await getCategoriesService(search);
     return res.status(200).json(categories)
 }
