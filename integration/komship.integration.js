@@ -99,10 +99,10 @@ export const createOrderKomship = async (transaction) => {
                 " - " + 
                 (det.product_variant.productColor ?? ""), 
             product_price: det.product_variant.productPrice, 
-            product_width: 5, 
-            product_height: 5, 
+            product_width: det.product_variant.productWidth, 
+            product_height: det.product_variant.productHeight, 
             product_weight: Math.ceil(det.product_variant.productWeight), 
-            product_length: 5, 
+            product_length: det.product_variant.productLength, 
             qty: det.quantity, 
             subtotal: det.quantity * det.product_variant.productPrice
         };

@@ -2,8 +2,8 @@ import { ProductVariantModel } from "../association/association.js";
 
 
 export const createProductVariantService = async (productId, variant) => {
-    const { sku, productSize, productColor, productPrice, productStock, productWeight, productImage } = variant;
-    const productVariant = await ProductVariantModel.create({ productId, sku, productSize, productColor, productPrice, productStock, productImage, productWeight })
+    const { sku, productSize, productColor, productPrice, productStock, productWeight, productWidth, productLength, productHeight, productImage } = variant;
+    const productVariant = await ProductVariantModel.create({ productId, sku, productSize, productColor, productPrice, productStock, productImage, productWeight, productWidth, productLength, productHeight })
     return productVariant;
 }
 

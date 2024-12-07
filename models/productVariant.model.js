@@ -44,6 +44,21 @@ const ProductVariant = sequelize.define('product_variants', {
     type: DataTypes.FLOAT,
     allowNull: false
   },
+  productWidth: {
+    field: "product_width",
+    type: DataTypes.FLOAT,
+    allowNull: false
+  },
+  productLength: {
+    field: "product_length",
+    type: DataTypes.FLOAT,
+    allowNull: false
+  },
+  productHeight: {
+    field: "product_height",
+    type: DataTypes.FLOAT,
+    allowNull: false
+  },
   productStock: {
     field: "product_stock",
     type: DataTypes.INTEGER,
