@@ -3,7 +3,7 @@ import { createProductVariantService, updateProductQuantityService, updatePromoS
 import { BASE_URL, UPLOAD_FOLDER } from "../utils/uploader.js";
 
 export const getProducts = async (req, res) => {
-    var { search, category } = req.query;
+    var { search, category, limit } = req.query;
     if (!search) {
         search = ""
     }
@@ -11,7 +11,7 @@ export const getProducts = async (req, res) => {
         category = ""
     }
     try {
-        const products = await getProductsService(search, category);
+        const products = await getProductsService(search, category, limit);
         
         return res.status(200).json(products) ;
     } catch (error) {

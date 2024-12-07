@@ -4,7 +4,7 @@ import { deleteDirectory } from "../utils/uploader.js";
 import { getCategoryByName } from "./productCategory.service.js";
 
 
-export const getProductsService = async (search, category) => {
+export const getProductsService = async (search, category, limit) => {
     const products = ProductModel.findAll({
         attributes: ['productId', 'productName', 'productDescription'],
         include: [
@@ -20,7 +20,8 @@ export const getProductsService = async (search, category) => {
         ],
         where: {
             productName: {  [Op.like]: `%${search}%` }
-        }
+        },
+        limit: parseInt(limit) || null,
     });
     return products;
 }
