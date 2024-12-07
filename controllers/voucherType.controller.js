@@ -1,7 +1,7 @@
 
 // #region GET
 
-import { createVoucherTypesService, getAllVoucherTypesService, getVoucherTypeByCodeService } from "../services/voucherType.service.js";
+import { createVoucherTypesService, deleteVoucherTypeByCodeService, getAllVoucherTypesService, getVoucherTypeByCodeService, updateVoucherTypesService } from "../services/voucherType.service.js";
 
 export const getAllVoucherTypes = async (req,res) => {
     const voucherTypes = await getAllVoucherTypesService();
@@ -20,9 +20,26 @@ export const getVoucherTypeByCode = async (req,res) => {
 
 export const createVoucherTypes = async (req,res) => {
   
-  const response = await createVoucherTypesService(req.body);
-  return res.status(200).json(response);
+  try {
+    await createVoucherTypesService(req.body);
+    return res.status(200).json({ message: "Voucher Type created successfully "});
+  } catch (error) {
+    return res.status(500).json({ message: error.message })
+  }
 }
+
+// #endregion
+
+// #region UPDATE
+
+  export const updateVoucherTypes = async (req,res) => {
+    try {
+      await updateVoucherTypesService(req.body);
+      return res.status(200).json({ message: "Voucher Type updated successfully "});
+    } catch (error) {
+      return res.status(500).json({ message: error.message })
+    }
+  }
 
 // #endregion
 
@@ -30,9 +47,13 @@ export const createVoucherTypes = async (req,res) => {
 
 export const deleteVoucherTypeByCode = async (req,res) => {
   
-  console.log(req)
-  const response = await deleteVoucherTypeByCode(req.body);
-  return res.status(200).json(response);
+  const {code} = req.body
+  try {
+    await deleteVoucherTypeByCodeService(code);
+    return res.status(200).json({ message: "Voucher Type removed successfully"});
+  } catch (error) {
+    return res.status(500).json({ message: error.message })
+  }
 }
 
 // #endregion

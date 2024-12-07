@@ -1,7 +1,7 @@
 import { body, checkSchema, validationResult } from "express-validator";
-import { voucherSchema } from "../../DTO/schema/voucher.dto.js";
+import { voucherSchema } from "../../schema/model/voucher.schema.js";
 
-export const createVouchersValidator = [
+export const vouchersValidator = [
   body('vouchers')
     .isArray({ min: 1 })
     .withMessage('vouchers should be a non-empty array'),

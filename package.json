@@ -22,7 +22,7 @@
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.11.2",
     "nodemon": "^3.1.7",
-    "sequelize": "^6.37.3",
+    "sequelize": "^6.37.5",
     "uuid": "^10.0.0",
     "xendit-node": "^6.0.0"
   }
