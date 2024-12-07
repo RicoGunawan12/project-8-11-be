@@ -6,7 +6,7 @@ import { getCategoryByName } from "./productCategory.service.js";
 
 export const getProductsService = async (search, category, limit) => {
     const products = ProductModel.findAll({
-        attributes: ['productId', 'productName', 'productDescription'],
+        attributes: ['productId', 'productName', 'productDescription', 'defaultImage'],
         include: [
             {
                 model: ProductCategoryModel,
@@ -15,7 +15,7 @@ export const getProductsService = async (search, category, limit) => {
             },
             {
                 model: ProductVariantModel,
-                attributes: ['productVariantId', 'sku', 'productPrice', 'productStock', 'productImage'],
+                attributes: ['productVariantId', 'productSize', 'productColor', 'sku', 'productPrice', 'productStock', 'productImage', 'productWeight', 'productLength', 'productWidth', 'productHeight'],
             },   
         ],
         where: {
@@ -28,7 +28,7 @@ export const getProductsService = async (search, category, limit) => {
 
 export const getProductByIdService = async (productId) => {
     const product = await ProductModel.findOne({
-        attributes: ['productId', 'productName', 'productDescription'],
+        attributes: ['productId', 'productName', 'productDescription', 'defaultImage'],
         include: [
             {
                 model: ProductCategoryModel,
@@ -36,7 +36,7 @@ export const getProductByIdService = async (productId) => {
             },
             {
                 model: ProductVariantModel,
-                attributes: ['productVariantId', 'sku', 'productPrice', 'productStock', 'productImage'],
+                attributes: ['productVariantId', 'productSize', 'productColor', 'sku', 'productPrice', 'productStock', 'productImage', 'productWeight', 'productLength', 'productWidth', 'productHeight'],
             }
         ],
         where: { productId }, 

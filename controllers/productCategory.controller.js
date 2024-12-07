@@ -11,14 +11,10 @@ export const getCategories = async (req, res) => {
 }
 
 export const createCategory = async (req, res) => {
-    const { category } = req.body;
-    
-    if (category.length < 1) {
-        return res.status(400).json({ message: "Category length must be filled" });
-    }
+    const { productCategoryName } = req.body;
 
     try {
-        const insertedCategory = await createCategoryService(category);
+        const insertedCategory = await createCategoryService(productCategoryName);
         return res.status(200).json({ message: "New category added!"});
     } catch (error) {
         return res.status(500).json({ message: error.message });

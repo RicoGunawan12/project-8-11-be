@@ -11,9 +11,10 @@ const ProductRoute = express.Router();
 
 ProductRoute.get('/', getProducts);
 ProductRoute.get('/:id', getProductById);
-ProductRoute.post('/', adminMiddleware, productsValidator, validateSchema, createProduct);
+// ProductRoute.post('/', adminMiddleware, productsValidator, validateSchema, createProduct);
 ProductRoute.post('/', 
     adminMiddleware, 
+    // productsValidator, validateSchema,
     upload.fields([
         { name: 'productImage', maxCount: 20 },
         { name: 'defaultImage', maxCount: 20 }
