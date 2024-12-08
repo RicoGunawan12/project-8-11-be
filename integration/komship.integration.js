@@ -20,6 +20,7 @@ export const searchDestinationKomship = async (keyword) => {
 
     try {
         const response = await fetch(process.env.KOMSHIP_URL + "/tariff/api/v1/destination/search?keyword=" + keyword, requestOptions);
+        console.log(response);
         
         if (!response.ok) {
             throw new Error(`Error: ${response.statusText}`);

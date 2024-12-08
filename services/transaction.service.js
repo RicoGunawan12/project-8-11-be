@@ -1,7 +1,7 @@
-import { ProductModel, ProductVariantModel, TransactionDetailModel, TransactionHeaderModel, UserAddressModel, UserModel } from "../association/association.js"
+import { ProductCategoryModel, ProductModel, ProductVariantModel, TransactionDetailModel, TransactionHeaderModel, UserAddressModel, UserModel } from "../association/association.js"
 import { createOrderKomship, deliveryDetailKomship, printLabelKomship, requestPickUpKomship } from "../integration/komship.integration.js";
 import { checkOutVATransactionXendit, createCreditCardTransactionXendit, createQrisTransactionXendit } from "../integration/xendit.integration.js";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 
 export const getAllTransactionsService = async (status) => {
     const transactions = await TransactionHeaderModel.findAll({
@@ -221,3 +221,136 @@ export const printLabelService = async (orderNumber) => {
     const komshipLabel = await printLabelKomship(orderNumber);
     return komshipLabel;
 }
+
+export const monthlySalesReportService = async (year, month) => {
+    
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0, 23, 59, 59);
+
+    const prevStartDate = new Date(year, month - 2, 1);
+    const prevEndDate = new Date(year, month - 1, 0, 23, 59, 59);
+
+    const transactions1 = await TransactionHeaderModel.findAll({
+        where: {
+          transactionDate: {
+            [Op.between]: [prevStartDate, prevEndDate],
+          },
+        },
+    })
+
+    const transactions2 = await TransactionHeaderModel.findAll({
+        where: {
+          transactionDate: {
+            [Op.between]: [startDate, endDate],
+          },
+        },
+    })
+
+    const totalSales1 = transactions1.reduce((sum, transaction) => {
+        return sum + transaction.totalPrice - transaction.deliveryFee;
+    }, 0);
+
+    const totalSales2 = transactions2.reduce((sum, transaction) => {
+        return sum + transaction.totalPrice - transaction.deliveryFee;
+    }, 0);
+
+    const growthPercentage = totalSales1
+        ? ((totalSales2 - totalSales1) / totalSales1) * 100
+        : 100;
+
+    const growthCountPercentage = transactions1.length !== 0
+        ? ((transactions2.length - transactions1.length) / transactions1.length) * 100
+        : 100;
+
+    return {
+        totalSales: totalSales2,
+        transactionCount: transactions2.length,
+        growthPercentage,
+        growthCountPercentage
+    }
+}
+
+export const allMonthSalesAnalyticService = async (year) => {
+    const monthlySales = await TransactionHeaderModel.findAll({
+        attributes: [
+            [Sequelize.fn("MONTH", Sequelize.col("transaction_date")), "month"], 
+            [Sequelize.fn("SUM", Sequelize.literal("total_price - delivery_fee")), "totalSales"],
+        ],
+        where: {
+            transactionDate: {
+                [Op.between]: [
+                    new Date(year, 0, 1), 
+                    new Date(year, 11, 31, 23, 59, 59), 
+                ],
+            },
+        },
+        group: [Sequelize.fn("MONTH", Sequelize.col("transaction_date"))], 
+        order: [[Sequelize.fn("MONTH", Sequelize.col("transaction_date")), "ASC"]], 
+    });
+
+    
+    const salesByMonth = Array.from({ length: 12 }, (_, index) => {
+        const monthData = monthlySales.find(
+            (data) => data.dataValues.month === index + 1
+        );
+        return {
+            // month: index + 1, 
+            totalSales: monthData ? parseFloat(monthData.dataValues.totalSales) : 0,
+        };
+    });
+
+    return salesByMonth
+}
+
+export const fetchSalesByCategoryService = async (year, month) => {
+    try {
+      const startDate = new Date(year, month - 1, 1); // Start of the month
+      const endDate = new Date(year, month, 0, 23, 59, 59); // End of the month
+  
+      const salesData = await TransactionHeaderModel.findAll({
+        where: {
+          transactionDate: {
+            [Op.between]: [startDate, endDate], // Define date range
+          },
+        },
+        include: [
+          {
+            model: TransactionDetailModel,
+            attributes: [], // Exclude attributes from this level
+            include: [
+              {
+                model: ProductVariantModel,
+                attributes: [], // Exclude attributes from this level
+                include: [
+                  {
+                    model: ProductModel,
+                    attributes: [], // Exclude attributes from this level
+                    include: [
+                      {
+                        model: ProductCategoryModel,
+                        attributes: ["productCategoryName"], // Include category name
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        attributes: [
+          // SUM of paid_product_price
+          [Sequelize.fn("SUM", Sequelize.col("transaction_details.paid_product_price")), "totalSales"],
+          // Use alias for category name
+          [Sequelize.col("transaction_details->product_variant->product->product_category.product_category_name"), "categoryName"],
+        ],
+        group: ["transaction_details->product_variant->product->product_category.product_category_name"], // Group by category name
+        raw: true, // Return raw data
+      });
+      
+  
+      return salesData;
+    } catch (error) {
+      console.error("Error fetching sales by category:", error);
+      throw error;
+    }
+  };

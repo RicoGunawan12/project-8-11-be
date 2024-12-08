@@ -7,7 +7,7 @@ import { checkoutQrisSchema } from '../schema/transaction/checkout/checkoutQris.
 import { checkoutVASchema } from './../schema/transaction/checkout/checkoutVA.schema.js';
 import { updateStatusValidator } from './../validator/transaction/updateStatus.validator.js';
 import { transactionIdSchema } from '../schema/general/transactionId.schema.js';
-import { checkOutCreditTransaction, checkOutQrisTransaction, checkOutVATransaction, createTransaction, deliveryDetail, getAllTransactions, getTransactionById, getTransactionsByUser, printLabel, requestPickupTransaction, updateTransactionStatus } from '../controllers/transaction.controller.js';
+import { allMonthSalesAnalytic, checkOutCreditTransaction, checkOutQrisTransaction, checkOutVATransaction, createTransaction, deliveryDetail, fetchSalesByCategory, getAllTransactions, getTransactionById, getTransactionsByUser, monthlySalesReport, printLabel, requestPickupTransaction, updateTransactionStatus } from '../controllers/transaction.controller.js';
 import { adminMiddleware, generalMiddleware, userMiddleware } from '../middleware/auth.middleware.js';
 
 const TransactionRoute = express.Router();
@@ -33,5 +33,11 @@ TransactionRoute.post('/pickup', adminMiddleware,generalValidator(transactionIdS
 TransactionRoute.post('/delivery/detail', generalMiddleware, deliveryDetail);
 
 TransactionRoute.post('/print/label', adminMiddleware, printLabel);
+
+TransactionRoute.post('/analytic/sales', adminMiddleware, monthlySalesReport);
+
+TransactionRoute.post('/analytic/all/month', adminMiddleware, allMonthSalesAnalytic);
+
+TransactionRoute.post('/analytic/category', adminMiddleware, fetchSalesByCategory);
 
 export default TransactionRoute;

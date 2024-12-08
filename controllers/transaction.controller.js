@@ -1,6 +1,6 @@
 import { createQrisTransactionXendit } from "../integration/xendit.integration.js";
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
-import { checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, printLabelService, requestPickupTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
+import { allMonthSalesAnalyticService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, printLabelService, requestPickupTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
 
 
 export const getAllTransactions = async (req, res) => {
@@ -314,6 +314,56 @@ export const printLabel = async (req, res) => {
     try {
         const label = await printLabelService(orderNumber);
         return res.status(200).json({ message: "Success!", label });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const monthlySalesReport = async (req, res) => {
+    const { year, month } = req.body;
+
+    if (year <= 0) {
+        return res.status(400).json({ message: "Invalid Year" });   
+    }
+    else if (month <= 0) {
+        return res.status(400).json({ message: "Invalid Month" });   
+    } 
+
+    try {
+        const response = await monthlySalesReportService(year, month);
+        return res.status(200).json({ message: "Fetch successfully", response })
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const allMonthSalesAnalytic = async (req, res) => {
+    const { year } = req.body;
+    if (year <= 0) {
+        return res.status(400).json({ message: "Invalid Year" });   
+    }
+
+    try {
+        const response = await allMonthSalesAnalyticService(year);
+        return res.status(200).json({ message: "Fetch successfully", response })
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const fetchSalesByCategory = async (req, res) => {
+    const { year, month } = req.body;
+
+    if (year <= 0) {
+        return res.status(400).json({ message: "Invalid Year" });   
+    }
+    else if (month <= 0) {
+        return res.status(400).json({ message: "Invalid Month" });   
+    } 
+
+    try {
+        const response = await fetchSalesByCategoryService(year, month);
+        return res.status(200).json({ message: "Fetch successfully", response })
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
