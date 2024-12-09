@@ -9,10 +9,16 @@ const Voucher = sequelize.define('vouchers', {
     primaryKey: true,
     allowNull: false
   },
-  voucherTypeId: {
-    field: "ref_voucher_type_id",
-    type: DataTypes.UUID,
-    primaryKey: false
+  voucherName: {
+    field: "voucher_name",
+    type: DataTypes.STRING,
+    primaryKey: false,
+    length: 50
+  },
+  voucherType: {
+    field: "voucher_type",
+    type: DataTypes.ENUM('Cashback', 'Discount'),
+    primaryKey: false,
   },
   voucherCode: {
     field: "voucher_code",

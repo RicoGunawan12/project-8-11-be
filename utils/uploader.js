@@ -23,7 +23,22 @@ const storage = multer.diskStorage({
     }
 });
 
+const storageBlog = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'blog');
+
+        if (!fs.existsSync(uploadPath)) {
+          fs.mkdirSync(uploadPath, { recursive: true });
+        }
+        cb(null, uploadPath);
+    },
+    filename: function (req, file, cb) {
+      cb(null, `${Date.now()}-${req.body.postTitle}.png`);
+    }
+});
+
 export const upload = multer({ storage: storage });
+export const uploadBlog = multer({ storage: storageBlog });
 
 
 export const deleteDirectory = (productName) => {

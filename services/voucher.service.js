@@ -4,13 +4,7 @@ import { getVoucherTypeByCodeService } from "./voucherType.service.js";
 
 // #region GET
 export const getAllVouchersService =  async ()=> {
-  const voucher = await VoucherModel.findAll({
-    include: [
-      {
-        model: VoucherTypeModel
-      }
-    ]
-  })
+  const voucher = await VoucherModel.findAll()
   return voucher
 }
 
@@ -38,11 +32,7 @@ export const getVoucherByCodeWithVoucherTypeService = async (voucherCode) => {
   const vouchers = await VoucherModel.findOne({
     where: {
       voucherCode: voucherCode
-    },
-    include: {
-      model: VoucherTypeModel, 
-      attributes: ['voucherTypeCode']
-    },
+    }
   })
 }
 
@@ -51,27 +41,6 @@ export const getVoucherByCodeWithVoucherTypeService = async (voucherCode) => {
 // #region CREATE
 
 export const createVouchersService = async (vouchers) => {
-
-  const voucherTypeCodes = vouchers.map(v => v.voucherTypeCode);
-
-  const voucherTypes = await VoucherTypeModel.findAll({
-    where: {
-      voucherTypeCode: voucherTypeCodes,
-    }
-  });
-
-  const voucherTypeMap = Object.fromEntries(
-    voucherTypes.map(voucherType => [voucherType.voucherTypeCode, voucherType.voucherTypeId])
-  );
-
-  for (let v of vouchers) {
-    const voucherTypeId = voucherTypeMap[v.voucherTypeCode];
-    if (!voucherTypeId) {
-      throw new Error(`Voucher Type Code ${v.voucherTypeCode} Not Found`);
-    }
-    v.voucherTypeId = voucherTypeId;
-  
-  }
   const voucherCodes = vouchers.map((voucher) => voucher.voucherCode);
   const duplicatedData = await VoucherModel.findAll({
     where: {

@@ -15,8 +15,9 @@ export const getPostByIdService = async (postId) => {
     return post;
 }
 
-export const createPostService = async (postTitle, postContent) => {
+export const createPostService = async (postImage, postTitle, postContent) => {
     const post = await Post.create({ 
+        postImage,
         postTitle: postTitle,
         postContent: postContent,
         createdAt: new Date() 

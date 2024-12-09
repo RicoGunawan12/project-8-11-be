@@ -1,4 +1,5 @@
 import { createPostService, deletePostService, getAllPostService, getPostByIdService, updatePostService } from "../services/post.service.js";
+import { UPLOAD_FOLDER } from "../utils/uploader.js";
 
 
 export const getAllPost = async (req, res) => {
@@ -25,8 +26,21 @@ export const getPostById = async (req, res) => {
 
 export const createPost = async (req, res) => {
     const { postTitle, postContent } = req.body;
+    const postImageFile = req.files['postImage'];
+    
+    if (postTitle.length <= 0) {
+        return res.status(400).json({ message: "Post title must be filled" });
+    }
+    else if (postTitle.content <= 0) {
+        return res.status(400).json({ message: "Post content must be filled" });
+    }
+    else if (!postImageFile) {
+        return res.status(400).json({ message: "Post image must be filled" });
+    }
+    
+    const postImage = `/${UPLOAD_FOLDER}blog/${postImageFile[0].filename}`
     try {
-        const post = await createPostService(postTitle, postContent);
+        const post = await createPostService(postImage, postTitle, postContent);
         return res.status(200).json({ message: "Post created successfully", post });
     } catch (error) {
         return res.status(500).json({ message: error.message });
