@@ -10,6 +10,11 @@ const Post = sequelize.define("posts", {
       primaryKey: true,
       allowNull: false
     },
+    postImage: {
+      field: "post_image",
+      type: DataTypes.TEXT,
+      primaryKey: false,
+    },
     postTitle: {
       field: "post_title",
       type: DataTypes.STRING,
@@ -18,7 +23,7 @@ const Post = sequelize.define("posts", {
     },
     postContent: {
       field: "post_content",
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       primaryKey: false
     },
     createdAt: {

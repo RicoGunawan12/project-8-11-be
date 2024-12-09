@@ -25,9 +25,13 @@ export const getAllTransactionsService = async (status) => {
         ],
         where: { 
             status: {
-                [Op.like]: `%${status}%`
+                [Op.and]: [
+                    { [Op.like]: `%${status}%` },
+                    { [Op.ne]: 'Unpaid' }
+                ]
             } 
-        }
+        },
+        order: [['transactionDate', 'DESC']]
     })
     return transactions;
 }
@@ -304,31 +308,31 @@ export const allMonthSalesAnalyticService = async (year) => {
 
 export const fetchSalesByCategoryService = async (year, month) => {
     try {
-      const startDate = new Date(year, month - 1, 1); // Start of the month
-      const endDate = new Date(year, month, 0, 23, 59, 59); // End of the month
+      const startDate = new Date(year, month - 1, 1); 
+      const endDate = new Date(year, month, 0, 23, 59, 59);
   
       const salesData = await TransactionHeaderModel.findAll({
         where: {
           transactionDate: {
-            [Op.between]: [startDate, endDate], // Define date range
+            [Op.between]: [startDate, endDate], 
           },
         },
         include: [
           {
             model: TransactionDetailModel,
-            attributes: [], // Exclude attributes from this level
+            attributes: [], 
             include: [
               {
                 model: ProductVariantModel,
-                attributes: [], // Exclude attributes from this level
+                attributes: [],
                 include: [
                   {
                     model: ProductModel,
-                    attributes: [], // Exclude attributes from this level
+                    attributes: [], 
                     include: [
                       {
                         model: ProductCategoryModel,
-                        attributes: ["productCategoryName"], // Include category name
+                        attributes: ["productCategoryName"], 
                       },
                     ],
                   },
@@ -338,9 +342,7 @@ export const fetchSalesByCategoryService = async (year, month) => {
           },
         ],
         attributes: [
-          // SUM of paid_product_price
           [Sequelize.fn("SUM", Sequelize.col("transaction_details.paid_product_price")), "totalSales"],
-          // Use alias for category name
           [Sequelize.col("transaction_details->product_variant->product->product_category.product_category_name"), "categoryName"],
         ],
         group: ["transaction_details->product_variant->product->product_category.product_category_name"], // Group by category name
