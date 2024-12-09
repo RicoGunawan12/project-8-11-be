@@ -26,9 +26,10 @@ export const createPostService = async (postImage, postTitle, postContent) => {
     return post;
 }
 
-export const updatePostService = async (postId, postTitle, postContent) => {
+export const updatePostService = async (postId, postImage, postTitle, postContent) => {
     const updatedPost = await Post.update(
         {
+            postImage,
             postTitle: postTitle,
             postContent: postContent
         },

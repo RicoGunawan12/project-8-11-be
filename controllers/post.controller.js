@@ -50,11 +50,24 @@ export const createPost = async (req, res) => {
 export const updatePost = async (req, res) => {
     const { postTitle, postContent } = req.body
     const postId = req.params.id;
+    const postImageFile = req.files['postImage'];
+
     if (!postId) {
         return res.status(400).json({ message: "Post ID is required" });
     }
+    if (postTitle.length <= 0) {
+        return res.status(400).json({ message: "Post title must be filled" });
+    }
+    else if (postTitle.content <= 0) {
+        return res.status(400).json({ message: "Post content must be filled" });
+    }
+    else if (!postImageFile) {
+        return res.status(400).json({ message: "Post image must be filled" });
+    }
+    
+    const postImage = `/${UPLOAD_FOLDER}blog/${postImageFile[0].filename}`
     try {
-        const updatedPost = await updatePostService(postId, postTitle, postContent);
+        const updatedPost = await updatePostService(postId, postImage, postTitle, postContent);
         return res.status(200).json({ message: "Post updated successfully", updatedPost });
     } catch (error) {
         return res.status(500).json({ message: error.message });

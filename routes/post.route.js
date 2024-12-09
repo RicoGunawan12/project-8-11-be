@@ -14,7 +14,14 @@ PostRoute.post("/", adminMiddleware,
 uploadBlog.fields([
     { name: "postImage", maxCount: 20 }
 ]), createPost);
-PostRoute.put("/:id", adminMiddleware, generalValidator(postSchema), validateSchema, updatePost);
+PostRoute.put("/:id", 
+    adminMiddleware, 
+    // generalValidator(postSchema), validateSchema,
+    uploadBlog.fields([
+        { name: "postImage", maxCount: 20 }
+    ]), 
+    updatePost
+);
 PostRoute.delete("/:id", adminMiddleware, deletePost);
 
 export default PostRoute;

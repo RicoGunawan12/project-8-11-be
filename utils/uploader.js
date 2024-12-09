@@ -25,6 +25,7 @@ const storage = multer.diskStorage({
 
 const storageBlog = multer.diskStorage({
     destination: function (req, file, cb) {
+        deletePostImage(req.body.postImage);
         const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'blog');
 
         if (!fs.existsSync(uploadPath)) {
@@ -54,5 +55,22 @@ export const deleteDirectory = (productName) => {
       }
       console.log("Directory deleted successfully");
       return { success: true, message: "Directory deleted successfully" };
+  });
+};
+
+
+export const deletePostImage = (postImage) => {
+  const filePath = path.join(__dirname, postImage);
+
+  return new Promise((resolve, reject) => {
+    fs.rm(filePath, { force: true }, (err) => {
+      if (err) {
+        console.error("Error deleting file:", err);
+        reject({ success: false, message: "File not found or error deleting file" });
+      } else {
+        console.log("File deleted successfully");
+        resolve({ success: true, message: "File deleted successfully" });
+      }
+    });
   });
 };
