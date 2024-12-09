@@ -24,8 +24,7 @@ const storage = multer.diskStorage({
 });
 
 const storageBlog = multer.diskStorage({
-    destination: function (req, file, cb) {
-        deletePostImage(req.body.postImage);
+    destination: async function (req, file, cb) {
         const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'blog');
 
         if (!fs.existsSync(uploadPath)) {

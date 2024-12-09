@@ -1,4 +1,5 @@
 import Post from "../models/post.model.js"
+import { deletePostImage } from "../utils/uploader.js";
 
 export const getAllPostService = async () => {
     const posts = await Post.findAll();
@@ -27,6 +28,9 @@ export const createPostService = async (postImage, postTitle, postContent) => {
 }
 
 export const updatePostService = async (postId, postImage, postTitle, postContent) => {
+    const post = await getPostByIdService(postId);
+    await deletePostImage('../' + post.postImage);
+
     const updatedPost = await Post.update(
         {
             postImage,

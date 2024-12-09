@@ -51,7 +51,7 @@ export const updatePost = async (req, res) => {
     const { postTitle, postContent } = req.body
     const postId = req.params.id;
     const postImageFile = req.files['postImage'];
-
+    
     if (!postId) {
         return res.status(400).json({ message: "Post ID is required" });
     }
@@ -64,6 +64,8 @@ export const updatePost = async (req, res) => {
     else if (!postImageFile) {
         return res.status(400).json({ message: "Post image must be filled" });
     }
+    
+    
     
     const postImage = `/${UPLOAD_FOLDER}blog/${postImageFile[0].filename}`
     try {
