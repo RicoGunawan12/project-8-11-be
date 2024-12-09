@@ -26,3 +26,9 @@ export const updatePromoService = async (productId, productPromo, productPromoEx
     }
     return updatedProduct;
 }
+
+export const updateVariantService = async (productVariantId, fieldsToUpdate) => {
+    await ProductVariantModel.update(fieldsToUpdate, {
+        where: { productVariantId },
+    });
+}

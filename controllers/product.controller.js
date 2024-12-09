@@ -1,5 +1,5 @@
 import { createProductService, deleteProductService, getProductByIdService, getProductsService } from "../services/product.service.js";
-import { createProductVariantService, updateProductQuantityService, updatePromoService } from "../services/productVariantService.js";
+import { createProductVariantService, updateProductQuantityService, updatePromoService, updateVariantService } from "../services/productVariantService.js";
 import { BASE_URL, UPLOAD_FOLDER } from "../utils/uploader.js";
 
 export const getProducts = async (req, res) => {
@@ -110,6 +110,32 @@ export const updateProductQuantity = async (req, res) => {
         return res.status(200).json({ message: "Quantity updated!", updatedProduct });
     } catch (error) {
         return res.status(500).json({ message: error.message });
+    }
+}
+
+export const updateVariant = async (req, res) => {
+    const updates = req.body;
+    try {
+        if (!Array.isArray(updates) || updates.length === 0) {
+            return res.status(400).json({ message: 'Invalid input: Expected a non-empty array.' });
+        }
+
+        const updatePromises = updates.map(async (update) => {
+            const { productVariantId, ...fieldsToUpdate } = update;
+
+            if (!productVariantId) {
+                throw new Error('productVariantId is required for each update.');
+            }
+
+            const variant = await updateVariantService(productVariantId, fieldsToUpdate);
+        });
+
+        await Promise.all(updatePromises);
+
+        res.status(200).json({ message: 'Update variant successful' });
+    } catch (error) {
+        console.error('Bulk update error:', error);
+        res.status(500).json({ message: 'Internal server error.', error: error.message });
     }
 }
 

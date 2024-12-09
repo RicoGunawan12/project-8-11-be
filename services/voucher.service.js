@@ -52,7 +52,7 @@ export const createVouchersService = async (vouchers) => {
   if (duplicatedData.length > 0) {
     throw new Error(`Duplicated voucher code: ${duplicatedData[0].get('voucherCode')}`);
   }
-
+  console.log(vouchers);
   await VoucherModel.bulkCreate(vouchers, {
     returning: true, 
   });

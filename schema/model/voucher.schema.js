@@ -1,10 +1,10 @@
 
 
 export const voucherSchema = {
-  voucherTypeCode: {
+  voucherType: {
     isString: true,
     notEmpty: {
-      errorMessage: 'Voucher Type Code is required',
+      errorMessage: 'Voucher Type is required',
     },
   },
   voucherCode: {

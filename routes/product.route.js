@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProduct, deleteProduct, getProductById, getProducts, updateProductQuantity, updatePromo } from '../controllers/product.controller.js';
+import { createProduct, deleteProduct, getProductById, getProducts, updateProductQuantity, updatePromo, updateVariant } from '../controllers/product.controller.js';
 import { userMiddleware, adminMiddleware } from '../middleware/auth.middleware.js';
 import { upload } from '../utils/uploader.js';
 import { productsValidator } from '../validator/model/product.validator.js';
@@ -25,6 +25,8 @@ ProductRoute.post('/',
 ProductRoute.delete('/:id', adminMiddleware, deleteProduct);
 ProductRoute.put('/promo/:id', adminMiddleware, generalValidator(updateProductSchema),validateSchema, updatePromo)
 ProductRoute.put('/quantity/:id', adminMiddleware, updateProductQuantity)
+
+ProductRoute.put('/update/variant', adminMiddleware, updateVariant)
 
 
 export default ProductRoute;
