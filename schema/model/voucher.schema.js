@@ -14,9 +14,15 @@ export const voucherSchema = {
     },
   },
   voucherEndDate: {
-    custom: {
-      options: (value) => value === null || isISO8601(value),
-      errorMessage: 'Voucher End Date must be a valid ISO date or null',
+    isISO8601: {
+      errorMessage: 'Voucher End Date must be a valid ISO date'
+    },
+    optional: true, 
+    toDate: true,
+  },
+  voucherStartDate: {
+    isISO8601: {
+      errorMessage: 'Voucher End Date must be a valid ISO date'
     },
     optional: true, 
     toDate: true,
