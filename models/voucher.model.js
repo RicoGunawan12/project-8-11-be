@@ -31,6 +31,11 @@ const Voucher = sequelize.define('vouchers', {
     type: DataTypes.DATE,
     allowNull: false
   },
+  voucherStartDate: {
+    field: "voucher_start_date",
+    type: DataTypes.DATE,
+    allowNull: false
+  },
   maxDiscount: {
     field: "max_discount",
     type: DataTypes.INTEGER,

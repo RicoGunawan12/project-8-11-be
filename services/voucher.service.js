@@ -14,7 +14,6 @@ export const getVoucherByCodeService = async (code) => {
       voucherCode: code
     }
   })
-
   return voucher
 }
 
@@ -52,7 +51,6 @@ export const createVouchersService = async (vouchers) => {
   if (duplicatedData.length > 0) {
     throw new Error(`Duplicated voucher code: ${duplicatedData[0].get('voucherCode')}`);
   }
-  console.log(vouchers);
   await VoucherModel.bulkCreate(vouchers, {
     returning: true, 
   });
@@ -65,8 +63,11 @@ export const createVouchersService = async (vouchers) => {
 // #region UPDATE
 
 export const updateVouchersService = async (req) => {
+  console.log("asdd")
   const { vouchers } = req;
   const voucherCodes = vouchers.map((code) => code.voucherCode);
+
+  console.log(voucherCodes)
 
   const isExists = await getVoucherByCodeListService(voucherCodes);
   if (isExists.length !== vouchers.length) {
@@ -81,27 +82,33 @@ export const updateVouchersService = async (req) => {
 
   for (const voucher of vouchers) {
 
-    const voucherType = await getVoucherTypeByCodeService(voucher.voucherTypeCode);
-    if (!voucherType) throw new Error(`Voucher Type Code ${voucher.voucherTypeCode} Not Found`);
-
-    const [updatedRowCount] = await VoucherModel.update(
-      {
-        voucherTypeId: voucherType.voucherTypeId,
-        voucherEndDate: voucher.voucherEndDate ? voucher.voucherEndDate : '',
-        maxDiscount: voucher.maxDiscount,
-        discount: voucher.discount
-      },
-      {
-        where: {
-          voucherCode: voucher.voucherCode,
+    try {
+      console.log('Voucher to update:', voucher);
+  
+      const [updatedRowCount] = await VoucherModel.update(
+        {
+          voucherEndDate: voucher.voucherEndDate || null,
+          voucherStartDate: voucher.voucherStartDate || null,
+          maxDiscount: voucher.maxDiscount,
+          discount: voucher.discount,
         },
+        {
+          where: {
+            voucherCode: voucher.voucherCode,
+          },
+        }
+      );
+  
+      console.log(`Updated ${updatedRowCount} rows for voucher code ${voucher.voucherCode}`);
+      if (updatedRowCount === 0) {
+        console.warn(`No rows updated for voucher code ${voucher.voucherCode}`);
       }
-    );
-
-    if (updatedRowCount === 0) {
-      throw new Error(`No records were updated for Voucher Code ${voucher.voucherCode}`);
+    } catch (err) {
+      console.error(`Error updating voucher ${voucher.voucherCode}:`, err);
     }
   }
+
+  console.log("test")
 
   return;
 };

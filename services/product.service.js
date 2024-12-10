@@ -26,6 +26,25 @@ export const getProductsService = async (search, category, limit) => {
     return products;
 }
 
+export const getProductPaginationService = async (limit, offset) => {
+    const products = ProductModel.findAll({
+        attributes: ['productId', 'productName', 'productDescription', 'defaultImage'],
+        include: [
+            {
+                model: ProductCategoryModel,
+                attributes: ['productCategoryName'],
+                where: category ? { productCategoryName: category } : undefined,
+            },
+            {
+                model: ProductVariantModel,
+                attributes: ['productVariantId', 'productSize', 'productColor', 'sku', 'productPrice', 'productStock', 'productImage', 'productWeight', 'productLength', 'productWidth', 'productHeight'],
+            },   
+        ],
+        limit: parseInt(limit) || null,
+        offset: parseInt(limit * offset) || null
+    })
+}
+
 export const getProductByIdService = async (productId) => {
     const product = await ProductModel.findOne({
         attributes: ['productId', 'productName', 'productDescription', 'defaultImage'],
