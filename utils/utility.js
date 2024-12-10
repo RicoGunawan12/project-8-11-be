@@ -20,3 +20,11 @@ export function formatDateToString(date) {
 
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
+
+export const isValidDate = (date) => {
+  const regex = /^\d{4}-\d{2}-\d{2}$/; // Regular expression for YYYY-MM-DD
+  if (!regex.test(date)) return false;
+
+  const parsedDate = new Date(date);
+  return !isNaN(parsedDate.getTime()) && date === parsedDate.toISOString().split('T')[0];
+};

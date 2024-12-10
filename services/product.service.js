@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { Op, where } from "sequelize";
 import { ProductModel, ProductCategoryModel, ProductVariantModel } from "../association/association.js";
 import { deleteDirectory } from "../utils/uploader.js";
 import { getCategoryByName } from "./productCategory.service.js";
@@ -6,7 +6,7 @@ import { getCategoryByName } from "./productCategory.service.js";
 
 export const getProductsService = async (search, category, limit) => {
     const products = ProductModel.findAll({
-        attributes: ['productId', 'productName', 'productDescription', 'defaultImage'],
+        attributes: ['productId', 'productName', 'productDescription', 'defaultImage', 'isPromo', 'productPromo', 'startDate', 'endDate'],
         include: [
             {
                 model: ProductCategoryModel,
@@ -28,7 +28,7 @@ export const getProductsService = async (search, category, limit) => {
 
 export const getProductPaginationService = async (limit, offset) => {
     const products = ProductModel.findAll({
-        attributes: ['productId', 'productName', 'productDescription', 'defaultImage'],
+        attributes: ['productId', 'productName', 'productDescription', 'defaultImage', 'isPromo', 'productPromo', 'startDate', 'endDate'],
         include: [
             {
                 model: ProductCategoryModel,
@@ -92,4 +92,35 @@ export const deleteProductService = async (productId) => {
 
     const deletedProduct = await ProductModel.destroy({ where: { productId: productId }});
     return deletedProduct;
+}
+
+export const updateBestSellerService = async (productId, isBestSeller) => {
+    const update = ProductModel.update(
+        { isBestSeller: isBestSeller },
+        { 
+            where: { 
+                productId: productId 
+            }
+        }
+    )
+    return update;
+}
+
+export const getBestSellerService = async () => {
+    const bestSellerProduct = await ProductModel.findAll({
+        where: { isBestSeller: true }
+    })
+    console.log(bestSellerProduct);
+    
+    return bestSellerProduct;
+}
+
+export const updatePromoService = async (productId, isPromo, productPromo, startDate, endDate) => {
+    const updatedProduct = await ProductModel.update({ isPromo: isPromo, productPromo: productPromo, startDate: startDate, endDate: endDate}, { where: { productId: productId } });
+    console.log(updatedProduct);
+    
+    if (updatedProduct[0] == 0) {
+        throw new Error("Product not found or no changes applied!");
+    }
+    return updatedProduct;
 }

@@ -1,4 +1,4 @@
-import { ProductVariantModel } from "../association/association.js";
+import { ProductModel, ProductVariantModel } from "../association/association.js";
 
 
 export const createProductVariantService = async (productId, variant) => {
@@ -13,14 +13,6 @@ export const updateProductQuantityService = async (productVariantId, quantity) =
         { productStock: quantity },
         { where: { productVariantId: productVariantId }}
     );
-    if (updatedProduct[0] == 0) {
-        throw new Error("Product variant not found!");
-    }
-    return updatedProduct;
-}
-
-export const updatePromoService = async (productId, productPromo, productPromoExpiry) => {
-    const updatedProduct = await ProductVariantModel.update({ productPromo: productPromo, productPromoExpiry: productPromoExpiry}, { where: { productVariantId: productId } });
     if (updatedProduct[0] == 0) {
         throw new Error("Product variant not found!");
     }

@@ -10,25 +10,15 @@ const Page = sequelize.define('pages', {
     primaryKey: true,
     allowNull: false
   },
-  pageName: {
-    field: "page_name",
-    type: DataTypes.STRING,
+  contentJSON: {
+    field: "content_json",
+    type: DataTypes.TEXT,
     allowNull: false
   },
-  path: {
-    field: "path",
+  language: {
+    field: "language",
     type: DataTypes.STRING,
-    allowNull: false
-  },
-  hasParams: {
-    field: "has_params",
-    type: DataTypes.BOOLEAN,
-    defaultValue: false
-  },
-  requiredParams: {
-    field: "required_params",
-    type: DataTypes.STRING,
-    allowNull: true
+    allowNull: false,
   }
 },{
   timestamps: false
