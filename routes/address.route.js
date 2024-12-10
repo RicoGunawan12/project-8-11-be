@@ -1,6 +1,6 @@
 import express from 'express';
-import { userMiddleware } from '../middleware/auth.middleware.js';
-import { calculateDeliveryFee, createAddress, deleteAddress, getAddressByUserId, getAllCity, getAllProvince, getAllSubdistrict, searchDestination, updateAddress } from '../controllers/address.controller.js';
+import { adminMiddleware, userMiddleware } from '../middleware/auth.middleware.js';
+import { calculateDeliveryFee, createAddress, deleteAddress, getAddressByUserId, getAllCity, getAllProvince, getAllSubdistrict, getPickUpPoint, searchDestination, updateAddress, updatePickUpPoint } from '../controllers/address.controller.js';
 
 const AddressRoute = express.Router();
 
@@ -9,11 +9,14 @@ AddressRoute.post('/', userMiddleware, createAddress);
 AddressRoute.delete('/:id', userMiddleware, deleteAddress);
 AddressRoute.put('/:id', userMiddleware, updateAddress);
 
-AddressRoute.get('/province', userMiddleware, getAllProvince);
-AddressRoute.get('/city', userMiddleware, getAllCity);
-AddressRoute.get('/subdistrict', userMiddleware, getAllSubdistrict);
+AddressRoute.get('/province', getAllProvince);
+AddressRoute.get('/city', getAllCity);
+AddressRoute.get('/subdistrict', getAllSubdistrict);
 
-AddressRoute.get('/destination', userMiddleware, searchDestination);
+AddressRoute.get('/destination', searchDestination);
 AddressRoute.get('/calculate', userMiddleware, calculateDeliveryFee);
+
+AddressRoute.post('/admin', adminMiddleware, updatePickUpPoint);
+AddressRoute.get('/admin', adminMiddleware, getPickUpPoint);
 
 export default AddressRoute;
