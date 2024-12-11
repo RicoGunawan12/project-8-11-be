@@ -1,4 +1,4 @@
-import { createProductService, deleteProductService, getBestSellerService, updatePromoService, getProductByIdService, getProductPaginationService, getProductsService, updateBestSellerService } from "../services/product.service.js";
+import { createProductService, deleteProductService, getBestSellerService, updatePromoService, getProductByIdService, getProductCountService, getProductPaginationService, getProductsService, updateBestSellerService } from "../services/product.service.js";
 import { createProductVariantService, updateProductQuantityService, updateVariantService } from "../services/productVariantService.js";
 import { BASE_URL, UPLOAD_FOLDER } from "../utils/uploader.js";
 import { isValidDate } from "../utils/utility.js";
@@ -21,7 +21,7 @@ export const getProducts = async (req, res) => {
 }
 
 export const getPaginateProduct = async(req, res) => {
-    var {limit, offset} = req.body;
+    var {limit, offset, search} = req.query;
 
     if(limit < 0){
         return res.status(400).json({message: "Limit can't be under 0"})
@@ -33,13 +33,25 @@ export const getPaginateProduct = async(req, res) => {
 
     try{
 
-        const products = await getProductPaginationService(limit, offset)
+        const products = await getProductPaginationService(limit, offset, search)
         return res.status(200).json(products)
 
     } catch (error){
         return res.status(500).json({message: error.message})
     }
 
+}
+
+export const getProductCount = async(req, res) => {
+
+    var {search} = req.query;
+
+    try {
+        const count = await getProductCountService(search)
+        return res.status(200).json({total : count})
+    } catch (error) {
+        return res.status(500).json({message: error.message})
+    }
 }
 
 export const getProductById = async (req, res) => {
@@ -99,8 +111,6 @@ export const createProduct = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
-
-
 
 export const deleteProduct = async (req, res) => {
     const id = req.params.id;
