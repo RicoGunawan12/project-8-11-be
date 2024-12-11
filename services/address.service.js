@@ -4,6 +4,7 @@ import { calculateDeliveryFeeKomship, searchDestinationKomship } from "../integr
 import { getAllCityRajaOngkir, getAllProvinceRajaOngkir, getAllSubdistrictRajaOngkir } from "../integration/rajaongkir.integeration.js";
 import RajaOngkirCity from "../models/rajaOngkirCity.model.js";
 import RajaOngkirProvince from "../models/rajaOngkirProvince.model.js";
+import AdminAddress from "../models/adminAddress.model.js";
 
 
 export const getAddresByUserIdService = async (ref_user_id) => {
@@ -126,4 +127,57 @@ export const searchDestinationService = async (keyword) => {
 export const calculateDeliveryFeeService = async (shipperDestinationId, receiverDestinationId, weight, itemValue, cod) => {
     const calculationResult = await calculateDeliveryFeeKomship(shipperDestinationId, receiverDestinationId, weight, itemValue, cod);
     return calculationResult;
+}
+
+export const updatePickUpPointService = async (senderName, senderPhoneNumber, province, city, subdistrict, postalCode, addressDetail) => {
+    const insertedAddress = await AdminAddress.findAll();
+    province = province.toUpperCase();
+    city = city.toUpperCase();
+    subdistrict = subdistrict.toUpperCase();
+
+    const destination = await searchDestinationKomship(postalCode);
+    console.log(destination);
+    var komshipAddressId = destination.data[0].id;
+    var komshipLabel = destination.data[0].label;
+
+    if (insertedAddress.length === 0) {
+        const response = await AdminAddress.create({
+            senderName: senderName,
+            senderPhoneNumber: senderPhoneNumber,
+            addressProvince: province,
+            addressCity: city,
+            addressSubdistrict: subdistrict,
+            postalCode: postalCode,
+            addressDetail: addressDetail,
+            komshipAddressId: komshipAddressId, 
+            komshipLabel: komshipLabel,
+        })
+        return response;
+    }
+    else {
+        const response = await AdminAddress.update(
+            {
+                senderName: senderName,
+                senderPhoneNumber: senderPhoneNumber,
+                addressProvince: province,
+                addressCity: city,
+                addressSubdistrict: subdistrict,
+                postalCode: postalCode,
+                addressDetail: addressDetail,
+                komshipAddressId: komshipAddressId, 
+                komshipLabel: komshipLabel,
+            },
+            {
+                where: {
+                    addressId: insertedAddress[0].addressId
+                }
+            }
+        )
+        return response
+    }
+}
+
+export const getPickUpPointService = async () => {
+    const pickupPoint = await AdminAddress.findAll();
+    return pickupPoint;
 }

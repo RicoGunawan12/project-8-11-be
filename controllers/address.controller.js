@@ -1,4 +1,4 @@
-import { calculateDeliveryFeeService, createAddresService, deleteAddressService, getAddresByUserIdService, getAllCityService, getAllProvinceService, getAllSubdistrictService, searchDestinationService, updateAddresService } from "../services/address.service.js";
+import { calculateDeliveryFeeService, createAddresService, deleteAddressService, getAddresByUserIdService, getAllCityService, getAllProvinceService, getAllSubdistrictService, getPickUpPointService, searchDestinationService, updateAddresService, updatePickUpPointService } from "../services/address.service.js";
 
 
 export const getAddressByUserId = async (req, res) => {
@@ -75,7 +75,7 @@ export const getAllSubdistrict = async (req, res) => {
     const { city } = req.query;
     
     if (city === undefined) {
-        city = "";
+        return res.status(400).json({ message: "City ID cannot be null"})
     }
     
     try {
@@ -105,5 +105,47 @@ export const calculateDeliveryFee = async (req, res) => {
         return res.status(200).json({ message: "Fetch success!", calculationResult });
     } catch (error) {
         return res.status(500).json({ message: error.message });   
+    }
+}
+
+export const updatePickUpPoint = async (req, res) => {
+    const { senderName, senderPhoneNumber, province, city, subdistrict, postalCode, addressDetail } = req.body;
+    
+    if (senderName.length === 0) {
+        return res.status(400).json({ message: "Sender name must be filled" });
+    }
+    else if (senderPhoneNumber.length === 0) {
+        return res.status(400).json({ message: "Phone number must be filled" });
+    }
+    else if (province.length === 0) {
+        return res.status(400).json({ message: "Province must be filled" });
+    }
+    else if (city.length === 0) {
+        return res.status(400).json({ message: "City number must be filled" });
+    }
+    else if (subdistrict.length === 0) {
+        return res.status(400).json({ message: "Subdistrict number must be filled" });
+    }
+    else if (postalCode.length === 0) {
+        return res.status(400).json({ message: "Postal code number must be filled" });
+    }
+    else if (addressDetail.length === 0) {
+        return res.status(400).json({ message: "Address detail must be filled" });
+    }
+
+    try {
+        const response = await updatePickUpPointService(senderName, senderPhoneNumber, province, city, subdistrict, postalCode, addressDetail);
+        return res.status(200).json({ message: "Address updated!" });
+    } catch (error) {
+        return res.status(500).json({ message: error.message }); 
+    }
+}
+
+export const getPickUpPoint = async (req, res) => {
+    try {
+        const response = await getPickUpPointService();
+        return res.status(200).json({ message: "Fetch successful", response });
+    } catch (error) {
+        return res.status(500).json({ message: error.message }); 
     }
 }

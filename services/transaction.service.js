@@ -356,3 +356,14 @@ export const fetchSalesByCategoryService = async (year, month) => {
       throw error;
     }
   };
+
+
+  export const updateTransactionDeliveryService = async (order_no, status) => {
+    const response = TransactionHeaderModel.update({ 
+        status: status,
+        where: {
+            komshipOrderNumber: order_no
+        }
+    })
+    return response;
+  }

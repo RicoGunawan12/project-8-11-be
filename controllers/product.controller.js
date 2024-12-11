@@ -1,6 +1,7 @@
-import { createProductService, deleteProductService, getProductByIdService, getProductCountService, getProductPaginationService, getProductsService } from "../services/product.service.js";
-import { createProductVariantService, updateProductQuantityService, updatePromoService, updateVariantService } from "../services/productVariantService.js";
+import { createProductService, deleteProductService, getBestSellerService, updatePromoService, getProductByIdService, getProductCountService, getProductPaginationService, getProductsService, updateBestSellerService } from "../services/product.service.js";
+import { createProductVariantService, updateProductQuantityService, updateVariantService } from "../services/productVariantService.js";
 import { BASE_URL, UPLOAD_FOLDER } from "../utils/uploader.js";
+import { isValidDate } from "../utils/utility.js";
 
 export const getProducts = async (req, res) => {
     var { search, category, limit } = req.query;
@@ -173,25 +174,71 @@ export const updateVariant = async (req, res) => {
 
 export const updatePromo = async (req, res) => {
     const id = req.params.id;
-    const { productPromo, productPromoExpiry } = req.body
-    console.log(productPromo, productPromoExpiry);
+    const { isPromo, productPromo, startDate, endDate } = req.body
     if (!id) {
         return res.status(400).json({ message: "Product id is required" })
     }
-
-    if (productPromo < 0) {
+    
+    if (isPromo === undefined) {
+        return res.status(400).json({ message: "Is Promo must be filled" })
+    }
+    else if (isPromo === true && productPromo <= 0) {
+        return res.status(400).json({ message: "Product promo must be filled" });
+    }
+    else if (productPromo < 0) {
         return res.status(400).json({ message: "Product promo cannot be minus" });
     }
-    else if (new Date(productPromoExpiry).getTime() - new Date().getTime() < 24 * 60 * 60 * 1000) {
-        return res.status(400).json({ message: "Product promo expiry must tommorow or more" });
+    else if (!startDate || !endDate) {
+        return res.status(400).json({ error: 'startDate and endDate are required' });
+    }
+    else if (!isValidDate(startDate) || !isValidDate(endDate)) {
+        return res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
     }
 
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (start > end) {
+        return res.status(400).json({ error: 'startDate must be before endDate' });
+    }
+    else if (start < today || end < today) {
+        return res.status(400).json({ error: 'Dates must not be in the past' });
+    }    
+
     try {
-        const updatedProduct = await updatePromoService(id, productPromo, productPromoExpiry);
-        console.log(updatedProduct);
+        const updatedProduct = await updatePromoService(id, isPromo, productPromo, startDate, endDate);
         return res.status(200).json({ message: "Promo updated!" })
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
     
+}
+
+export const updateBestSeller = async (req, res) => {
+    const { isBestSeller } = req.body;
+    const id = req.params.id;
+
+    if (!id) {
+        return res.status(400).json({ message: "Product id is required" })
+    }
+
+    try {
+        const updatedProduct = await updateBestSellerService(id, isBestSeller);
+        return res.status(200).json({ message: "Promo updated!" })
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const getBestSeller = async (req, res) => {
+    console.log("asdasd");
+    const bestSellerProduct = await getBestSellerService();
+    
+    return res.status(200).json({ message: "Product fetched!", bestSellerProduct })
+    // try {
+    // } catch (error) {
+    //     return res.status(500).json({ message: error.message });
+    // }
 }

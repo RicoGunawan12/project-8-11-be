@@ -1,6 +1,6 @@
 import { createQrisTransactionXendit } from "../integration/xendit.integration.js";
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
-import { allMonthSalesAnalyticService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, printLabelService, requestPickupTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
+import { allMonthSalesAnalyticService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, printLabelService, requestPickupTransactionService, updateTransactionDeliveryService, updateTransactionStatusService } from "../services/transaction.service.js";
 
 
 export const getAllTransactions = async (req, res) => {
@@ -112,12 +112,18 @@ export const createTransaction = async (req, res) => {
 
         // insert transaction detail
         const transactionDetails = productsInCart.map(product => {
+            const currentDate = new Date();
+    
+            const isPromoActive =
+                product.isPromo &&
+                new Date(product.startDate) <= currentDate &&
+                currentDate <= new Date(product.endDate);
             return {
                 transactionId: transaction.transactionId,
                 productVariantId: product.product_variant.productVariantId,
                 quantity: product.quantity,
                 paidProductPrice: product.product_variant.productPrice,
-                realizedPromo: product.product_variant.productPromoExpiry ? (product.product_variant.productPromoExpiry > new Date() ? product.product_variant.productPromo : 0) : 0 
+                realizedPromo: isPromoActive ? product.product_variant.productPrice : 0
             };
         });
         const insertedTransactionDetails = await createTransactionDetailService(transactionDetails);
@@ -364,6 +370,19 @@ export const fetchSalesByCategory = async (req, res) => {
     try {
         const response = await fetchSalesByCategoryService(year, month);
         return res.status(200).json({ message: "Fetch successfully", response })
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const updateTransactionDelivery = async (req, res) => {
+    const { order_no, cnote, status } = req.body; 
+    if (!order_no || !cnote || !status) {
+        return res.status(400).json({ message: "Invalid input" }); 
+    }
+
+    try {
+        const response = updateTransactionDeliveryService(order_no, status);
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

@@ -30,6 +30,33 @@ const Product = sequelize.define('products', {
     field: "default_image",
     type: DataTypes.STRING,
     allowNull: true,
+  },
+  isBestSeller: {
+    field: "is_best_seller",
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    allowNull: false,
+  },
+  isPromo: {
+    field: "is_promo",
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    allowNull: false,
+  },
+  productPromo: {
+    field: "product_promo",
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  startDate: {
+    field: "start_date",
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  endDate: {
+    field: "end_date",
+    type: DataTypes.DATE,
+    allowNull: true,
   }
 },{
   timestamps: false
