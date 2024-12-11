@@ -112,12 +112,18 @@ export const createTransaction = async (req, res) => {
 
         // insert transaction detail
         const transactionDetails = productsInCart.map(product => {
+            const currentDate = new Date();
+    
+            const isPromoActive =
+                product.isPromo &&
+                new Date(product.startDate) <= currentDate &&
+                currentDate <= new Date(product.endDate);
             return {
                 transactionId: transaction.transactionId,
                 productVariantId: product.product_variant.productVariantId,
                 quantity: product.quantity,
                 paidProductPrice: product.product_variant.productPrice,
-                realizedPromo: product.product_variant.productPromoExpiry ? (product.product_variant.productPromoExpiry > new Date() ? product.product_variant.productPromo : 0) : 0 
+                realizedPromo: isPromoActive ? product.product_variant.productPrice : 0
             };
         });
         const insertedTransactionDetails = await createTransactionDetailService(transactionDetails);
