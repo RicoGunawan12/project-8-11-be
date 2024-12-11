@@ -10,6 +10,7 @@ export const getUsersService = async () => {
 }
 
 export const getUserByIdService = async (userId) => {
+  console.log("pong")
   const user = await UserModel.findOne({ where: { userId }});
   if (!user) {
     throw new Error('User not found!');

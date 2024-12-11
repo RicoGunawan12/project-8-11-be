@@ -32,11 +32,9 @@ export const getUsers = async (req, res) => {
 }
 
 export const getUserById = async (req, res) => {
-  const userId = req.params.id;
-  if (userId) {
-    return res.status(400).json({ message: "User id is required" });
-  }
+  const userId = req.user.userId;
 
+  console.log(userId)
   try {
     const user = await getUserByIdService(userId);
     return res.status(200).json(user)

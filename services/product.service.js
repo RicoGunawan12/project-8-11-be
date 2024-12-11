@@ -26,24 +26,51 @@ export const getProductsService = async (search, category, limit) => {
     return products;
 }
 
-export const getProductPaginationService = async (limit, offset) => {
-    const products = ProductModel.findAll({
+export const getProductPaginationService = async (limit, offset, search) => {
+
+    const whereCondition = {}
+    whereCondition.productName = {
+        [Op.like] : `%${search}%`
+    }
+    console.log(limit, offset, search)
+    const products = await ProductModel.findAll({
         attributes: ['productId', 'productName', 'productDescription', 'defaultImage'],
         include: [
             {
                 model: ProductCategoryModel,
                 attributes: ['productCategoryName'],
-                where: category ? { productCategoryName: category } : undefined,
             },
             {
                 model: ProductVariantModel,
                 attributes: ['productVariantId', 'productSize', 'productColor', 'sku', 'productPrice', 'productStock', 'productImage', 'productWeight', 'productLength', 'productWidth', 'productHeight'],
             },   
         ],
+        where: whereCondition,
         limit: parseInt(limit) || null,
-        offset: parseInt(limit * offset) || null
-    })
-}
+        offset: parseInt(offset) || 0,
+    });
+
+    if (!products || products.length === 0) {
+        throw new Error('No products match the query parameters');
+    }
+
+    return products;
+};
+
+export const getProductCountService = async (search) => {
+    const whereCondition = {}
+    whereCondition.productName = {
+        [Op.like] : `%${search}%`
+    }
+    console.log(search)
+
+    const count = await ProductModel.count({
+        where: whereCondition,
+    });
+    console.log(count)
+
+    return count;
+};
 
 export const getProductByIdService = async (productId) => {
     const product = await ProductModel.findOne({
@@ -62,7 +89,7 @@ export const getProductByIdService = async (productId) => {
     });
 
     if (!product) {
-        throw new Error("Product not found!");
+        throw new Error("Product not found!sdsdwds");
     }
     return product
 }
