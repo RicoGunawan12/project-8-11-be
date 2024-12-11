@@ -19,6 +19,8 @@ import PostRoute from './routes/post.route.js';
 import { storeAllCityService, storeAllProvinceService } from './services/address.service.js';
 import { migratePage } from './services/page.service.js';
 import PageRoute from './routes/page.route.js';
+import ContactRoute from './routes/contact.route.js';
+import { migrateContactService } from './services/contact.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -44,6 +46,7 @@ app.use('/api/transactions', TransactionRoute);
 app.use('/api/faqs', FAQRoute);
 app.use('/api/posts', PostRoute);
 app.use('/api/pages', PageRoute);
+app.use('/api/contacts', ContactRoute);
 
 (async () => {
   try {
@@ -53,6 +56,7 @@ app.use('/api/pages', PageRoute);
     await storeAllProvinceService();
     await storeAllCityService();
     await migratePage();
+    await migrateContactService();
     app.listen(5000, () => {
       console.log('Server running on port 5000');
     });

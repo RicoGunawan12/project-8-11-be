@@ -25,4 +25,4 @@ const Contact = sequelize.define('contact', {
   timestamps: false
 })
 
-export default FAQ;
+export default Contact;
