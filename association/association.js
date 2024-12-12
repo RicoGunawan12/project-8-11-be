@@ -2,7 +2,8 @@
 import UserAddress from "../models/userAddress.model.js";
 import { Cart, CartItem } from "./cart.association.js";
 import { ContentDetail, ContentHeader, Page } from "./content.association.js";
-import { Product, ProductCategory, Promo } from "./product.association.js";
+import { ProductCategory } from "./product.association.js";
+import { PromoDetail, Product, Promo } from "./promo.association.js";
 import { PaymentMethod, ProductVariant, TransactionDetail, TransactionHeader, User, Voucher, VoucherType, Wishlist, WishlistItem } from "./transaction.association.js"
 
 const PaymentMethodModel = PaymentMethod;
@@ -18,6 +19,7 @@ const VoucherTypeModel = VoucherType
 const ProductModel = Product
 const ProductCategoryModel = ProductCategory
 const PromoModel = Promo
+const PromoDetailModel = PromoDetail
 
 const CartModel = Cart
 const CartItemModel = CartItem
@@ -27,6 +29,7 @@ const WishlistItemModel = WishlistItem
 const ContentHeaderModel = ContentHeader
 const ContentDetailModel = ContentDetail
 const PageModel = Page
+
 
 export { 
     PaymentMethodModel, 
@@ -43,5 +46,6 @@ export {
     CartModel, 
     CartItemModel,
     WishlistModel,
-    WishlistItemModel
+    WishlistItemModel,
+    PromoDetailModel
 };

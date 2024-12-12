@@ -5,7 +5,7 @@ import { getPage, updatePage } from '../controllers/page.controller.js';
 const PageRoute = express.Router();
 
 PageRoute.get('/', getPage);
-PageRoute.put('/:id', updatePage);
+PageRoute.put('/:id', adminMiddleware,updatePage);
 
 
 export default PageRoute;

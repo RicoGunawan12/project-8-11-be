@@ -21,6 +21,7 @@ import { migratePage } from './services/page.service.js';
 import PageRoute from './routes/page.route.js';
 import ContactRoute from './routes/contact.route.js';
 import { migrateContactService } from './services/contact.service.js';
+import PromoRoute from './routes/promo.route.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -47,6 +48,7 @@ app.use('/api/faqs', FAQRoute);
 app.use('/api/posts', PostRoute);
 app.use('/api/pages', PageRoute);
 app.use('/api/contacts', ContactRoute);
+app.use('/api/promos', PromoRoute);
 
 (async () => {
   try {

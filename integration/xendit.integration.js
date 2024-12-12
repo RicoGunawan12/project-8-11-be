@@ -60,7 +60,7 @@ export const createCreditCardTransactionXendit = async (
             paymentMethod: {
                 card: {
                     channelProperties : {
-                        successReturnUrl : "https://redirect.me/success",
+                        successReturnUrl : "http://localhost:4650/transactions/" + transactionId,
                         failureReturnUrl: "https://redirect.me/failed"
                     },
                     cardInformation: {

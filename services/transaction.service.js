@@ -23,13 +23,10 @@ export const getAllTransactionsService = async (status) => {
                 }
             }
         ],
-        where: { 
-            status: {
-                [Op.and]: [
-                    { [Op.like]: `%${status}%` },
-                    { [Op.ne]: 'Unpaid' }
-                ]
-            } 
+        where: {
+            status: status
+                ? { [Op.and]: [{ [Op.eq]: status }, { [Op.ne]: 'Unpaid' }] }
+                : { [Op.ne]: 'Unpaid' }
         },
         order: [['transactionDate', 'DESC']]
     })
@@ -212,8 +209,24 @@ export const createKomshipOrderService = async (transaction) => {
 }
 
 export const requestPickupTransactionService = async (transaction) => {
-    const pickupResponse = await requestPickUpKomship(transaction.komshipOrderNumber);
-    return pickupResponse;
+    try {
+        const pickupResponse = await requestPickUpKomship(transaction.komshipOrderNumber);
+    } catch (error) {
+        throw new Error("Failed to request pickup");
+    }
+
+    const updatedTransaction = await TransactionHeaderModel.update(
+        {
+            status: 'Shipping',
+        },
+        {
+            where: {
+                transactionId: transaction.transactionId
+            },
+        }
+    )
+
+    return updatedTransaction;
 }
 
 export const deliveryDetailService = async (orderNumber) => {

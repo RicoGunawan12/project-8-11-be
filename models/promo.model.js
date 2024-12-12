@@ -10,16 +10,26 @@ const Promo = sequelize.define('promos', {
       primaryKey: true,
       allowNull: false
     },
-    productVariantId: {
-      field: "ref_product_variant_id",
-      type: DataTypes.UUID,
+    promoName: {
+      field: "promo_name",
+      type: DataTypes.STRING,
       primaryKey: false
     },
-    promoPrice: {
-      field: "promo_price",
+    promoAmount: {
+      field: "promo_amount",
       type: DataTypes.INTEGER,
-      allowNull: false
-    }
+      primaryKey: false
+    },
+    startDate: {
+      field: "start_date",
+      type: DataTypes.DATE,
+      primaryKey: false
+    },
+    endDate: {
+      field: "end_date",
+      type: DataTypes.DATE,
+      primaryKey: false
+    },
   },{
     timestamps: false
   })

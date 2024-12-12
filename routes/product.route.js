@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProduct, deleteProduct, getBestSeller, getPaginateProduct, getProductById, getProducts, updateBestSeller, updateProductQuantity, updatePromo, updateVariant } from '../controllers/product.controller.js';
+import { createProduct, deleteProduct, getBestSeller, getPaginateProduct, getProductById, getProductCount, getProducts, updateBestSeller, updateProductQuantity, updatePromo, updateVariant } from '../controllers/product.controller.js';
 import { adminMiddleware } from '../middleware/auth.middleware.js';
 import { upload } from '../utils/uploader.js';
 
