@@ -1,6 +1,6 @@
 import { createQrisTransactionXendit } from "../integration/xendit.integration.js";
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
-import { allMonthSalesAnalyticService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, printLabelService, requestPickupTransactionService, updateTransactionDeliveryService, updateTransactionStatusService } from "../services/transaction.service.js";
+import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, payTransactionService, printLabelService, requestPickupTransactionService, updateTransactionDeliveryService, updateTransactionStatusService } from "../services/transaction.service.js";
 
 
 export const getAllTransactions = async (req, res) => {
@@ -114,21 +114,22 @@ export const createTransaction = async (req, res) => {
         const transactionDetails = productsInCart.map(product => {
             const currentDate = new Date();
     
-            const isPromoActive =
-                product.isPromo &&
-                new Date(product.startDate) <= currentDate &&
-                currentDate <= new Date(product.endDate);
+            // const isPromoActive =
+            //     product.isPromo &&
+            //     new Date(product.startDate) <= currentDate &&
+            //     currentDate <= new Date(product.endDate);
             return {
                 transactionId: transaction.transactionId,
                 productVariantId: product.product_variant.productVariantId,
                 quantity: product.quantity,
                 paidProductPrice: product.product_variant.productPrice,
-                realizedPromo: isPromoActive ? product.product_variant.productPrice : 0
+                // realizedPromo: isPromoActive ? product.product_variant.productPrice : 0
             };
         });
         const insertedTransactionDetails = await createTransactionDetailService(transactionDetails);
-        const deletedCartItem = await removeAllCartItemInUserService(userId);
-        return res.status(200).json({ message: "Transaction created!", transaction, insertedTransactionDetails });
+        // const deletedCartItem = await removeAllCartItemInUserService(userId);
+        const payTransactionResponse = await payTransactionService(transaction, req.user.customerId)
+        return res.status(200).json({ message: "Transaction created!", payTransactionResponse, transaction, insertedTransactionDetails });
         
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -315,10 +316,11 @@ export const deliveryDetail = async (req, res) => {
 }
 
 export const printLabel = async (req, res) => {
-    const { orderNumber } = req.body;
+    const { transactionId } = req.body;
 
     try {
-        const label = await printLabelService(orderNumber);
+        const getTransactionById = await getTransactionsByIdService(transactionId);
+        const label = await printLabelService(getTransactionById.orderNumber);
         return res.status(200).json({ message: "Success!", label });
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -386,4 +388,36 @@ export const updateTransactionDelivery = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
+}
+
+export const cancelTransaction = async (req, res) => {
+    const transactionId = req.params.id;
+
+    if (!transactionId) {
+        return res.status(400).json({ message: "Transaction is required!" });
+    }
+
+    try {
+        const cancelledTransaction = await cancelTransactionService(transactionId);
+        return res.status(200).json({ message: "Transaction cancelled!" })
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const payTransaction = async (req, res) => {
+    const user = req.user;
+    const { transactionId } = req.body;
+
+    if (!transactionId) {
+        return res.status(400).json({ message: "Transaction is required!" });
+    }
+
+    try {
+        const transactionPlan = await payTransactionService(transactionId, user);
+        return res.status(200).json({ message: "Plan created!" });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+
 }

@@ -1,6 +1,6 @@
 import { ProductCategoryModel, ProductModel, ProductVariantModel, TransactionDetailModel, TransactionHeaderModel, UserAddressModel, UserModel } from "../association/association.js"
 import { createOrderKomship, deliveryDetailKomship, printLabelKomship, requestPickUpKomship } from "../integration/komship.integration.js";
-import { checkOutVATransactionXendit, createCreditCardTransactionXendit, createQrisTransactionXendit } from "../integration/xendit.integration.js";
+import { checkOutVATransactionXendit, createCreditCardTransactionXendit, createPlanXendit, createQrisTransactionXendit } from "../integration/xendit.integration.js";
 import { Op, Sequelize } from "sequelize";
 
 export const getAllTransactionsService = async (status) => {
@@ -371,7 +371,7 @@ export const fetchSalesByCategoryService = async (year, month) => {
   };
 
 
-  export const updateTransactionDeliveryService = async (order_no, status) => {
+export const updateTransactionDeliveryService = async (order_no, status) => {
     const response = TransactionHeaderModel.update({ 
         status: status,
         where: {
@@ -379,4 +379,27 @@ export const fetchSalesByCategoryService = async (year, month) => {
         }
     })
     return response;
-  }
+}
+
+export const cancelTransactionService = async (transactionId) => {
+    const updatedTransaction = await TransactionHeaderModel.update(
+        {
+            status: 'Cancelled',
+        },
+        {
+            where: {
+                transactionId: transactionId
+            },
+        }
+    )
+    if (updatedTransaction[0] === 0) {
+        throw new Error("There is no change or no transaction");
+    }
+    return updatedTransaction;
+}
+
+export const payTransactionService = async (transaction, customerId) => {
+    const response = await createPlanXendit(transaction, customerId);
+    console.log(response);
+    return response
+}
