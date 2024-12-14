@@ -2,6 +2,7 @@ import { ProductCategoryModel, ProductModel, ProductVariantModel, TransactionDet
 import { createOrderKomship, deliveryDetailKomship, printLabelKomship, requestPickUpKomship } from "../integration/komship.integration.js";
 import { checkOutVATransactionXendit, createCreditCardTransactionXendit, createPlanXendit, createQrisTransactionXendit } from "../integration/xendit.integration.js";
 import { Op, Sequelize } from "sequelize";
+import { generateReadableId } from "../utils/utility.js";
 
 export const getAllTransactionsService = async (status) => {
     const transactions = await TransactionHeaderModel.findAll({
@@ -107,6 +108,7 @@ export const createTransactionService = async (
     totalWeight
 ) => {
     const transaction = await TransactionHeaderModel.create({
+        readableId: generateReadableId(),
         userId,
         addressId,
         voucherId,
@@ -403,3 +405,23 @@ export const payTransactionService = async (transaction, customerId) => {
     console.log(response);
     return response
 }
+
+export const checkTransactionWithVoucher = async (voucherCode, userId) => {
+    try {
+        const transaction = await TransactionHeaderModel.findOne({
+            where: { 
+                voucherCode, 
+                userId 
+            }
+        });
+
+        if (transaction) {
+            return true
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.error("Error checking transaction with voucher:", error);
+        throw new Error("An error occurred while checking the transaction.");
+    }
+};

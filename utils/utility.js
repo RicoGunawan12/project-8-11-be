@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import fs from 'fs';
 import path from 'path';
+import { v4 as uuidv4 } from 'uuid'; // Import UUID library
 
 export const hashPassword = async (password) => {
   return await bcrypt.hash(password, 10);
@@ -27,4 +28,17 @@ export const isValidDate = (date) => {
 
   const parsedDate = new Date(date);
   return !isNaN(parsedDate.getTime()) && date === parsedDate.toISOString().split('T')[0];
+};
+
+
+export const generateReadableId = () => {
+    const date = new Date();
+    
+    const formattedDate = date.toISOString().slice(0, 10).replace(/-/g, "");
+    
+    const randomId = uuidv4().replace(/-/g, "").slice(0, 6).toUpperCase();
+    
+    const readableId = `TYS/${formattedDate}/${randomId}`;
+    
+    return readableId;
 };

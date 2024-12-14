@@ -1,5 +1,5 @@
 import { json } from "sequelize";
-import { createPromoDetailService, createPromoService, getPromoService } from "../services/promo.service.js";
+import { createPromoDetailService, createPromoService, deletePromoService, getPromoService } from "../services/promo.service.js";
 import { isValidDate } from "../utils/utility.js";
 
 
@@ -40,6 +40,19 @@ export const createPromo = async (req, res) => {
         const promo = await createPromoService(promoName, promoAmount, startDate, endDate);
         const promoDetail = await createPromoDetailService(promo.promoId, products);
         return res.status(200).json({ message: "Promo created!", promo});
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const deletePromo = async (req, res) => {
+    const promoId = req.params.id;
+    if (!promoId) {
+        return res.status(400).json({ message: "Promo id is required!" });
+    }
+    try {
+        const deletedPromo = await deletePromoService(promoId);
+        return res.status(200).json({ message: "Promo deleted!", deletedPromo });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

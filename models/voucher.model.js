@@ -17,7 +17,7 @@ const Voucher = sequelize.define('vouchers', {
   },
   voucherType: {
     field: "voucher_type",
-    type: DataTypes.ENUM('Cashback', 'Discount'),
+    type: DataTypes.ENUM('percentage', 'fixed'),
     primaryKey: false,
   },
   voucherCode: {
@@ -45,6 +45,11 @@ const Voucher = sequelize.define('vouchers', {
     field: "discount",
     type: DataTypes.INTEGER,
     allowNull: true
+  },
+  quota: {
+    field: "quota",
+    type: DataTypes.INTEGER,
+    // allowNull: true
   }
 },{
   timestamps: false

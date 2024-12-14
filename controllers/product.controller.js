@@ -1,5 +1,5 @@
-import { createProductService, deleteProductService, getBestSellerService, updatePromoService, getProductByIdService, getProductCountService, getProductPaginationService, getProductsService, updateBestSellerService } from "../services/product.service.js";
-import { createProductVariantService, updateProductQuantityService, updateVariantService } from "../services/productVariantService.js";
+import { createProductService, deleteProductService, getBestSellerService, updatePromoService, getProductByIdService, getProductCountService, getProductPaginationService, getProductsService, updateBestSellerService, updateProductService } from "../services/product.service.js";
+import { createProductVariantService, updateProductQuantityService, updateProductVariantService, updateVariantService } from "../services/productVariantService.js";
 import { BASE_URL, UPLOAD_FOLDER } from "../utils/uploader.js";
 import { isValidDate } from "../utils/utility.js";
 
@@ -69,6 +69,75 @@ export const getProductById = async (req, res) => {
     }
 }
 
+export const validateProduct = (req, res, next) => {
+    const { productName, productDescription, productCategoryName, productVariants } = req.body;
+
+    // Validate productName
+    if (!productName || typeof productName !== 'string' || productName.trim() === '') {
+        return res.status(400).json({ message: 'Product name is required and must be a non-empty string.' });
+    }
+
+    // Validate productDescription
+    if (!productDescription || typeof productDescription !== 'string' || productDescription.trim() === '') {
+        return res.status(400).json({ message: 'Product description is required and must be a non-empty string.' });
+    }
+
+    // Validate productCategoryName
+    if (!productCategoryName || typeof productCategoryName !== 'string' || productCategoryName.trim() === '') {
+        return res.status(400).json({ message: 'Product category name is required and must be a non-empty string.' });
+    }
+
+    // Validate productVariants
+    try {
+        const variants = JSON.parse(productVariants); // Parse the JSON string
+        if (!Array.isArray(variants) || variants.length === 0) {
+            return res.status(400).json({ message: 'Product variants must be a non-empty array.' });
+        }
+
+        for (let i = 0; i < variants.length; i++) {
+            const variant = variants[i];
+            if (!variant.productSize || typeof variant.productSize !== 'string' || variant.productSize.trim() === '') {
+                return res.status(400).json({ message: `Variant at index ${i} must have a valid size.` });
+            }
+            if (!variant.productColor || typeof variant.productColor !== 'string' || variant.productColor.trim() === '') {
+                return res.status(400).json({ message: `Variant at index ${i} must have a valid color.` });
+            }
+            if (!variant.productPrice || typeof variant.productPrice !== 'number' || variant.productPrice <= 0) {
+                return res.status(400).json({ message: `Variant price at index ${i} must be a positive number.` });
+            }
+            if (!variant.productStock || typeof variant.productStock !== 'number' || variant.productStock <= 0) {
+                return res.status(400).json({ message: `Variant stock at index ${i} must be a positive number.` });
+            }
+            if (!variant.productWeight || typeof variant.productWeight !== 'number' || variant.productWeight <= 0) {
+                return res.status(400).json({ message: `Variant weight at index ${i} must be a positive number.` });
+            }
+            if (!variant.productLength || typeof variant.productLength !== 'number' || variant.productLength <= 0) {
+                return res.status(400).json({ message: `Variant length at index ${i} must be a positive number.` });
+            }
+            if (!variant.productWidth || typeof variant.productWidth !== 'number' || variant.productWidth <= 0) {
+                return res.status(400).json({ message: `Variant width at index ${i} must be a positive number.` });
+            }
+            if (!variant.productHeight || typeof variant.productHeight !== 'number' || variant.productHeight <= 0) {
+                return res.status(400).json({ message: `Variant height at index ${i} must be a positive number.` });
+            }
+        }
+    } catch (err) {
+        return res.status(400).json({ message: 'Product variants must be a valid JSON string.' });
+    }
+
+    // Validate images
+    if (!req.files || !req.files['productImage'] || req.files['productImage'].length === 0) {
+        return res.status(400).json({ message: 'At least one product image is required.' });
+    }
+    if (!req.files['defaultImage'] || req.files['defaultImage'].length === 0) {
+        return res.status(400).json({ message: 'Default image is required.' });
+    }
+
+    // If all validations pass
+    next();
+};
+
+
 export const createProduct = async (req, res) => {
     try {
         const images = req.files['productImage'];
@@ -111,6 +180,53 @@ export const createProduct = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
+export const updateProduct = async (req, res) => {
+    try {
+        const images = req.files['productImage'];
+        const defaultImage = req.files['defaultImage']
+        const { productName, productDescription, productCategoryName, productVariants } = req.body;
+        const productId = req.params.id;
+        
+        const hash = new Map();
+        images.forEach((image) => {
+            console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
+            
+            hash.set(image.originalname.substring(0, image.originalname.length - 4), `/${UPLOAD_FOLDER}${productName}/${image.filename}`);
+        });
+        
+        
+        if (productName.length < 1) {
+            return res.status(400).json({ message: "Product name must be filled" })
+        }
+
+        const variants = JSON.parse(productVariants);
+        variants.forEach((variant) => {
+            console.log(productName + " - " + variant.productSize + " - " + variant.productColor);
+            
+            console.log("hash: " + hash.get(productName + " - " + variant.productSize + " - " + variant.productColor));
+            
+            variant.productImage = hash.get(productName + " - " + variant.productSize + " - " + variant.productColor);
+        });
+
+        // console.log(defaultImage);
+        const defaultImageString = `/${UPLOAD_FOLDER}${productName}/${defaultImage[0].filename}`
+        const product = await updateProductService(productId, productName, productDescription, productCategoryName, defaultImageString);
+        const insertVariantPromise = variants.map(async (variant) => {
+            console.log("product id: " + product.productId);
+            
+            await updateProductVariantService(product.productId, variant);
+        })
+        await Promise.all(insertVariantPromise);
+        
+        return res.status(200).json({ message: "New product added!", product });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+
+
 
 export const deleteProduct = async (req, res) => {
     const id = req.params.id;

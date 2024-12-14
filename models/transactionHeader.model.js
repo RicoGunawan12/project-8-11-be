@@ -9,6 +9,11 @@ const TransactionHeader = sequelize.define('transaction_headers', {
     primaryKey: true,
     allowNull: false
   },
+  readableId: {
+    field: "readable_id",
+    type: DataTypes.STRING,
+    allowNull: false
+  },
   userId: {
     field: "ref_user_id",
     type: DataTypes.UUID,
@@ -19,8 +24,8 @@ const TransactionHeader = sequelize.define('transaction_headers', {
     type: DataTypes.UUID,
     primaryKey: false
   },
-  voucherId: {
-    field: "ref_voucher_id",
+  voucherCode: {
+    field: "ref_voucher_code",
     type: DataTypes.UUID,
     primaryKey: false,
     allowNull: true

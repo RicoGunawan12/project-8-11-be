@@ -41,9 +41,17 @@ export const voucherSchema = {
     },
   },
   discount: {
-    isFloat: {
-      options: { min: 0, max: 100 },
-      errorMessage: 'Discount must be a valid number with two decimal places',
+    isInt: {
+      // options: { min: 0, max: 100 },
+      errorMessage: 'Discount must be a valid number',
+    },
+    optional: true,
+    toFloat: true,
+  },
+  quota: {
+    isInt: {
+      options: { min: 1 },
+      errorMessage: 'Quota must be more than 0',
     },
     optional: true,
     toFloat: true,

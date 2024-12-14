@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
 
-const Page = sequelize.define('pages', {
+const AboutPage = sequelize.define('about_pages', {
   pageId: {
     field: "page_id",
     type: DataTypes.UUID,
@@ -10,13 +10,23 @@ const Page = sequelize.define('pages', {
     primaryKey: true,
     allowNull: false
   },
-  contentJSONEng: {
-    field: "content_json_eng",
+  titleEng: {
+    field: "title_eng",
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  titleIndo: {
+    field: "title_indo",
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  contentEng: {
+    field: "content_eng",
     type: DataTypes.TEXT,
     allowNull: false
   },
-  contentJSONIndo: {
-    field: "content_json_indo",
+  contentIndo: {
+    field: "content_indo",
     type: DataTypes.TEXT,
     allowNull: false
   },
@@ -24,4 +34,4 @@ const Page = sequelize.define('pages', {
   timestamps: false
 })
 
-export default Page;
+export default AboutPage;

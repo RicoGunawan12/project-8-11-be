@@ -11,7 +11,7 @@ export const UPLOAD_FOLDER = process.env.FOLDER_PATH || 'assets/';
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + req.body.productName);
+        const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + "product/" + req.body.productName);
 
         if (!fs.existsSync(uploadPath)) {
           fs.mkdirSync(uploadPath, { recursive: true });
