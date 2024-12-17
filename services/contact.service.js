@@ -26,8 +26,8 @@ export const updateContactService = async (id, contact, contactAccount) => {
     return updatedContact
 }
 
-export const createContactService = async (contact, contactAccount) => {
-    const createdContact = await Contact.create({ contact, contactAccount });
+export const createContactService = async (contact, contactAccount, contactImage) => {
+    const createdContact = await Contact.create({ contact, contactAccount, contactImage });
     return createdContact
 }
 

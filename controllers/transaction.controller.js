@@ -1,7 +1,7 @@
 import { createQrisTransactionXendit } from "../integration/xendit.integration.js";
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
 import { checkPromoService } from "../services/promo.service.js";
-import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, payTransactionService, printLabelService, requestPickupTransactionService, updateTransactionDeliveryService, updateTransactionStatusService } from "../services/transaction.service.js";
+import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, payTransactionService, printLabelService, requestPickupTransactionService, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionStatusService } from "../services/transaction.service.js";
 import { applyVoucherService } from "../services/voucher.service.js";
 
 
@@ -150,6 +150,7 @@ export const createTransaction = async (req, res) => {
         const insertedTransactionDetails = await createTransactionDetailService(transactionDetails);
         // const deletedCartItem = await removeAllCartItemInUserService(userId);
         const payTransactionResponse = await payTransactionService(transaction, req.user.customerId)
+        const updatePaymentLink = await updatePaymentLinkService(transaction, payTransactionResponse.actions.url);
         return res.status(200).json({ message: "Transaction created!", payTransactionResponse, transaction, insertedTransactionDetails });
         
     } catch (error) {

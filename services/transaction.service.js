@@ -425,3 +425,16 @@ export const checkTransactionWithVoucher = async (voucherCode, userId) => {
         throw new Error("An error occurred while checking the transaction.");
     }
 };
+
+export const updatePaymentLinkService = async (transaction, paymentLink) => {
+    const updatedTransaction = await TransactionHeaderModel.update(
+        {
+            paymenLink: paymentLink
+        },
+        {
+            where: {
+                transactionId: transaction.transactionId
+            },
+        }
+    )
+}

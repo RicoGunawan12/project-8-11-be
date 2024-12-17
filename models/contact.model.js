@@ -20,6 +20,12 @@ const Contact = sequelize.define('contact', {
       type: DataTypes.STRING,
       length: 100,
       primaryKey: false
+    },
+    contactImage: {
+      field: "contact_image",
+      type: DataTypes.STRING,
+      length: 100,
+      primaryKey: false
     }
 },{
   timestamps: false

@@ -103,6 +103,11 @@ const TransactionHeader = sequelize.define('transaction_headers', {
     field: "komship_order_id",
     type: DataTypes.INTEGER,
     allowNull: true
+  },
+  paymentLink: {
+    field: "payment_link",
+    type: DataTypes.STRING,
+    allowNull: true
   }
 },{
   timestamps: false
