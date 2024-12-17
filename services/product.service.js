@@ -50,7 +50,11 @@ export const getProductsService = async (search, category, limit) => {
   return products;
 };
 
-export const getProductPaginationService = async (limit, offset) => {
+export const getProductPaginationService = async (limit, offset, search) => {
+  const whereCondition = {};
+  whereCondition.productName = {
+    [Op.like]: `%${search}%`,
+  };
   const products = ProductModel.findAll({
     attributes: [
       "productId",
@@ -85,10 +89,10 @@ export const getProductPaginationService = async (limit, offset) => {
       },
     ],
     where: whereCondition,
-    limit: parseInt(limit) || null,
+    limit: parseInt(limit) || 0,
     offset: parseInt(offset) || 0,
   });
-
+  console.log("asd")
   if (!products || products.length === 0) {
     throw new Error("No products match the query parameters");
   }

@@ -4,10 +4,16 @@ import Page from "../models/page.model.js"
 export const getPageService = async () => {
     const pages = await Page.findAll();
     const parsedPages = pages.map(page => {
+        const contentJSONEng = page.contentJSONEng ? JSON.parse(page.contentJSONEng) : {};
+        const contentJSONIndo = page.contentJSONIndo ? JSON.parse(page.contentJSONIndo) : {};
+        
+        console.log("Parsed contentJSONEng:", contentJSONEng);
+        console.log("Parsed contentJSONIndo:", contentJSONIndo);
+        
         return {
             ...page.toJSON(),
-            contentJSONEng: JSON.parse(page.contentJSONEng),
-            contentJSONIndo: JSON.parse(page.contentJSONIndo),
+            contentJSONEng,
+            contentJSONIndo,
         };
     });
     return parsedPages;
