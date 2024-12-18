@@ -26,7 +26,8 @@ const TransactionHeader = sequelize.define('transaction_headers', {
   },
   voucherCode: {
     field: "ref_voucher_code",
-    type: DataTypes.UUID,
+    type: DataTypes.STRING,
+    defaultValue: null,
     primaryKey: false,
     allowNull: true
   },

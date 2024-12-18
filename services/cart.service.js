@@ -1,4 +1,5 @@
-import { CartItemModel, CartModel, ProductModel, ProductVariantModel } from "../association/association.js"
+import { Op } from "sequelize";
+import { CartItemModel, CartModel, ProductModel, ProductVariantModel, PromoDetailModel, PromoModel } from "../association/association.js"
 import ProductVariant from "../models/productVariant.model.js";
 
 
@@ -28,7 +29,26 @@ export const getCartItemsByUserService = async (userId) => {
                 include: [
                     {
                         model: ProductModel,
-                        attributes: ['productName']
+                        attributes: ['productName'],
+                        include: [
+                            {
+                                model: PromoDetailModel,
+                                attributes: ['promoDetailId'],
+                                include: [
+                                    {
+                                        model: PromoModel,
+                                        where: {
+                                            startDate: {
+                                                [Op.lte]: new Date(), 
+                                            },
+                                            endDate: {
+                                                [Op.gte]: new Date(),
+                                            },
+                                        },
+                                    },
+                                ]
+                            }
+                        ]
                     }
                 ]
             }

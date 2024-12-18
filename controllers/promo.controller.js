@@ -17,6 +17,12 @@ export const createPromo = async (req, res) => {
     const { promoName, promoAmount, startDate, endDate, products } = req.body;
     console.log(req.body);
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
     if (!promoName) {
         return res.status(400).json({ message: "Promo name must be filled!" });
     }
@@ -27,13 +33,23 @@ export const createPromo = async (req, res) => {
         return res.status(400).json({ message: "Product promo cannot be minus" });
     }
     else if (!startDate || !endDate) {
-        return res.status(400).json({ error: 'startDate and endDate are required' });
+        return res.status(400).json({ message: 'startDate and endDate are required' });
     }
     else if (!isValidDate(startDate) || !isValidDate(endDate)) {
-        return res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
+        return res.status(400).json({ message: 'Invalid date format. Use YYYY-MM-DD' });
+    }
+    else if (start < today) {
+        return res.status(400).json({
+            message: "Start date must be today or a future date.",
+        });
+    }
+    else if (end <= start) {
+        return res.status(400).json({
+            message: "End date must be greater than the start date.",
+        });
     }
     else if (!products || !Array.isArray(products)) {
-        return res.status(400).json({ error: "Invalid or missing products. It should be an array." });
+        return res.status(400).json({ message: "Invalid or missing products. It should be an array." });
     }
 
     try {

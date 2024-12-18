@@ -148,7 +148,7 @@ export const createProduct = async (req, res) => {
         images.forEach((image) => {
             console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
             
-            hash.set(image.originalname.substring(0, image.originalname.length - 4), `/${UPLOAD_FOLDER}${productName}/${image.filename}`);
+            hash.set(image.originalname.substring(0, image.originalname.length - 4), `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`);
         });
         
         
@@ -166,7 +166,7 @@ export const createProduct = async (req, res) => {
         });
 
         // console.log(defaultImage);
-        const defaultImageString = `/${UPLOAD_FOLDER}${productName}/${defaultImage[0].filename}`
+        const defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${defaultImage[0].filename}`
         const product = await createProductService(productName, productDescription, productCategoryName, defaultImageString);
         const insertVariantPromise = variants.map(async (variant) => {
             console.log("product id: " + product.productId);
@@ -192,7 +192,7 @@ export const updateProduct = async (req, res) => {
         images.forEach((image) => {
             console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
             
-            hash.set(image.originalname.substring(0, image.originalname.length - 4), `/${UPLOAD_FOLDER}${productName}/${image.filename}`);
+            hash.set(image.originalname.substring(0, image.originalname.length - 4), `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`);
         });
         
         
@@ -210,7 +210,7 @@ export const updateProduct = async (req, res) => {
         });
 
         // console.log(defaultImage);
-        const defaultImageString = `/${UPLOAD_FOLDER}${productName}/${defaultImage[0].filename}`
+        const defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${defaultImage[0].filename}`
         const product = await updateProductService(productId, productName, productDescription, productCategoryName, defaultImageString);
         const insertVariantPromise = variants.map(async (variant) => {
             console.log("product id: " + product.productId);

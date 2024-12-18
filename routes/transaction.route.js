@@ -26,7 +26,7 @@ TransactionRoute.post('/checkout-qris', userMiddleware, generalValidator(checkou
 
 TransactionRoute.post('/checkout-va', userMiddleware,generalValidator(checkoutVASchema), validateSchema, checkOutVATransaction);
 
-TransactionRoute.post('/update-status', updateStatusValidator, validateSchema, updateTransactionStatus);
+TransactionRoute.post('/update-status', updateTransactionStatus);
 
 TransactionRoute.post('/pickup', adminMiddleware,generalValidator(transactionIdSchema), validateSchema, requestPickupTransaction);
 

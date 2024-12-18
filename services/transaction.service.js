@@ -3,6 +3,8 @@ import { createOrderKomship, deliveryDetailKomship, printLabelKomship, requestPi
 import { checkOutVATransactionXendit, createCreditCardTransactionXendit, createPlanXendit, createQrisTransactionXendit } from "../integration/xendit.integration.js";
 import { Op, Sequelize } from "sequelize";
 import { generateReadableId } from "../utils/utility.js";
+import { getPickUpPointService } from "./address.service.js";
+import sequelize from "../config/database.js";
 
 export const getAllTransactionsService = async (status) => {
     const transactions = await TransactionHeaderModel.findAll({
@@ -93,7 +95,7 @@ export const getTransactionsByIdService = async (transactionId) => {
 export const createTransactionService = async (
     userId,
     addressId,
-    voucherId,
+    voucherCode,
     transactionDate,
     paymentMethod,
     gatewayResponse,
@@ -111,7 +113,7 @@ export const createTransactionService = async (
         readableId: generateReadableId(),
         userId,
         addressId,
-        voucherId,
+        voucherCode,
         transactionDate,
         paymentMethod,
         gatewayResponse,
@@ -129,7 +131,36 @@ export const createTransactionService = async (
 }
 
 export const createTransactionDetailService = async (products) => {
+    for (const product of products) {
+      const { productVariantId, quantity } = product;
+
+      const productVariant = await ProductVariantModel.findOne({
+        where: { productVariantId },
+        attributes: ['productStock']
+      });
+
+      if (!productVariant) {
+        throw new Error(`Product variant not found.`);
+      }
+
+      if (productVariant.productStock - quantity < 0) {
+        throw new Error(
+          `Insufficient stock. Available: ${productVariant.productStock}, Requested: ${quantity}.`
+        );
+      }
+    }
+
     const transactionDetails = await TransactionDetailModel.bulkCreate(products);
+
+    for (const product of products) {
+      const { productVariantId, quantity } = product;
+
+      await ProductVariantModel.update(
+        { productStock: sequelize.literal(`product_stock - ${quantity}`) },
+        { where: { productVariantId } }
+      );
+    }
+
     return transactionDetails;
 }
 
@@ -192,21 +223,8 @@ export const updateTransactionStatusService = async (transactionId, gatewayRespo
 }
 
 export const createKomshipOrderService = async (transaction) => {
-
-    const createdKomshipOrder = await createOrderKomship(transaction);
-    const updatedTransaction = await TransactionHeaderModel.update(
-        {
-            komshipOrderNumber: createdKomshipOrder.komshipResponse.data.order_no,
-            komshipOrderId: createdKomshipOrder.komshipResponse.data.order_id,
-            status: 'Shipping'
-        },
-        {
-            where: {
-                transactionId: transaction.transactionId
-            },
-        }
-    )
-
+    const adminAddress = await getPickUpPointService();
+    const createdKomshipOrder = await createOrderKomship(transaction, adminAddress);
     return createdKomshipOrder
 }
 
