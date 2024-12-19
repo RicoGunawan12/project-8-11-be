@@ -37,8 +37,38 @@ const storageBlog = multer.diskStorage({
     }
 });
 
+const storageContact = multer.diskStorage({
+    destination: async function (req, file, cb) {
+        const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'contact');
+
+        if (!fs.existsSync(uploadPath)) {
+          fs.mkdirSync(uploadPath, { recursive: true });
+        }
+        cb(null, uploadPath);
+    },
+    filename: function (req, file, cb) {
+      cb(null, `${Date.now()}-${req.body.contact}.png`);
+    }
+});
+
+const storageBanner = multer.diskStorage({
+    destination: async function (req, file, cb) {
+        const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'banner');
+
+        if (!fs.existsSync(uploadPath)) {
+          fs.mkdirSync(uploadPath, { recursive: true });
+        }
+        cb(null, uploadPath);
+    },
+    filename: function (req, file, cb) {
+      cb(null, `${Date.now()}-${req.body.page}.png`);
+    }
+});
+
 export const upload = multer({ storage: storage });
 export const uploadBlog = multer({ storage: storageBlog });
+export const uploadContact = multer({ storage: storageContact });
+export const uploadBanner = multer({ storage: storageBanner });
 
 
 export const deleteDirectory = (productName) => {

@@ -1,7 +1,8 @@
+import sequelize from "../config/database.js";
 import { createQrisTransactionXendit } from "../integration/xendit.integration.js";
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
 import { checkPromoService } from "../services/promo.service.js";
-import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, payTransactionService, printLabelService, requestPickupTransactionService, updateTransactionDeliveryService, updateTransactionStatusService } from "../services/transaction.service.js";
+import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, payTransactionService, printLabelService, requestPickupTransactionService, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionStatusService } from "../services/transaction.service.js";
 import { applyVoucherService } from "../services/voucher.service.js";
 
 
@@ -65,6 +66,7 @@ export const createTransaction = async (req, res) => {
         return res.status(400).json({ message: "Payment method must be filled" });
     }
 
+    const seqTransaction = await sequelize.transaction();
     try {
         // get all item from user cart
         const userCart = await getCartItemsByUserService(userId);
@@ -87,6 +89,7 @@ export const createTransaction = async (req, res) => {
                     product.product_variant.productPrice = 
                     product.product_variant.productPrice - promoDetails.promo.promoAmount <= 0 ? 0 :
                     product.product_variant.productPrice - promoDetails.promo.promoAmount;
+                    product.product_variant.realizedPromo = promoDetails.promo.promoAmount;
                 }
                 console.log(product.product_variant.productPrice);
 
@@ -104,10 +107,11 @@ export const createTransaction = async (req, res) => {
                 return res.status(400).json({ message: "Voucher has used!" });
             }
             else {
-                const discount = await applyVoucherService(voucherCode);
+                const discount = await applyVoucherService(voucherCode, totalPrice - deliveryFee);
                 totalPrice -= discount
             }
         }
+        
         // set transaction date to now 
         // set gateway response to null
         // set status to Wait for payment
@@ -116,7 +120,8 @@ export const createTransaction = async (req, res) => {
         const transaction = await createTransactionService(
             userId, 
             addressId, 
-            voucherId, 
+            voucherCode.length === 0 ? null : voucherCode, 
+            // null, 
             new Date(), 
             paymentMethod, 
             null, 
@@ -144,15 +149,19 @@ export const createTransaction = async (req, res) => {
                 productVariantId: product.product_variant.productVariantId,
                 quantity: product.quantity,
                 paidProductPrice: product.product_variant.productPrice,
-                // realizedPromo: isPromoActive ? product.product_variant.productPrice : 0
+                realizedPromo: product.product_variant.realizedPromo
             };
         });
         const insertedTransactionDetails = await createTransactionDetailService(transactionDetails);
         // const deletedCartItem = await removeAllCartItemInUserService(userId);
         const payTransactionResponse = await payTransactionService(transaction, req.user.customerId)
+        const updatePaymentLink = await updatePaymentLinkService(transaction, payTransactionResponse.actions[0].url);
+        
+        await seqTransaction.commit();
         return res.status(200).json({ message: "Transaction created!", payTransactionResponse, transaction, insertedTransactionDetails });
         
     } catch (error) {
+        await seqTransaction.rollback();
         return res.status(500).json({ message: error.message });
     }
 }
@@ -305,6 +314,7 @@ export const updateTransactionStatus = async (req, res) => {
     try {
         const updatedTransaction = await updateTransactionStatusService(reference_id, req.body);
         const getTransactionById = await getTransactionsByIdService(reference_id);
+
         const response = await createKomshipOrderService(getTransactionById);
         // return res.status(200).json({ response });
         return res.redirect('/');

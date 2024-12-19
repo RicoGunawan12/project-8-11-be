@@ -91,7 +91,7 @@ export const calculateDeliveryFeeKomship = async (shipperDestinationId, receiver
     //     "subtotal": 500000
     // }
 // ]
-export const createOrderKomship = async (transaction) => {
+export const createOrderKomship = async (transaction, adminAddress) => {
     const transactionDetails = transaction.transaction_details.map((det) => {
         return {
             product_name: det.product_variant.product.productName, 
@@ -117,10 +117,10 @@ export const createOrderKomship = async (transaction) => {
         body: JSON.stringify({
             order_date: formatDateToString(new Date()),
             brand_name: "Tyeso",
-            shipper_name: "Toko Official Tyeso",
-            shipper_phone: "6281234567689",
-            shipper_destination_id: 17588,
-            shipper_address: "test 123123",
+            shipper_name: adminAddress[0].senderName,
+            shipper_phone: adminAddress[0].senderPhoneNumber,
+            shipper_destination_id: adminAddress[0].komshipAddressId,
+            shipper_address: adminAddress[0].addressDetail,
             shipper_email: "test@gmail.com",
             receiver_name: transaction.user.user_addresses[0].receiverName, //ambil dari transaction
             receiver_phone: transaction.user.user_addresses[0].receiverPhoneNumber, //ambil dari transaction
