@@ -62,8 +62,8 @@ app.use('/api/banners', BannerRoute);
 
 (async () => {
   try {
-    // await sequelize.sync({ force:true, alter: true });
-    await sequelize.sync();
+    await sequelize.sync({ force:true, alter: true });
+    // await sequelize.sync();
     
     await storeAllProvinceService();
     await storeAllCityService();

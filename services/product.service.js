@@ -3,6 +3,8 @@ import {
   ProductModel,
   ProductCategoryModel,
   ProductVariantModel,
+  PromoDetailModel,
+  PromoModel,
 } from "../association/association.js";
 import { deleteDirectory, deletePostImage } from "../utils/uploader.js";
 import { getCategoryByName } from "./productCategory.service.js";
@@ -41,6 +43,24 @@ export const getProductsService = async (search, category, limit) => {
           "productHeight",
         ],
       },
+      {
+        model: PromoDetailModel,
+        attributes: ['promoDetailId'],
+        include: [
+            {
+                model: PromoModel,
+                where: {
+                    startDate: {
+                        [Op.lte]: new Date(), 
+                    },
+                    endDate: {
+                        [Op.gte]: new Date(),
+                    },
+                },
+            },
+        ]
+      }
+      
     ],
     where: {
       productName: { [Op.like]: `%${search}%` },
@@ -87,6 +107,23 @@ export const getProductPaginationService = async (limit, offset, search) => {
           "productHeight",
         ],
       },
+      {
+        model: PromoDetailModel,
+        attributes: ['promoDetailId'],
+        include: [
+            {
+                model: PromoModel,
+                where: {
+                    startDate: {
+                        [Op.lte]: new Date(), 
+                    },
+                    endDate: {
+                        [Op.gte]: new Date(),
+                    },
+                },
+            },
+        ]
+      }
     ],
     where: whereCondition,
     limit: parseInt(limit) || 0,
