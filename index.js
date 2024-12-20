@@ -23,6 +23,7 @@ import ContactRoute from './routes/contact.route.js';
 import { migrateContactService } from './services/contact.service.js';
 import PromoRoute from './routes/promo.route.js';
 import { checkPromoService } from './services/promo.service.js';
+import EmailRoute from './routes/email.route.js';
 import BannerRoute from './routes/banner.route.js';
 import { migrateBanner } from './services/banner.service.js';
 
@@ -58,6 +59,7 @@ app.use('/api/posts', PostRoute);
 app.use('/api/pages', PageRoute);
 app.use('/api/contacts', ContactRoute);
 app.use('/api/promos', PromoRoute);
+app.use('/api/emails', EmailRoute);
 app.use('/api/banners', BannerRoute);
 
 (async () => {
