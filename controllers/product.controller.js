@@ -35,6 +35,7 @@ export const getPaginateProduct = async(req, res) => {
     try{
 
         const products = await getProductPaginationService(limit, offset, search)
+        console.log(products)
         return res.status(200).json(products)
 
     } catch (error){

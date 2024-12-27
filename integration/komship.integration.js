@@ -21,7 +21,7 @@ export const searchDestinationKomship = async (keyword) => {
     try {
         const response = await fetch(process.env.KOMSHIP_URL + "/tariff/api/v1/destination/search?keyword=" + keyword, requestOptions);
         console.log(response);
-        
+
         if (!response.ok) {
             throw new Error(`Error: ${response.statusText}`);
         }
@@ -41,20 +41,20 @@ export const calculateDeliveryFeeKomship = async (shipperDestinationId, receiver
         redirect: 'follow'
     };
 
-    
+
     try {
-        
+
         const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/tariff/api/v1/calculate?shipper_destination_id=${shipperDestinationId}&receiver_destination_id=${receiverDestinationId}&weight=${weight}&item_value=${itemValue}&cod=${cod}`, requestOptions);
         if (!komshipResponse.ok) {
             throw new Error("Failed to calculate delivery fee: " + komshipResponse.statusText);
         }
-    
+
         const calculation = await komshipResponse.json();
         return calculation
     } catch (error) {
         throw new Error(error.message);
     }
-    
+
 }
 
 // "order_date": "2024-05-29 23:59:59",
@@ -79,32 +79,32 @@ export const calculateDeliveryFeeKomship = async (shipperDestinationId, receiver
 // "cod_value":317000,
 // "insurance_value": 1000,
 // "order_details": [
-    // {
-    //     "product_name": "Komship package",
-    //     "product_variant_name": "Komship variant product",
-    //     "product_price": 500000,
-    //     "product_width": 5,
-    //     "product_height": 2,
-    //     "product_weight": 5100,
-    //     "product_length": 20,
-    //     "qty": 1,
-    //     "subtotal": 500000
-    // }
+// {
+//     "product_name": "Komship package",
+//     "product_variant_name": "Komship variant product",
+//     "product_price": 500000,
+//     "product_width": 5,
+//     "product_height": 2,
+//     "product_weight": 5100,
+//     "product_length": 20,
+//     "qty": 1,
+//     "subtotal": 500000
+// }
 // ]
 export const createOrderKomship = async (transaction, adminAddress) => {
     const transactionDetails = transaction.transaction_details.map((det) => {
         return {
-            product_name: det.product_variant.product.productName, 
-            product_variant_name: 
-                (det.product_variant.productSize ?? "") + 
-                " - " + 
-                (det.product_variant.productColor ?? ""), 
-            product_price: det.product_variant.productPrice, 
-            product_width: det.product_variant.productWidth / 100, 
-            product_height: det.product_variant.productHeight / 100, 
-            product_weight: Math.ceil(det.product_variant.productWeight / 1000), 
-            product_length: det.product_variant.productLength / 100, 
-            qty: det.quantity, 
+            product_name: det.product_variant.product.productName,
+            product_variant_name:
+                (det.product_variant.productSize ?? "") +
+                " - " +
+                (det.product_variant.productColor ?? ""),
+            product_price: det.product_variant.productPrice,
+            product_width: det.product_variant.productWidth / 100,
+            product_height: det.product_variant.productHeight / 100,
+            product_weight: Math.ceil(det.product_variant.productWeight / 1000),
+            product_length: det.product_variant.productLength / 100,
+            qty: det.quantity,
             subtotal: det.quantity * det.product_variant.productPrice
         };
     });
@@ -179,17 +179,17 @@ export const createOrderKomship = async (transaction, adminAddress) => {
     try {
         const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/store`, requestOptions);
         console.log(komshipResponse);
-        
+
         if (!komshipResponse.ok) {
             throw new Error("Failed to store order: " + komshipResponse.statusText);
         }
-        
+
         const result = await komshipResponse.json();
         return { response: "Order created successfully", komshipResponse: result };
     } catch (error) {
         throw new Error(error.message);
     }
-    
+
 }
 
 
@@ -211,7 +211,7 @@ export const requestPickUpKomship = async (orderNumber) => {
             }
         )
     }
-    
+
     try {
         const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/pickup/request`, requestOptions);
         console.log(komshipResponse);
@@ -235,7 +235,7 @@ export const deliveryDetailKomship = async (orderNumber) => {
     try {
         const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/detail?order_no=${orderNumber}`, requestOptions);
         console.log(komshipResponse);
-        
+
         if (!komshipResponse.ok) {
             throw new Error(`Error: ${komshipResponse.statusText}`);
         }
@@ -256,7 +256,7 @@ export const printLabelKomship = async (orderNumber) => {
 
     try {
         const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/print-label?order_no=${orderNumber}&page=page_1`, requestOptions);
-        
+
         if (!komshipResponse.ok) {
             throw new Error(`Error: ${komshipResponse.statusText}`);
         }

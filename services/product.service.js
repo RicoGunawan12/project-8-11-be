@@ -46,9 +46,11 @@ export const getProductsService = async (search, category, limit) => {
       {
         model: PromoDetailModel,
         attributes: ['promoDetailId'],
+        required: false,
         include: [
             {
                 model: PromoModel,
+                required: false,
                 where: {
                     startDate: {
                         [Op.lte]: new Date(), 
@@ -75,6 +77,9 @@ export const getProductPaginationService = async (limit, offset, search) => {
   whereCondition.productName = {
     [Op.like]: `%${search}%`,
   };
+
+  console.log(search)
+
   const products = ProductModel.findAll({
     attributes: [
       "productId",
@@ -110,9 +115,11 @@ export const getProductPaginationService = async (limit, offset, search) => {
       {
         model: PromoDetailModel,
         attributes: ['promoDetailId'],
+        required: false,
         include: [
             {
                 model: PromoModel,
+                required: false,
                 where: {
                     startDate: {
                         [Op.lte]: new Date(), 
@@ -130,10 +137,10 @@ export const getProductPaginationService = async (limit, offset, search) => {
     offset: parseInt(offset) || 0,
   });
   console.log("asd")
-  if (!products || products.length === 0) {
-    throw new Error("No products match the query parameters");
-  }
-
+  // if (!products || products.length === 0) {
+  //   throw new Error("No products match the query parameters");
+  // }
+  console.log(products)
   return products;
 };
 
@@ -181,6 +188,25 @@ export const getProductByIdService = async (productId) => {
           "productHeight",
         ],
       },
+      {
+        model: PromoDetailModel,
+        attributes: ['promoDetailId'],
+        required: false,
+        include: [
+            {
+                model: PromoModel,
+                required: false,
+                where: {
+                    startDate: {
+                        [Op.lte]: new Date(), 
+                    },
+                    endDate: {
+                        [Op.gte]: new Date(),
+                    },
+                },
+            },
+        ]
+      }
     ],
     where: { productId },
   });
@@ -287,11 +313,33 @@ export const getBestSellerService = async () => {
     where: { isBestSeller: true },
     include: [
       {
+        model: ProductCategoryModel,
+        attributes: ["productCategoryName"],
+      },
+      {
+        model: ProductVariantModel,
+        attributes: [
+          "productVariantId",
+          "productSize",
+          "productColor",
+          "sku",
+          "productPrice",
+          "productStock",
+          "productImage",
+          "productWeight",
+          "productLength",
+          "productWidth",
+          "productHeight",
+        ],
+      },
+      {
         model: PromoDetailModel,
         attributes: ['promoDetailId'],
+        required: false,
         include: [
             {
                 model: PromoModel,
+                required: false,
                 where: {
                     startDate: {
                         [Op.lte]: new Date(), 
@@ -303,7 +351,7 @@ export const getBestSellerService = async () => {
             },
         ]
       }
-    ]
+    ],
   });
   console.log(bestSellerProduct);
 

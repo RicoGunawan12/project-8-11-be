@@ -30,6 +30,16 @@ const AboutPage = sequelize.define('about_pages', {
     type: DataTypes.TEXT,
     allowNull: false
   },
+  whyEng: {
+    field: "why_eng",
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  whyIndo: {
+    field: "why_indo",
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
 },{
   timestamps: false
 })

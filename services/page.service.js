@@ -98,7 +98,9 @@ export const migrateAboutPage = async () => {
             const contentIndo = "Dengan banyaknya botol di pasar ...."
             const titleEng = "test english"
             const titleIndo = "test indo"
-            AboutPage.create({ contentEng, contentIndo, titleEng, titleIndo });
+            const whyEng = "why tyeso???"
+            const whyIndo = "kenapa tyeso???"
+            AboutPage.create({ contentEng, contentIndo, titleEng, titleIndo, whyEng, whyIndo });
             console.log("Migrate page success!");
         } catch (error) {
             console.error(error.message);
@@ -136,11 +138,12 @@ export const updateIndoPageService = async (id, contentJSONIndo) => {
     return updatedPage;
 }
 
-export const updateEngAboutPageService = async (id, contentEng, titleEng) => {
+export const updateEngAboutPageService = async (id, contentEng, titleEng, whyEng) => {
     const updatedPage = await AboutPage.update(
         { 
             contentEng: contentEng, 
-            titleEng: titleEng
+            titleEng: titleEng,
+            whyEng: whyEng
         },
         { 
             where: {
@@ -154,11 +157,12 @@ export const updateEngAboutPageService = async (id, contentEng, titleEng) => {
     return updatedPage;
 }
 
-export const updateIndoAboutPageService = async (id, contentIndo, titleIndo) => {
+export const updateIndoAboutPageService = async (id, contentIndo, titleIndo, whyIndo) => {
     const updatedPage = await AboutPage.update(
         { 
             contentIndo: contentIndo, 
-            titleIndo: titleIndo 
+            titleIndo: titleIndo,
+            whyIndo: whyIndo
         },
         { 
             where: {
