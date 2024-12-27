@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerUser, getUsers, loginUser, getUserById } from '../controllers/user.controller.js';
+import { registerUser, getUsers, loginUser, getUserById, loginAdmin } from '../controllers/user.controller.js';
 import { idParamsValidator } from '../validator/general/getByIdParams.validator.js';
 import { validateSchema } from '../validator/validate.js';
 import { generalValidator } from '../validator/general/general.validator.js';
@@ -14,5 +14,6 @@ userRoute.get('/data', userMiddleware, getUserById)
 
 userRoute.post('/register',generalValidator(userSchema),validateSchema, registerUser);
 userRoute.post('/login', loginUser);
+userRoute.post('/login/admin', loginAdmin);
 
 export default userRoute;

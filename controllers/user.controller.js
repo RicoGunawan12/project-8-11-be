@@ -1,4 +1,4 @@
-import { registerUserService, getUsersService, loginUserService, getUserByIdService } from '../services/user.service.js';
+import { registerUserService, getUsersService, loginUserService, getUserByIdService, loginAdminService } from '../services/user.service.js';
 
 
 export const registerUser = async (req, res) => {
@@ -59,6 +59,24 @@ export const loginUser = async (req, res) => {
 
   try {
     const token = await loginUserService(email, password);
+    return res.status(200).json({ message: 'Login success!', token: token })
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+
+export const loginAdmin = async (req, res) => {
+  const { email, password } = req.body;
+  
+  if (email.length < 1) {
+    return res.status(400).json({ message: 'Email must be filled' });
+  }
+  else if (password.length < 1) {
+    return res.status(400).json({ message: 'Password must be filled' });
+  }
+
+  try {
+    const token = await loginAdminService(email, password);
     return res.status(200).json({ message: 'Login success!', token: token })
   } catch (error) {
     return res.status(500).json({ message: error.message });

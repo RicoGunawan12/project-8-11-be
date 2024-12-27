@@ -73,6 +73,31 @@ export const loginUserService = async (email, password) => {
     throw new Error('User not found!');
   }
 
+  
+  if (existingUser.role !== "user") {
+    throw new Error('Invalid credential!');
+  }
+
+  const isMatch = await matchPassword(password, existingUser.password);
+  if (!isMatch) {
+    throw new Error('Wrong credential!');
+  }
+  
+  const token = jwt.sign({ userId: existingUser.dataValues.userId }, process.env.JWT_KEY, { expiresIn: process.env.JWT_EXPIRY });
+  
+  return token;
+}
+
+export const loginAdminService = async (email, password) => {
+  const existingUser = await UserModel.findOne({ where: { email } });
+  if (!existingUser) {
+    throw new Error('User not found!');
+  }
+
+  if (existingUser.role !== "admin") {
+    throw new Error('Invalid credential!');
+  }
+
   const isMatch = await matchPassword(password, existingUser.password);
   if (!isMatch) {
     throw new Error('Wrong credential!');

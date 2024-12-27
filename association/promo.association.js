@@ -5,7 +5,7 @@ import { Product } from "./product.association.js";
 Promo.hasMany(PromoDetail, { foreignKey: 'promo_id', onDelete: 'CASCADE' });
 PromoDetail.belongsTo(Promo, { foreignKey: 'promo_id' })
 
-Product.hasMany(PromoDetail, { foreignKey: 'product_id' })
+Product.hasMany(PromoDetail, { foreignKey: 'product_id', onDelete: 'CASCADE' })
 PromoDetail.belongsTo(Product, { foreignKey: 'product_id' })
 
 export  { Promo, PromoDetail, Product }
