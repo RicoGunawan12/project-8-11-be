@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { ProductCategoryModel } from "../association/association.js";
+import { ProductCategoryModel, ProductModel, ProductVariantModel } from "../association/association.js";
 
 
 export const getCategoriesService = async (search) => {
@@ -65,4 +65,21 @@ export const updateCategoryService = async (productCategoryId, productCategoryNa
     );
 
     return { message: 'Category updated successfully' };
+}
+
+export const getCategoryWithProductService = async () => {
+    const category = ProductCategoryModel.findAll({
+        include: [
+            {
+                model: ProductModel,
+                include: [
+                    {
+                        model: ProductVariantModel
+                    }
+                ],
+                limit: 8
+            }
+        ]
+    })
+    return category
 }

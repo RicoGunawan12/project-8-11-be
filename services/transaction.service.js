@@ -223,8 +223,25 @@ export const updateTransactionStatusService = async (transactionId, gatewayRespo
 }
 
 export const createKomshipOrderService = async (transaction) => {
-    const adminAddress = await getPickUpPointService();
-    const createdKomshipOrder = await createOrderKomship(transaction, adminAddress);
+
+    const adminAddress = await getPickUpPointService(); 
+    // if (adminAddress.length === 0) {
+
+    // }
+    const createdKomshipOrder = await createOrderKomship(transaction, adminAddress[0]);
+    const updatedTransaction = await TransactionHeaderModel.update(
+        {
+            komshipOrderNumber: createdKomshipOrder.komshipResponse.data.order_no,
+            komshipOrderId: createdKomshipOrder.komshipResponse.data.order_id,
+            status: 'Shipping'
+        },
+        {
+            where: {
+                transactionId: transaction.transactionId
+            },
+        }
+    )
+
     return createdKomshipOrder
 }
 
