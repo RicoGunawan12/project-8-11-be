@@ -1,4 +1,4 @@
-import { getPageService, updatePageService } from "../services/page.service.js";
+import { getAboutPageService, getPageService, updateEngAboutPageService, updateEngPageService, updateIndoAboutPageService, updateIndoPageService } from "../services/page.service.js";
 
 
 export const getPage = async (req, res) => {
@@ -10,17 +10,13 @@ export const getPage = async (req, res) => {
     }
 }
 
-export const updatePage = async (req, res) => {
+export const updateEngPage = async (req, res) => {
     
-    const { contentJSON, language } = req.body;
+    const { contentJSONEng } = req.body;
     const id = req.params.id
     
-    if (!contentJSON || !Array.isArray(contentJSON)) {
-        return res.status(400).json({ error: "Invalid or missing contentJSON. It should be an array." });
-    }
-
-    if (!language || typeof language !== "string") {
-        return res.status(400).json({ error: "Invalid or missing language. It should be a 3-character string." });
+    if (!contentJSONEng || !Array.isArray(contentJSONEng)) {
+        return res.status(400).json({ error: "Invalid or missing content. It should be an array." });
     }
     
     if (!id || typeof id !== "string" || !/^[a-f0-9-]{36}$/i.test(id)) {
@@ -28,8 +24,89 @@ export const updatePage = async (req, res) => {
     }
 
     try {
-        const response = await updatePageService(id, contentJSON, language);
+        const response = await updateEngPageService(id, contentJSONEng);
         return res.status(200).json({ message: "Page updated!"});
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const updateIndoPage = async (req, res) => {
+    
+    const { contentJSONIndo } = req.body;
+    const id = req.params.id
+    
+    if (!contentJSONIndo || !Array.isArray(contentJSONIndo)) {
+        return res.status(400).json({ error: "Invalid or missing content. It should be an array." });
+    }
+    
+    if (!id || typeof id !== "string" || !/^[a-f0-9-]{36}$/i.test(id)) {
+        return res.status(400).json({ error: "Invalid or missing ID. It should be a valid UUID." });
+    }
+
+    try {
+        const response = await updateIndoPageService(id, contentJSONIndo);
+        return res.status(200).json({ message: "Page updated!"});
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const getAboutPage = async (req, res) => {
+    try {
+        const response = await getAboutPageService();
+        return res.status(200).json({ message: "About Page Fetched!", response });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const updateEngAboutPage = async (req, res) => {
+
+    const { contentEng, titleEng } = req.body;
+    const id = req.params.id
+    if (!id || typeof id !== 'string') {
+        return res.status(400).json({ error: "Invalid or missing ID parameter." });
+    }
+
+    if (!titleEng || typeof titleEng !== 'string' || titleEng.trim().length === 0) {
+        return res.status(400).json({ error: "Title must be a non-empty string." });
+    }
+
+    if (!contentEng || typeof contentEng !== 'string' || contentEng.trim().length === 0) {
+        return res.status(400).json({ error: "Content must be a non-empty string." });
+    }
+
+
+    try {
+        const response = await updateEngAboutPageService(id, contentEng, titleEng);
+        return res.status(200).json({ message: "About Page updated!"});
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const updateIndoAboutPage = async (req, res) => {
+
+    const { contentIndo, titleIndo } = req.body;
+    const id = req.params.id
+
+    if (!id || typeof id !== 'string') {
+        return res.status(400).json({ error: "Invalid or missing ID parameter." });
+    }
+
+    if (!titleIndo || typeof titleIndo !== 'string' || titleIndo.trim().length === 0) {
+        return res.status(400).json({ error: "Title must be a non-empty string." });
+    }
+
+    if (!contentIndo || typeof contentIndo !== 'string' || contentIndo.trim().length === 0) {
+        return res.status(400).json({ error: "Content must be a non-empty string." });
+    }
+
+
+    try {
+        const response = await updateIndoAboutPageService(id, contentIndo, titleIndo);
+        return res.status(200).json({ message: "About Page updated!"});
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

@@ -1,4 +1,5 @@
 import { createContactService, deleteContactService, getContactService, updateContactService } from "../services/contact.service.js";
+import { UPLOAD_FOLDER } from "../utils/uploader.js";
 
 
 export const getContact = async (req, res) => {
@@ -12,16 +13,21 @@ export const getContact = async (req, res) => {
 
 export const createContact = async (req, res) => {
     const { contact, contactAccount } = req.body;
+    const images = req.files['contactImage'];
 
+    if (!images) {
+        return res.status(400).json({ message: "Contact image is required!" });
+    }
     if (!contact) {
         return res.status(400).json({ message: "Contact is required!" });
     }
     else if (!contactAccount) {
         return res.status(400).json({ message: "Contact account is required!" });
     }
+    const contactImage = `/${UPLOAD_FOLDER}contact/${images[0].filename}`
 
     try {
-        const contacts = await createContactService(contact, contactAccount);
+        const contacts = await createContactService(contact, contactAccount, contactImage);
         return res.status(200).json({ message: "Contact created!", contacts, });
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -57,7 +63,7 @@ export const deleteContact = async (req, res) => {
     if (!id) {
         return res.status(400).json({ message: "Contact Id is required!" });
     }
-
+    
     try {
         const contacts = await deleteContactService(id);
         return res.status(200).json({ message: "Contact deleted!", contacts, });

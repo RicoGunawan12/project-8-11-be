@@ -25,6 +25,11 @@ const User = sequelize.define('users', {
       isEmail: true,
     },
   },
+  phone: {
+    field: "phone",
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   password: {
     field: "password",
     type: DataTypes.STRING,
@@ -36,7 +41,12 @@ const User = sequelize.define('users', {
     type: DataTypes.ENUM('admin', 'user'),
     allowNull: false,
     length: 50
-  }
+  },
+  customerId: {
+    field: "customer_id",
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
 }, {
   hooks: {
     beforeCreate: async (user) => {

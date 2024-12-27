@@ -2,12 +2,12 @@ import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
 const Voucher = sequelize.define('vouchers', {
-  voucherId: {
-    field: "voucher_id",
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4, 
-    primaryKey: true,
-    allowNull: false
+  voucherCode: {
+    field: "voucher_code",
+    type: DataTypes.STRING,
+    length: 50,
+    allowNull: false, 
+    primaryKey: true
   },
   voucherName: {
     field: "voucher_name",
@@ -17,14 +17,8 @@ const Voucher = sequelize.define('vouchers', {
   },
   voucherType: {
     field: "voucher_type",
-    type: DataTypes.ENUM('Cashback', 'Discount'),
+    type: DataTypes.ENUM('percentage', 'fixed'),
     primaryKey: false,
-  },
-  voucherCode: {
-    field: "voucher_code",
-    type: DataTypes.STRING,
-    length: 50,
-    allowNull: false
   },
   voucherEndDate: {
     field: "voucher_end_date",
@@ -45,6 +39,11 @@ const Voucher = sequelize.define('vouchers', {
     field: "discount",
     type: DataTypes.INTEGER,
     allowNull: true
+  },
+  quota: {
+    field: "quota",
+    type: DataTypes.INTEGER,
+    // allowNull: true
   }
 },{
   timestamps: false

@@ -5,6 +5,12 @@ const { PaymentRequest } = xenditClient
 
 const xenditPaymentRequestClient = new PaymentRequestClient({secretKey: process.env.XENDIT_API})
 
+const credentials = btoa(`${process.env.XENDIT_API_TEST}:`);
+const headers = new Headers({
+    "Authorization": `Basic ${credentials}`,
+    "Content-Type": "application/json",
+});
+
 
 export const createCreditCardTransactionXendit = async (
     transactionId,
@@ -141,4 +147,102 @@ export const checkOutVATransactionXendit = async (transactionId, amount, bank, c
         data
     })
     return response
+}
+
+export const createCustomerXendit = async (userId, username, email, phone) => {
+    const body = {
+        reference_id: userId,
+        type: "INDIVIDUAL",
+        individual_detail: {
+        given_names: username,
+        surname: username
+        },
+        email: email,
+        mobile_number: phone
+    }
+
+    const requestOptions = {
+        method: 'POST',
+        headers: headers,
+        redirect: 'follow',
+        body: JSON.stringify(body)
+    }
+    
+    try {
+        const xenditResponse = await fetch(`${process.env.XENDIT_URL}/customers`, requestOptions);
+        if (!xenditResponse.ok) {
+            throw new Error(`Error: ${xenditResponse.statusText}`);
+        }
+        const result = await xenditResponse.json();
+        return result;
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+}
+
+export const createPlanXendit = async (transaction, customerId) => {
+    const body = {
+        reference_id: transaction.transactionId,
+        customer_id: customerId,
+        recurring_action: "PAYMENT",
+        currency: "IDR",
+        amount: transaction.totalPrice,
+        payment_methods: [],
+        schedule: {
+            reference_id: transaction.transactionId,
+            interval: "DAY",
+            interval_count: 1,
+            total_recurrence: 12,
+            anchor_date: "2024-12-13T10:27:52Z",
+            retry_interval: "DAY",
+            retry_interval_count: 3,
+            total_retry: 2,
+            failed_attempt_notifications: [1,2]
+        },
+        immediate_action_type: "FULL_AMOUNT",
+        notification_config: {
+            recurring_created: ["WHATSAPP","EMAIL"],
+            recurring_succeeded: ["WHATSAPP","EMAIL"],
+            recurring_failed: ["WHATSAPP","EMAIL"],
+            locale: "en"
+        },
+        failed_cycle_action: "STOP",
+        payment_link_for_failed_attempt : true,
+        metadata: null,
+        description: "Tyeso Payment",
+        // items: [
+        //         {
+        //             type: "DIGITAL_PRODUCT",
+        //             name: "Cine Mraft",
+        //             net_unit_amount: 11512,
+        //             quantity: 1,
+        //             url: "https://www.xendit.co/",
+        //             category: "Gaming",
+        //             subcategory: "Open World"
+        //         }
+        //     ],
+        success_return_url: "http://localhost:4650/transactions/" + transaction.transactionId,
+        failure_return_url: "https://www.xendit.co/failureisthemotherofsuccess"
+    }
+    console.log(body);
+
+    const requestOptions = {
+        method: 'POST',
+        headers: headers,
+        redirect: 'follow',
+        body: JSON.stringify(body)
+    }
+
+    try {
+        const xenditResponse = await fetch(`${process.env.XENDIT_URL}/recurring/plans`, requestOptions);
+        if (!xenditResponse.ok) {
+            throw new Error(`Error: ${xenditResponse.statusText}`);
+        }
+        const result = await xenditResponse.json();
+        return result;
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
 }

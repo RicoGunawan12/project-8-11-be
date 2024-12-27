@@ -33,6 +33,7 @@ export const getVoucherByCodeWithVoucherTypeService = async (voucherCode) => {
       voucherCode: voucherCode
     }
   })
+  return vouchers
 }
 
 // #endregion
@@ -155,6 +156,10 @@ export const applyVoucherService = async (voucherCode, totalAmount) => {
   const voucher = await getVoucherByCodeWithVoucherTypeService(voucherCode)
   
   if(!voucher) throw new Error(`Voucher with code ${voucherCode} doesn't exist`)
+
+  if (voucher.quota <= 0) {
+    throw new Error("Voucher quota has reached the limit")
+  }
 
   if(voucher.voucherEndDate && (voucher.voucherEndDate && new Date(voucher.voucherEndDate) < new Date())){
     throw new Error("Voucher has expired")

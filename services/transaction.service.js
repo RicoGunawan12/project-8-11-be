@@ -1,8 +1,10 @@
 import { ProductCategoryModel, ProductModel, ProductVariantModel, TransactionDetailModel, TransactionHeaderModel, UserAddressModel, UserModel } from "../association/association.js"
 import { createOrderKomship, deliveryDetailKomship, printLabelKomship, requestPickUpKomship } from "../integration/komship.integration.js";
-import { checkOutVATransactionXendit, createCreditCardTransactionXendit, createQrisTransactionXendit } from "../integration/xendit.integration.js";
+import { checkOutVATransactionXendit, createCreditCardTransactionXendit, createPlanXendit, createQrisTransactionXendit } from "../integration/xendit.integration.js";
 import { Op, Sequelize } from "sequelize";
+import { generateReadableId } from "../utils/utility.js";
 import { getPickUpPointService } from "./address.service.js";
+import sequelize from "../config/database.js";
 
 export const getAllTransactionsService = async (status) => {
     const transactions = await TransactionHeaderModel.findAll({
@@ -93,7 +95,7 @@ export const getTransactionsByIdService = async (transactionId) => {
 export const createTransactionService = async (
     userId,
     addressId,
-    voucherId,
+    voucherCode,
     transactionDate,
     paymentMethod,
     gatewayResponse,
@@ -108,9 +110,10 @@ export const createTransactionService = async (
     totalWeight
 ) => {
     const transaction = await TransactionHeaderModel.create({
+        readableId: generateReadableId(),
         userId,
         addressId,
-        voucherId,
+        voucherCode,
         transactionDate,
         paymentMethod,
         gatewayResponse,
@@ -128,7 +131,36 @@ export const createTransactionService = async (
 }
 
 export const createTransactionDetailService = async (products) => {
+    for (const product of products) {
+      const { productVariantId, quantity } = product;
+
+      const productVariant = await ProductVariantModel.findOne({
+        where: { productVariantId },
+        attributes: ['productStock']
+      });
+
+      if (!productVariant) {
+        throw new Error(`Product variant not found.`);
+      }
+
+      if (productVariant.productStock - quantity < 0) {
+        throw new Error(
+          `Insufficient stock. Available: ${productVariant.productStock}, Requested: ${quantity}.`
+        );
+      }
+    }
+
     const transactionDetails = await TransactionDetailModel.bulkCreate(products);
+
+    for (const product of products) {
+      const { productVariantId, quantity } = product;
+
+      await ProductVariantModel.update(
+        { productStock: sequelize.literal(`product_stock - ${quantity}`) },
+        { where: { productVariantId } }
+      );
+    }
+
     return transactionDetails;
 }
 
@@ -376,7 +408,7 @@ export const fetchSalesByCategoryService = async (year, month) => {
   };
 
 
-  export const updateTransactionDeliveryService = async (order_no, status) => {
+export const updateTransactionDeliveryService = async (order_no, status) => {
     const response = TransactionHeaderModel.update({ 
         status: status,
         where: {
@@ -384,4 +416,60 @@ export const fetchSalesByCategoryService = async (year, month) => {
         }
     })
     return response;
-  }
+}
+
+export const cancelTransactionService = async (transactionId) => {
+    const updatedTransaction = await TransactionHeaderModel.update(
+        {
+            status: 'Cancelled',
+        },
+        {
+            where: {
+                transactionId: transactionId
+            },
+        }
+    )
+    if (updatedTransaction[0] === 0) {
+        throw new Error("There is no change or no transaction");
+    }
+    return updatedTransaction;
+}
+
+export const payTransactionService = async (transaction, customerId) => {
+    const response = await createPlanXendit(transaction, customerId);
+    console.log(response);
+    return response
+}
+
+export const checkTransactionWithVoucher = async (voucherCode, userId) => {
+    try {
+        const transaction = await TransactionHeaderModel.findOne({
+            where: { 
+                voucherCode, 
+                userId 
+            }
+        });
+
+        if (transaction) {
+            return true
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.error("Error checking transaction with voucher:", error);
+        throw new Error("An error occurred while checking the transaction.");
+    }
+};
+
+export const updatePaymentLinkService = async (transaction, paymentLink) => {
+    const updatedTransaction = await TransactionHeaderModel.update(
+        {
+            paymenLink: paymentLink
+        },
+        {
+            where: {
+                transactionId: transaction.transactionId
+            },
+        }
+    )
+}

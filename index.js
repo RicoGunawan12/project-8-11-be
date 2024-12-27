@@ -16,12 +16,16 @@ import AddressRoute from './routes/address.route.js';
 import TransactionRoute from './routes/transaction.route.js';
 import FAQRoute from './routes/faq.route.js';
 import PostRoute from './routes/post.route.js';
-import { storeAllCityService, storeAllProvinceService } from './services/address.service.js';
-import { migratePage } from './services/page.service.js';
+import { getPickUpPointService, storeAllCityService, storeAllProvinceService } from './services/address.service.js';
+import { migrateAboutPage, migratePage } from './services/page.service.js';
 import PageRoute from './routes/page.route.js';
 import ContactRoute from './routes/contact.route.js';
 import { migrateContactService } from './services/contact.service.js';
 import PromoRoute from './routes/promo.route.js';
+import { checkPromoService } from './services/promo.service.js';
+import EmailRoute from './routes/email.route.js';
+import BannerRoute from './routes/banner.route.js';
+import { migrateBanner } from './services/banner.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,7 +34,13 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors())
+// app.use(cors())
+app.use(
+  cors({
+    origin: '*',
+    credentials: true, // Set to false if cookies are not needed
+  })
+);
 app.use(express.json());
 app.use(morgan('dev'));
 
@@ -49,16 +59,23 @@ app.use('/api/posts', PostRoute);
 app.use('/api/pages', PageRoute);
 app.use('/api/contacts', ContactRoute);
 app.use('/api/promos', PromoRoute);
+app.use('/api/emails', EmailRoute);
+app.use('/api/banners', BannerRoute);
 
 (async () => {
   try {
-    // await sequelize.sync({ force:true, alter: true });
-    await sequelize.sync();
+    await sequelize.sync({ force:true, alter: true });
+    // await sequelize.sync();
     
     await storeAllProvinceService();
     await storeAllCityService();
     await migratePage();
+    await migrateAboutPage();
     await migrateContactService();
+    await migrateBanner();
+    // const adminAddress = await getPickUpPointService();
+    // console.log(adminAddress);
+    // console.log(adminAddress[0].senderName);
     app.listen(5000, () => {
       console.log('Server running on port 5000');
     });

@@ -2,6 +2,7 @@ import { hashPassword, matchPassword } from '../utils/utility.js';
 import jwt from 'jsonwebtoken'
 import { UserModel } from '../association/association.js';
 import { createCart } from './cart.service.js';
+import { createCustomerXendit } from '../integration/xendit.integration.js';
 
 
 export const getUsersService = async () => {
@@ -19,15 +20,22 @@ export const getUserByIdService = async (userId) => {
   return user;
 }
 
-export const registerUserService = async (username, email, password) => {
+export const registerUserService = async (username, email, password, phone) => {
   const existingUser = await UserModel.findOne({ where: { email } });
   if (existingUser) {
     throw new Error('User already exists');
   }
 
   // const hashedPassword = await hashPassword(password);
-  const user = await UserModel.create({ username, email, password: password, role: 'user' });
+  const user = await UserModel.create({ username, email, password: password, role: 'user', phone });
   const cart = await createCart(user.userId);
+
+  const customer = await createCustomerXendit(user.userId, username, email, phone);
+  console.log(customer);
+  await UserModel.update(
+    { customerId: customer.id },
+    { where: { userId: user.userId }}
+  )
   
   return {user, cart};
 };
