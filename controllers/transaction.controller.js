@@ -74,7 +74,7 @@ export const createTransaction = async (req, res) => {
             return res.status(400).json({ message: "There is no items in cart!" });
         }
         const productsInCart = userCart;
-        console.log(userCart);
+        // console.log(userCart);
 
         // calculate the total price
         // calculate the total weight
@@ -84,21 +84,21 @@ export const createTransaction = async (req, res) => {
             productsInCart.map(async (product) => {
                 // console.log(product.product_variant.ref_product_id);
                 const promoDetails = await checkPromoService(product.product_variant.ref_product_id);
-                console.log(product.product_variant.productPrice);
+                // console.log(product.product_variant.productPrice);
                 if (promoDetails) {
                     product.product_variant.productPrice = 
                     product.product_variant.productPrice - promoDetails.promo.promoAmount <= 0 ? 0 :
                     product.product_variant.productPrice - promoDetails.promo.promoAmount;
                     product.product_variant.realizedPromo = promoDetails.promo.promoAmount;
                 }
-                console.log(product.product_variant.productPrice);
+                // console.log(product.product_variant.productPrice);
 
                 const itemTotal = product.product_variant.productPrice * product.quantity;
                 totalPrice += itemTotal;
                 totalWeight += product.product_variant.productWeight;
             })
         );
-        console.log(totalWeight);
+        // console.log(totalWeight);
 
         if (voucherCode) {
             // minus the totalprice

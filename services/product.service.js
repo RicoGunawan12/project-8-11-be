@@ -78,7 +78,7 @@ export const getProductPaginationService = async (limit, offset, search) => {
     [Op.like]: `%${search}%`,
   };
 
-  console.log(search)
+  // console.log(search)
 
   const products = ProductModel.findAll({
     attributes: [
@@ -136,11 +136,11 @@ export const getProductPaginationService = async (limit, offset, search) => {
     limit: parseInt(limit) || 0,
     offset: parseInt(offset) || 0,
   });
-  console.log("asd")
+  // console.log("asd")
   // if (!products || products.length === 0) {
   //   throw new Error("No products match the query parameters");
   // }
-  console.log(products)
+  // console.log(products)
   return products;
 };
 
@@ -149,12 +149,12 @@ export const getProductCountService = async (search) => {
   whereCondition.productName = {
     [Op.like]: `%${search}%`,
   };
-  console.log(search);
+  // console.log(search);
 
   const count = await ProductModel.count({
     where: whereCondition,
   });
-  console.log(count);
+  // console.log(count);
 
   return count;
 };
@@ -374,7 +374,7 @@ export const updatePromoService = async (
     },
     { where: { productId: productId } }
   );
-  console.log(updatedProduct);
+  // console.log(updatedProduct);
 
   if (updatedProduct[0] == 0) {
     throw new Error("Product not found or no changes applied!");

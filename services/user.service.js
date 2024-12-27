@@ -11,7 +11,7 @@ export const getUsersService = async () => {
 }
 
 export const getUserByIdService = async (userId) => {
-  console.log("pong")
+  // console.log("pong")
   const user = await UserModel.findOne({ where: { userId }});
   if (!user) {
     throw new Error('User not found!');
@@ -31,7 +31,7 @@ export const registerUserService = async (username, email, password, phone) => {
   const cart = await createCart(user.userId);
 
   const customer = await createCustomerXendit(user.userId, username, email, phone);
-  console.log(customer);
+  // console.log(customer);
   await UserModel.update(
     { customerId: customer.id },
     { where: { userId: user.userId }}

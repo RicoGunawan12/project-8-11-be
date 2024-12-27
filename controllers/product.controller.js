@@ -35,7 +35,7 @@ export const getPaginateProduct = async(req, res) => {
     try{
 
         const products = await getProductPaginationService(limit, offset, search)
-        console.log(products)
+
         return res.status(200).json(products)
 
     } catch (error){
@@ -224,7 +224,7 @@ export const createProduct = async (req, res) => {
 
         const hash = new Map();
         images.forEach((image) => {
-            console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
+            // console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
             
             hash.set(image.originalname.substring(0, image.originalname.length - 4), `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`);
         });
@@ -236,9 +236,9 @@ export const createProduct = async (req, res) => {
 
         const variants = JSON.parse(productVariants);
         variants.forEach((variant) => {
-            console.log(productName + " - " + variant.productSize + " - " + variant.productColor);
+            // console.log(productName + " - " + variant.productSize + " - " + variant.productColor);
             
-            console.log("hash: " + hash.get(productName + " - " + variant.productSize + " - " + variant.productColor));
+            // console.log("hash: " + hash.get(productName + " - " + variant.productSize + " - " + variant.productColor));
             
             variant.productImage = hash.get(productName + " - " + variant.productSize + " - " + variant.productColor);
         });
@@ -247,7 +247,7 @@ export const createProduct = async (req, res) => {
         const defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${defaultImage[0].filename}`
         const product = await createProductService(productName, productDescription, productCategoryName, defaultImageString);
         const insertVariantPromise = variants.map(async (variant) => {
-            console.log("product id: " + product.productId);
+            // console.log("product id: " + product.productId);
             
             await createProductVariantService(product.productId, variant);
         })
@@ -268,7 +268,7 @@ export const updateProduct = async (req, res) => {
         
         const hash = new Map();
         images.forEach((image) => {
-            console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
+            // console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
             
             hash.set(image.originalname.substring(0, image.originalname.length - 4), `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`);
         });
@@ -280,9 +280,9 @@ export const updateProduct = async (req, res) => {
 
         const variants = JSON.parse(productVariants);
         variants.forEach((variant) => {
-            console.log(productName + " - " + variant.productSize + " - " + variant.productColor);
+            // console.log(productName + " - " + variant.productSize + " - " + variant.productColor);
             
-            console.log("hash: " + hash.get(productName + " - " + variant.productSize + " - " + variant.productColor));
+            // console.log("hash: " + hash.get(productName + " - " + variant.productSize + " - " + variant.productColor));
             
             variant.productImage = hash.get(productName + " - " + variant.productSize + " - " + variant.productColor);
         });
@@ -291,7 +291,7 @@ export const updateProduct = async (req, res) => {
         const defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${defaultImage[0].filename}`
         const product = await updateProductService(productId, productName, productDescription, productCategoryName, defaultImageString);
         const insertVariantPromise = variants.map(async (variant) => {
-            console.log("product id: " + product.productId);
+            // console.log("product id: " + product.productId);
             
             await updateProductVariantService(product.productId, variant);
         })
@@ -440,7 +440,7 @@ export const getCategoryWithProduct = async (req, res) => {
         const products = await getCategoryWithProductService();
         return res.status(200).json({ message: "Product fetched!", products })
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         
         return res.status(500).json({ message: error.message });
     }

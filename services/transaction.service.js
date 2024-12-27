@@ -437,7 +437,7 @@ export const cancelTransactionService = async (transactionId) => {
 
 export const payTransactionService = async (transaction, customerId) => {
     const response = await createPlanXendit(transaction, customerId);
-    console.log(response);
+    // console.log(response);
     return response
 }
 

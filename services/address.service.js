@@ -136,7 +136,7 @@ export const updatePickUpPointService = async (senderName, senderPhoneNumber, pr
     subdistrict = subdistrict.toUpperCase();
 
     const destination = await searchDestinationKomship(postalCode);
-    console.log(destination);
+    // console.log(destination);
     var komshipAddressId = destination.data[0].id;
     var komshipLabel = destination.data[0].label;
 

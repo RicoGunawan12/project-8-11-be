@@ -74,7 +74,7 @@ export const uploadBanner = multer({ storage: storageBanner });
 export const deleteDirectory = (productName) => {
   const dirPath = path.join(__dirname, "../", UPLOAD_FOLDER + productName);
 
-  console.log(dirPath);
+  // console.log(dirPath);
   
 
   fs.rm(dirPath, { recursive: true, force: true }, (err) => {
@@ -82,7 +82,7 @@ export const deleteDirectory = (productName) => {
           console.error("Error deleting directory:", err);
           return { success: false, message: "Directory not found or error deleting directory" };
       }
-      console.log("Directory deleted successfully");
+      // console.log("Directory deleted successfully");
       return { success: true, message: "Directory deleted successfully" };
   });
 };
@@ -97,7 +97,7 @@ export const deletePostImage = (postImage) => {
         console.error("Error deleting file:", err);
         reject({ success: false, message: "File not found or error deleting file" });
       } else {
-        console.log("File deleted successfully");
+        // console.log("File deleted successfully");
         resolve({ success: true, message: "File deleted successfully" });
       }
     });
