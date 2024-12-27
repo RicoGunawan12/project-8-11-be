@@ -14,12 +14,13 @@ export const getProductsService = async (search, category, limit) => {
     attributes: [
       "productId",
       "productName",
+      "productSize",
       "productDescription",
       "defaultImage",
-      "isPromo",
-      "productPromo",
-      "startDate",
-      "endDate",
+      "productWeight",
+      "productLength",
+      "productWidth",
+      "productHeight",
     ],
     include: [
       {
@@ -31,16 +32,11 @@ export const getProductsService = async (search, category, limit) => {
         model: ProductVariantModel,
         attributes: [
           "productVariantId",
-          "productSize",
           "productColor",
           "sku",
           "productPrice",
           "productStock",
           "productImage",
-          "productWeight",
-          "productLength",
-          "productWidth",
-          "productHeight",
         ],
       },
       {
@@ -72,6 +68,63 @@ export const getProductsService = async (search, category, limit) => {
   return products;
 };
 
+export const getNewestProductsService = async () => {
+  const products = await ProductModel.findAll({
+    attributes: [
+      "productId",
+      "productName",
+      "productSize",
+      "productDescription",
+      "defaultImage",
+      "productWeight",
+      "productLength",
+      "productWidth",
+      "productHeight",
+      "createdAt"
+    ],
+    include: [
+      {
+        model: ProductCategoryModel,
+        attributes: ["productCategoryName"],
+      },
+      {
+        model: ProductVariantModel,
+        attributes: [
+          "productVariantId",
+          "productColor",
+          "sku",
+          "productPrice",
+          "productStock",
+          "productImage",
+        ],
+      },
+      {
+        model: PromoDetailModel,
+        attributes: ['promoDetailId'],
+        required: false,
+        include: [
+            {
+                model: PromoModel,
+                required: false,
+                where: {
+                    startDate: {
+                        [Op.lte]: new Date(), 
+                    },
+                    endDate: {
+                        [Op.gte]: new Date(),
+                    },
+                },
+            },
+        ]
+      }
+    ],
+    limit: 3,
+    order: [['createdAt', 'DESC']],
+  });
+  return products;
+};
+
+
 export const getProductPaginationService = async (limit, offset, search) => {
   const whereCondition = {};
   whereCondition.productName = {
@@ -84,12 +137,13 @@ export const getProductPaginationService = async (limit, offset, search) => {
     attributes: [
       "productId",
       "productName",
+      "productSize",
       "productDescription",
       "defaultImage",
-      "isPromo",
-      "productPromo",
-      "startDate",
-      "endDate",
+      "productWeight",
+      "productLength",
+      "productWidth",
+      "productHeight",
     ],
     include: [
       {
@@ -100,16 +154,11 @@ export const getProductPaginationService = async (limit, offset, search) => {
         model: ProductVariantModel,
         attributes: [
           "productVariantId",
-          "productSize",
           "productColor",
           "sku",
           "productPrice",
           "productStock",
           "productImage",
-          "productWeight",
-          "productLength",
-          "productWidth",
-          "productHeight",
         ],
       },
       {
@@ -164,8 +213,13 @@ export const getProductByIdService = async (productId) => {
     attributes: [
       "productId",
       "productName",
+      "productSize",
       "productDescription",
       "defaultImage",
+      "productWeight",
+      "productLength",
+      "productWidth",
+      "productHeight",
     ],
     include: [
       {
@@ -176,16 +230,11 @@ export const getProductByIdService = async (productId) => {
         model: ProductVariantModel,
         attributes: [
           "productVariantId",
-          "productSize",
           "productColor",
           "sku",
           "productPrice",
           "productStock",
           "productImage",
-          "productWeight",
-          "productLength",
-          "productWidth",
-          "productHeight",
         ],
       },
       {
@@ -221,7 +270,12 @@ export const createProductService = async (
   productName,
   productDescription,
   productCategoryName,
-  defaultImage
+  defaultImage,
+  productSize,
+  productWeight, 
+  productLength, 
+  productWidth, 
+  productHeight
 ) => {
   const category = await getCategoryByName(productCategoryName);
   if (!category) {
@@ -242,6 +296,11 @@ export const createProductService = async (
     productDescription,
     productCategoryId,
     defaultImage,
+    productSize,
+    productWeight, 
+    productLength, 
+    productWidth, 
+    productHeight
   });
   return product;
 };
@@ -252,7 +311,12 @@ export const updateProductService = async (
   productName,
   productDescription,
   productCategoryName,
-  defaultImage
+  defaultImage,
+  productSize,
+  productWeight, 
+  productLength, 
+  productWidth, 
+  productHeight 
 ) => {
   const category = await getCategoryByName(productCategoryName);
   if (!category) {
@@ -280,6 +344,11 @@ export const updateProductService = async (
     productDescription,
     productCategoryId,
     defaultImage,
+    productSize,
+    productWeight, 
+    productLength, 
+    productWidth, 
+    productHeight 
   });
 
   return product;
@@ -320,16 +389,11 @@ export const getBestSellerService = async () => {
         model: ProductVariantModel,
         attributes: [
           "productVariantId",
-          "productSize",
           "productColor",
           "sku",
           "productPrice",
           "productStock",
           "productImage",
-          "productWeight",
-          "productLength",
-          "productWidth",
-          "productHeight",
         ],
       },
       {

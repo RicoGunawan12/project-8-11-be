@@ -87,30 +87,26 @@ export const getCategoryWithProductService = async () => {
                     productCategoryId: category.productCategoryId
                 },
                 attributes: [
-                    ['product_id', 'productId'],
-                    ['product_name', 'productName'],
-                    ['product_description', 'productDescription'],
-                    ['default_image', 'defaultImage'],
-                    ['is_promo', 'isPromo'],
-                    ['product_promo', 'productPromo'],
-                    ['start_date', 'startDate'],
-                    ['end_date', 'endDate']
+                    "productId",
+                    "productName",
+                    "productSize",
+                    "productDescription",
+                    "defaultImage",
+                    "productWeight",
+                    "productLength",
+                    "productWidth",
+                    "productHeight",
                 ],
                 include: [
                     {
                         model: ProductVariantModel,
                         attributes: [
-                            ['product_variant_id', 'productVariantId'],
-                            ['product_size', 'productSize'],
-                            ['product_color', 'productColor'],
-                            'sku',
-                            ['product_price', 'productPrice'],
-                            ['product_stock', 'productStock'],
-                            ['product_image', 'productImage'],
-                            ['product_weight', 'productWeight'],
-                            ['product_length', 'productLength'],
-                            ['product_width', 'productWidth'],
-                            ['product_height', 'productHeight']
+                            "productVariantId",
+                            "productColor",
+                            "sku",
+                            "productPrice",
+                            "productStock",
+                            "productImage",
                         ]
                     },
                     {

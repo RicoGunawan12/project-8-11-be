@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProduct, deleteProduct, getBestSeller, getCategoryWithProduct, getPaginateProduct, getProductById, getProductCount, getProducts, updateBestSeller, updateProduct, updateProductQuantity, updatePromo, updateVariant, validateProduct } from '../controllers/product.controller.js';
+import { createProduct, deleteProduct, getBestSeller, getCategoryWithProduct, getNewestProduct, getPaginateProduct, getProductById, getProductCount, getProducts, updateBestSeller, updateProduct, updateProductQuantity, updatePromo, updateVariant, validateProduct } from '../controllers/product.controller.js';
 import { adminMiddleware } from '../middleware/auth.middleware.js';
 import { upload } from '../utils/uploader.js';
 
@@ -11,6 +11,8 @@ ProductRoute.get('/category', getCategoryWithProduct)
 ProductRoute.get('/paginate', getPaginateProduct)
 ProductRoute.get('/getCount', getProductCount)
 ProductRoute.get('/bestseller', getBestSeller)
+ProductRoute.get('/newest', getNewestProduct)
+
 ProductRoute.get('/:id', getProductById);
 // ProductRoute.post('/', adminMiddleware, productsValidator, validateSchema, createProduct);
 ProductRoute.post('/', 
@@ -20,7 +22,7 @@ ProductRoute.post('/',
         { name: 'productImage', maxCount: 20 },
         { name: 'defaultImage', maxCount: 20 }
     ]), 
-    validateProduct,
+    // validateProduct,
     createProduct
     );
 
@@ -31,7 +33,7 @@ ProductRoute.put('/:id',
         { name: 'productImage', maxCount: 20 },
         { name: 'defaultImage', maxCount: 20 }
     ]), 
-    validateProduct,
+    // validateProduct,
     updateProduct
     );
 

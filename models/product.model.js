@@ -37,29 +37,39 @@ const Product = sequelize.define('products', {
     defaultValue: false,
     allowNull: false,
   },
-  isPromo: {
-    field: "is_promo",
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
-    allowNull: false,
+  productSize: {
+    field: "product_size",
+    type: DataTypes.STRING,
+    allowNull: true
   },
-  productPromo: {
-    field: "product_promo",
-    type: DataTypes.INTEGER,
-    allowNull: true,
+  productWeight: {
+    field: "product_weight",
+    type: DataTypes.FLOAT,
+    allowNull: false
   },
-  startDate: {
-    field: "start_date",
-    type: DataTypes.DATE,
-    allowNull: true,
+  productWidth: {
+    field: "product_width",
+    type: DataTypes.FLOAT,
+    allowNull: false
   },
-  endDate: {
-    field: "end_date",
-    type: DataTypes.DATE,
-    allowNull: true,
+  productLength: {
+    field: "product_length",
+    type: DataTypes.FLOAT,
+    allowNull: false
+  },
+  productHeight: {
+    field: "product_height",
+    type: DataTypes.FLOAT,
+    allowNull: false
+  },
+  createdAt: {
+    field: "created_at",
+    type: DataTypes.DATE
   }
 },{
-  timestamps: false
+  timestamps: true,
+  createdAt: 'created_at', // Match database column name
+  updatedAt: 'updated_at',
 })
 
 

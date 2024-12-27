@@ -77,7 +77,7 @@ export const loginUserService = async (email, password) => {
   if (existingUser.role !== "user") {
     throw new Error('Invalid credential!');
   }
-
+  
   const isMatch = await matchPassword(password, existingUser.password);
   if (!isMatch) {
     throw new Error('Wrong credential!');
@@ -98,6 +98,9 @@ export const loginAdminService = async (email, password) => {
     throw new Error('Invalid credential!');
   }
 
+  console.log(password);
+  console.log(existingUser.password);
+  
   const isMatch = await matchPassword(password, existingUser.password);
   if (!isMatch) {
     throw new Error('Wrong credential!');

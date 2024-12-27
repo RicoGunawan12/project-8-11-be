@@ -18,11 +18,6 @@ const ProductVariant = sequelize.define('product_variants', {
     type: DataTypes.STRING,
     allowNull: true
   },
-  productSize: {
-    field: "product_size",
-    type: DataTypes.STRING,
-    allowNull: true
-  },
   sku: {
     field: "sku",
     type: DataTypes.STRING,
@@ -39,48 +34,17 @@ const ProductVariant = sequelize.define('product_variants', {
     type: DataTypes.FLOAT,
     allowNull: false
   },
-  productWeight: {
-    field: "product_weight",
-    type: DataTypes.FLOAT,
-    allowNull: false
-  },
-  productWidth: {
-    field: "product_width",
-    type: DataTypes.FLOAT,
-    allowNull: false
-  },
-  productLength: {
-    field: "product_length",
-    type: DataTypes.FLOAT,
-    allowNull: false
-  },
-  productHeight: {
-    field: "product_height",
-    type: DataTypes.FLOAT,
-    allowNull: false
-  },
   productStock: {
     field: "product_stock",
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  productPromo: {
-    field: "product_promo",
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    defaultValue: 0
-  },
-  productPromoExpiry: {
-    field: "product_promo_expiry",
-    type: DataTypes.DATE,
-    allowNull: true
-  }
 },{
   timestamps: false,
   indexes: [
     {
       unique: true,
-      fields: ['ref_product_id', 'product_color', 'product_size']
+      fields: ['ref_product_id', 'product_color']
     }
   ]
 })

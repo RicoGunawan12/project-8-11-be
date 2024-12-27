@@ -1,8 +1,8 @@
-import { createProductService, deleteProductService, getBestSellerService, updatePromoService, getProductByIdService, getProductCountService, getProductPaginationService, getProductsService, updateBestSellerService, updateProductService } from "../services/product.service.js";
+import { createProductService, deleteProductService, getBestSellerService, updatePromoService, getProductByIdService, getProductCountService, getProductPaginationService, getProductsService, updateBestSellerService, updateProductService, getNewestProductsService } from "../services/product.service.js";
 import { getCategoryWithProductService } from "../services/productCategory.service.js";
 import { createProductVariantService, updateProductQuantityService, updateProductVariantService, updateVariantService } from "../services/productVariantService.js";
 import { BASE_URL, UPLOAD_FOLDER } from "../utils/uploader.js";
-import { isValidDate } from "../utils/utility.js";
+import { isValidDate, isValidNumber } from "../utils/utility.js";
 
 export const getProducts = async (req, res) => {
     var { search, category, limit } = req.query;
@@ -66,6 +66,15 @@ export const getProductById = async (req, res) => {
     try {
         const product = await getProductByIdService(id);
         return res.status(200).json(product);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const getNewestProduct = async (req, res) => {
+    try {
+        const products = await getNewestProductsService();
+        return res.status(200).json({ message: "Product fetched!", products })
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
@@ -139,12 +148,21 @@ export const validateProduct = (req, res, next) => {
     next();
 };
 
-
 export const createProduct = async (req, res) => {
     try {
         const images = req.files['productImage'];
         const defaultImage = req.files['defaultImage']
-        const { productName, productDescription, productCategoryName, productVariants } = req.body;
+        var { 
+            productName, 
+            productDescription, 
+            productCategoryName, 
+            productVariants, 
+            productSize,
+            productWeight, 
+            productLength, 
+            productWidth, 
+            productHeight 
+        } = req.body;
         
         if (!productName || typeof productName !== "string" || productName.trim().length < 1) {
             return res.status(400).json({ message: "Product name must be filled" });
@@ -159,6 +177,47 @@ export const createProduct = async (req, res) => {
         if (!productCategoryName || typeof productCategoryName !== "string" || productCategoryName.trim().length < 1) {
             return res.status(400).json({ message: "Product category name must be filled" });
         }
+        if (!productSize || typeof productSize !== "string" || productSize.trim().length < 1) {
+            throw new Error(`Variant ${index + 1} must have product size`);
+        }
+        if (
+            isValidNumber(productWeight) &&
+            isValidNumber(productLength) &&
+            isValidNumber(productWidth) &&
+            isValidNumber(productHeight)
+        ) {
+            // Proceed with handling the data
+            productWeight = parseInt(productWeight);
+            productLength = parseInt(productLength);
+            productWidth = parseInt(productWidth);
+            productHeight = parseInt(productHeight);
+        } else {
+            res.status(400).json({ message: "Product weight, length, width, and height must be a valid number" });
+        }
+        if (
+            typeof productWeight !== "number" || 
+            productWeight < 0
+        ) {
+            return res.status(400).json({ message: `Product weight must be greater than 0` });
+        }
+        if (
+            typeof productLength !== "number" || 
+            productLength < 0
+        ) {
+            return res.status(400).json({ message: `Product length must be greater than 0` });
+        }
+        if (
+            typeof productWidth !== "number" || 
+            productWidth < 0
+        ) {
+            return res.status(400).json({ message: `Product width must be greater than 0` });
+        }
+        if (
+            typeof productHeight !== "number" || 
+            productHeight < 0
+        ) {
+            return res.status(400).json({ message: `Product height must be greater than 0` });
+        }
 
         let tempVariants;
         try {
@@ -166,10 +225,12 @@ export const createProduct = async (req, res) => {
             if (!Array.isArray(tempVariants) || tempVariants.length < 1) {
                 return res.status(400).json({ message: "Product must have at least one variants" });
             }
+            const tmpHash = new Map();
             tempVariants.forEach((variant, index) => {
-                if (!variant.productSize || typeof variant.productSize !== "string" || variant.productSize.trim().length < 1) {
-                    throw new Error(`Variant ${index + 1} must have product size`);
+                if (tmpHash.get(variant.productColor) === "found") {
+                    throw new Error("Duplicate product color!");
                 }
+                tmpHash.set(variant.productColor, "found");
                 if (!variant.productColor || typeof variant.productColor !== "string" || variant.productColor.trim().length < 1) {
                     throw new Error(`Variant ${index + 1} must have product color`);
                 }
@@ -184,30 +245,6 @@ export const createProduct = async (req, res) => {
                     variant.productStock < 0
                 ) {
                     throw new Error(`Variant ${index + 1} product stock must be greater than 0`);
-                }
-                if (
-                    typeof variant.productWeight !== "number" || 
-                    variant.productWeight < 0
-                ) {
-                    throw new Error(`Variant ${index + 1} product weight must be greater than 0`);
-                }
-                if (
-                    typeof variant.productLength !== "number" || 
-                    variant.productLength < 0
-                ) {
-                    throw new Error(`Variant ${index + 1} product length must be greater than 0`);
-                }
-                if (
-                    typeof variant.productWidth !== "number" || 
-                    variant.productWidth < 0
-                ) {
-                    throw new Error(`Variant ${index + 1} product width must be greater than 0`);
-                }
-                if (
-                    typeof variant.productHeight !== "number" || 
-                    variant.productHeight < 0
-                ) {
-                    throw new Error(`Variant ${index + 1} product height must be greater than 0`);
                 }
             });
         } catch (error) {
@@ -240,12 +277,22 @@ export const createProduct = async (req, res) => {
             
             // console.log("hash: " + hash.get(productName + " - " + variant.productSize + " - " + variant.productColor));
             
-            variant.productImage = hash.get(productName + " - " + variant.productSize + " - " + variant.productColor);
+            variant.productImage = hash.get(productName + " - " + variant.productColor);
         });
 
         // console.log(defaultImage);
         const defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${defaultImage[0].filename}`
-        const product = await createProductService(productName, productDescription, productCategoryName, defaultImageString);
+        const product = await createProductService(
+            productName, 
+            productDescription, 
+            productCategoryName, 
+            defaultImageString, 
+            productSize,
+            productWeight, 
+            productLength, 
+            productWidth, 
+            productHeight
+        );
         const insertVariantPromise = variants.map(async (variant) => {
             // console.log("product id: " + product.productId);
             
@@ -263,8 +310,111 @@ export const updateProduct = async (req, res) => {
     try {
         const images = req.files['productImage'];
         const defaultImage = req.files['defaultImage']
-        const { productName, productDescription, productCategoryName, productVariants } = req.body;
+        var { 
+            productName, 
+            productDescription, 
+            productCategoryName, 
+            productVariants, 
+            productSize,
+            productWeight, 
+            productLength, 
+            productWidth, 
+            productHeight 
+        } = req.body;
         const productId = req.params.id;
+
+        if (!productId) {
+            return res.status(400).json({ message: "Product id is required!" })
+        }
+
+        if (!productName || typeof productName !== "string" || productName.trim().length < 1) {
+            return res.status(400).json({ message: "Product name must be filled" });
+        }
+
+        // Manual validation for productDescription
+        // if (!productDescription || typeof productDescription !== "string" || productDescription.trim().length < 1) {
+        //     return res.status(400).json({ message: "Product description must be a non-empty string" });
+        // }
+
+        // Manual validation for productCategoryName
+        if (!productCategoryName || typeof productCategoryName !== "string" || productCategoryName.trim().length < 1) {
+            return res.status(400).json({ message: "Product category name must be filled" });
+        }
+        if (!productSize || typeof productSize !== "string" || productSize.trim().length < 1) {
+            throw new Error(`Variant ${index + 1} must have product size`);
+        }
+        if (
+            isValidNumber(productWeight) &&
+            isValidNumber(productLength) &&
+            isValidNumber(productWidth) &&
+            isValidNumber(productHeight)
+        ) {
+            // Proceed with handling the data
+            productWeight = parseInt(productWeight);
+            productLength = parseInt(productLength);
+            productWidth = parseInt(productWidth);
+            productHeight = parseInt(productHeight);
+        } else {
+            res.status(400).json({ message: "Product weight, length, width, and height must be a valid number" });
+        }
+        if (
+            typeof productWeight !== "number" || 
+            productWeight < 0
+        ) {
+            return res.status(400).json({ message: `Product weight must be greater than 0` });
+        }
+        if (
+            typeof productLength !== "number" || 
+            productLength < 0
+        ) {
+            return res.status(400).json({ message: `Product length must be greater than 0` });
+        }
+        if (
+            typeof productWidth !== "number" || 
+            productWidth < 0
+        ) {
+            return res.status(400).json({ message: `Product width must be greater than 0` });
+        }
+        if (
+            typeof productHeight !== "number" || 
+            productHeight < 0
+        ) {
+            return res.status(400).json({ message: `Product height must be greater than 0` });
+        }
+
+        let tempVariants;
+        try {
+            tempVariants = JSON.parse(productVariants);
+            if (!Array.isArray(tempVariants) || tempVariants.length < 1) {
+                return res.status(400).json({ message: "Product must have at least one variants" });
+            }
+            tempVariants.forEach((variant, index) => {
+                if (!variant.productColor || typeof variant.productColor !== "string" || variant.productColor.trim().length < 1) {
+                    throw new Error(`Variant ${index + 1} must have product color`);
+                }
+                if (
+                    typeof variant.productPrice !== "number" || 
+                    variant.productPrice <= 0
+                ) {
+                    throw new Error(`Variant ${index + 1} product price must be greater than 0`);
+                }
+                if (
+                    typeof variant.productStock !== "number" || 
+                    variant.productStock < 0
+                ) {
+                    throw new Error(`Variant ${index + 1} product stock must be greater than 0`);
+                }
+            });
+        } catch (error) {
+            return res.status(400).json({ message: `${error.message}` });
+        }
+
+        if (!images || !Array.isArray(images) || images.length < 1) {
+            return res.status(400).json({ message: "Variant image is required" });
+        }
+        if (!defaultImage || !Array.isArray(defaultImage) || defaultImage.length !== 1) {
+            return res.status(400).json({ message: "Default image is required" });
+        }
         
         const hash = new Map();
         images.forEach((image) => {
@@ -284,12 +434,23 @@ export const updateProduct = async (req, res) => {
             
             // console.log("hash: " + hash.get(productName + " - " + variant.productSize + " - " + variant.productColor));
             
-            variant.productImage = hash.get(productName + " - " + variant.productSize + " - " + variant.productColor);
+            variant.productImage = hash.get(productName + " - " + variant.productColor);
         });
 
         // console.log(defaultImage);
         const defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${defaultImage[0].filename}`
-        const product = await updateProductService(productId, productName, productDescription, productCategoryName, defaultImageString);
+        const product = await updateProductService(
+            productId, 
+            productName, 
+            productDescription, 
+            productCategoryName, 
+            defaultImageString,
+            productSize,
+            productWeight, 
+            productLength, 
+            productWidth, 
+            productHeight 
+        );
         const insertVariantPromise = variants.map(async (variant) => {
             // console.log("product id: " + product.productId);
             
