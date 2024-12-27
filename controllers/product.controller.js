@@ -1,4 +1,5 @@
 import { createProductService, deleteProductService, getBestSellerService, updatePromoService, getProductByIdService, getProductCountService, getProductPaginationService, getProductsService, updateBestSellerService } from "../services/product.service.js";
+import { getCategoryWithProductService } from "../services/productCategory.service.js";
 import { createProductVariantService, updateProductQuantityService, updateVariantService } from "../services/productVariantService.js";
 import { BASE_URL, UPLOAD_FOLDER } from "../utils/uploader.js";
 import { isValidDate } from "../utils/utility.js";
@@ -75,6 +76,82 @@ export const createProduct = async (req, res) => {
         const defaultImage = req.files['defaultImage']
         const { productName, productDescription, productCategoryName, productVariants } = req.body;
         
+        if (!productName || typeof productName !== "string" || productName.trim().length < 1) {
+            return res.status(400).json({ message: "Product name must be filled" });
+        }
+
+        // Manual validation for productDescription
+        // if (!productDescription || typeof productDescription !== "string" || productDescription.trim().length < 1) {
+        //     return res.status(400).json({ message: "Product description must be a non-empty string" });
+        // }
+
+        // Manual validation for productCategoryName
+        if (!productCategoryName || typeof productCategoryName !== "string" || productCategoryName.trim().length < 1) {
+            return res.status(400).json({ message: "Product category name must be filled" });
+        }
+
+        let tempVariants;
+        try {
+            tempVariants = JSON.parse(productVariants);
+            if (!Array.isArray(tempVariants) || tempVariants.length < 1) {
+                return res.status(400).json({ message: "Product must have at least one variants" });
+            }
+            tempVariants.forEach((variant, index) => {
+                if (!variant.productSize || typeof variant.productSize !== "string" || variant.productSize.trim().length < 1) {
+                    throw new Error(`Variant ${index + 1} must have product size`);
+                }
+                if (!variant.productColor || typeof variant.productColor !== "string" || variant.productColor.trim().length < 1) {
+                    throw new Error(`Variant ${index + 1} must have product color`);
+                }
+                if (
+                    typeof variant.productPrice !== "number" || 
+                    variant.productPrice <= 0
+                ) {
+                    throw new Error(`Variant ${index + 1} product price must be greater than 0`);
+                }
+                if (
+                    typeof variant.productStock !== "number" || 
+                    variant.productStock < 0
+                ) {
+                    throw new Error(`Variant ${index + 1} product stock must be greater than 0`);
+                }
+                if (
+                    typeof variant.productWeight !== "number" || 
+                    variant.productWeight < 0
+                ) {
+                    throw new Error(`Variant ${index + 1} product weight must be greater than 0`);
+                }
+                if (
+                    typeof variant.productLength !== "number" || 
+                    variant.productLength < 0
+                ) {
+                    throw new Error(`Variant ${index + 1} product length must be greater than 0`);
+                }
+                if (
+                    typeof variant.productWidth !== "number" || 
+                    variant.productWidth < 0
+                ) {
+                    throw new Error(`Variant ${index + 1} product width must be greater than 0`);
+                }
+                if (
+                    typeof variant.productHeight !== "number" || 
+                    variant.productHeight < 0
+                ) {
+                    throw new Error(`Variant ${index + 1} product height must be greater than 0`);
+                }
+            });
+        } catch (error) {
+            return res.status(400).json({ message: `${error.message}` });
+        }
+
+        if (!images || !Array.isArray(images) || images.length < 1) {
+            return res.status(400).json({ message: "Variant image is required" });
+        }
+        if (!defaultImage || !Array.isArray(defaultImage) || defaultImage.length !== 1) {
+            return res.status(400).json({ message: "Default image is required" });
+        }
+
+
         const hash = new Map();
         images.forEach((image) => {
             console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
@@ -233,12 +310,19 @@ export const updateBestSeller = async (req, res) => {
 }
 
 export const getBestSeller = async (req, res) => {
-    console.log("asdasd");
-    const bestSellerProduct = await getBestSellerService();
-    
-    return res.status(200).json({ message: "Product fetched!", bestSellerProduct })
-    // try {
-    // } catch (error) {
-    //     return res.status(500).json({ message: error.message });
-    // }
+    try {
+        const bestSellerProduct = await getBestSellerService();
+        return res.status(200).json({ message: "Product fetched!", bestSellerProduct })
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const getCategoryWithProduct = async (req, res) => {
+    try {
+        const products = await getCategoryWithProductService();
+        return res.status(200).json({ message: "Product fetched!", products })
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
 }

@@ -2,6 +2,7 @@ import { ProductCategoryModel, ProductModel, ProductVariantModel, TransactionDet
 import { createOrderKomship, deliveryDetailKomship, printLabelKomship, requestPickUpKomship } from "../integration/komship.integration.js";
 import { checkOutVATransactionXendit, createCreditCardTransactionXendit, createQrisTransactionXendit } from "../integration/xendit.integration.js";
 import { Op, Sequelize } from "sequelize";
+import { getPickUpPointService } from "./address.service.js";
 
 export const getAllTransactionsService = async (status) => {
     const transactions = await TransactionHeaderModel.findAll({
@@ -191,7 +192,11 @@ export const updateTransactionStatusService = async (transactionId, gatewayRespo
 
 export const createKomshipOrderService = async (transaction) => {
 
-    const createdKomshipOrder = await createOrderKomship(transaction);
+    const adminAddress = await getPickUpPointService(); 
+    // if (adminAddress.length === 0) {
+
+    // }
+    const createdKomshipOrder = await createOrderKomship(transaction, adminAddress[0]);
     const updatedTransaction = await TransactionHeaderModel.update(
         {
             komshipOrderNumber: createdKomshipOrder.komshipResponse.data.order_no,

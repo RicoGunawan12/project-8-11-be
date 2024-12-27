@@ -91,7 +91,7 @@ export const calculateDeliveryFeeKomship = async (shipperDestinationId, receiver
     //     "subtotal": 500000
     // }
 // ]
-export const createOrderKomship = async (transaction) => {
+export const createOrderKomship = async (transaction, adminAddress) => {
     const transactionDetails = transaction.transaction_details.map((det) => {
         return {
             product_name: det.product_variant.product.productName, 
@@ -100,10 +100,10 @@ export const createOrderKomship = async (transaction) => {
                 " - " + 
                 (det.product_variant.productColor ?? ""), 
             product_price: det.product_variant.productPrice, 
-            product_width: det.product_variant.productWidth, 
-            product_height: det.product_variant.productHeight, 
-            product_weight: Math.ceil(det.product_variant.productWeight), 
-            product_length: det.product_variant.productLength, 
+            product_width: det.product_variant.productWidth / 100, 
+            product_height: det.product_variant.productHeight / 100, 
+            product_weight: Math.ceil(det.product_variant.productWeight / 1000), 
+            product_length: det.product_variant.productLength / 100, 
             qty: det.quantity, 
             subtotal: det.quantity * det.product_variant.productPrice
         };
@@ -117,10 +117,10 @@ export const createOrderKomship = async (transaction) => {
         body: JSON.stringify({
             order_date: formatDateToString(new Date()),
             brand_name: "Tyeso",
-            shipper_name: "Toko Official Tyeso",
-            shipper_phone: "6281234567689",
-            shipper_destination_id: 17588,
-            shipper_address: "test 123123",
+            shipper_name: adminAddress.senderName,
+            shipper_phone: adminAddress.senderPhoneNumber,
+            shipper_destination_id: adminAddress.komshipAddressId,
+            shipper_address: adminAddress.addressDetail,
             shipper_email: "test@gmail.com",
             receiver_name: transaction.user.user_addresses[0].receiverName, //ambil dari transaction
             receiver_phone: transaction.user.user_addresses[0].receiverPhoneNumber, //ambil dari transaction

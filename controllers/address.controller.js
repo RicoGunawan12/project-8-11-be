@@ -114,22 +114,27 @@ export const updatePickUpPoint = async (req, res) => {
     if (senderName.length === 0) {
         return res.status(400).json({ message: "Sender name must be filled" });
     }
-    else if (senderPhoneNumber.length === 0) {
-        return res.status(400).json({ message: "Phone number must be filled" });
+    if (!senderPhoneNumber || typeof senderPhoneNumber !== "string") {
+        return res.status(400).json({ message: "Sender phone number is required and must be a string" });
     }
-    else if (province.length === 0) {
+    if (!/^62\d{8,11}$/.test(senderPhoneNumber)) {
+        return res.status(400).json({ 
+            message: "Sender phone number must start with '62' and be valid phone" 
+        });
+    }
+    if (province.length === 0) {
         return res.status(400).json({ message: "Province must be filled" });
     }
-    else if (city.length === 0) {
+    if (city.length === 0) {
         return res.status(400).json({ message: "City number must be filled" });
     }
-    else if (subdistrict.length === 0) {
+    if (subdistrict.length === 0) {
         return res.status(400).json({ message: "Subdistrict number must be filled" });
     }
-    else if (postalCode.length === 0) {
+    if (postalCode.length === 0) {
         return res.status(400).json({ message: "Postal code number must be filled" });
     }
-    else if (addressDetail.length === 0) {
+    if (addressDetail.length === 0) {
         return res.status(400).json({ message: "Address detail must be filled" });
     }
 
