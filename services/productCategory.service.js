@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import { ProductCategoryModel, ProductModel, ProductVariantModel, PromoDetailModel, PromoModel } from "../association/association.js";
 
 
@@ -68,66 +68,61 @@ export const updateCategoryService = async (productCategoryId, productCategoryNa
 }
 
 export const getCategoryWithProductService = async () => {
-    const category = await ProductCategoryModel.findAll({
-        attributes: ["productCategoryName"], // Only fetch the category name
-        include: [
-            {
-                model: ProductModel,
-                as: "products", // Match this alias with the one defined in your association
+    // First get categories
+    const categories = await ProductCategoryModel.findAll({
+        attributes: [
+            ['product_category_name', 'productCategoryName'],
+            'productCategoryId'  // or whatever your primary key is
+        ]
+    });
+
+    // Then for each category, get products with variants
+    const categoriesWithProducts = await Promise.all(
+        categories.map(async (category) => {
+            console.log(category.productCategoryName);
+            console.log(category.productCategoryId);
+            
+            const products = await ProductModel.findAll({
+                where: {
+                    productCategoryId: category.productCategoryId
+                },
                 attributes: [
-                    "productName",
-                    "productDescription",
-                    "defaultImage",
-                    "isPromo",
-                    "productPromo",
-                    "startDate",
-                    "endDate",
+                    ['product_id', 'productId'],
+                    ['product_name', 'productName'],
+                    ['product_description', 'productDescription'],
+                    ['default_image', 'defaultImage'],
+                    ['is_promo', 'isPromo'],
+                    ['product_promo', 'productPromo'],
+                    ['start_date', 'startDate'],
+                    ['end_date', 'endDate']
                 ],
                 include: [
                     {
                         model: ProductVariantModel,
-                        as: "product_variants", // Match alias with your association
                         attributes: [
-                            "productVariantId",
-                            "productSize",
-                            "productColor",
-                            "sku",
-                            "productPrice",
-                            "productStock",
-                            "productImage",
-                            "productWeight",
-                            "productLength",
-                            "productWidth",
-                            "productHeight",
-                        ],
-                    },
-                    {
-                        model: PromoDetailModel,
-                        as: "promo_details", // Match alias with your association
-                        attributes: ["promoDetailId"],
-                        include: [
-                            {
-                                model: PromoModel,
-                                as: "promo", // Match alias with your association
-                                attributes: [], // Fetch only the necessary attributes
-                                where: {
-                                    startDate: {
-                                        [Op.lte]: new Date(),
-                                    },
-                                    endDate: {
-                                        [Op.gte]: new Date(),
-                                    },
-                                },
-                            },
-                        ],
-                    },
+                            ['product_variant_id', 'productVariantId'],
+                            ['product_size', 'productSize'],
+                            ['product_color', 'productColor'],
+                            'sku',
+                            ['product_price', 'productPrice'],
+                            ['product_stock', 'productStock'],
+                            ['product_image', 'productImage'],
+                            ['product_weight', 'productWeight'],
+                            ['product_length', 'productLength'],
+                            ['product_width', 'productWidth'],
+                            ['product_height', 'productHeight']
+                        ]
+                    }
                 ],
-                limit: 8, // Ensure proper placement of the limit
-            },
-        ],
-    });
-    
-    console.log(category);
-    
-    return category
-}
+                limit: 8
+            });
+
+            return {
+                ...category.dataValues,
+                products
+            };
+        })
+    );
+
+    return categoriesWithProducts;
+};
