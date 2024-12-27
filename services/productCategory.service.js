@@ -75,12 +75,12 @@ export const getCategoryWithProductService = async () => {
             'productCategoryId'  // or whatever your primary key is
         ]
     });
-
+    console.log("categoriy: ", categories)
     // Then for each category, get products with variants
     const categoriesWithProducts = await Promise.all(
         categories.map(async (category) => {
-            console.log(category.productCategoryName);
-            console.log(category.productCategoryId);
+            // console.log(category.productCategoryName);
+            // console.log(category.productCategoryId);
             
             const products = await ProductModel.findAll({
                 where: {

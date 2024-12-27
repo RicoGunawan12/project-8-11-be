@@ -20,7 +20,7 @@ export const searchDestinationKomship = async (keyword) => {
 
     try {
         const response = await fetch(process.env.KOMSHIP_URL + "/tariff/api/v1/destination/search?keyword=" + keyword, requestOptions);
-        console.log(response);
+        // console.log(response);
 
         if (!response.ok) {
             throw new Error(`Error: ${response.statusText}`);
@@ -108,7 +108,7 @@ export const createOrderKomship = async (transaction, adminAddress) => {
             subtotal: det.quantity * det.product_variant.productPrice
         };
     });
-    console.log(transactionDetails);
+    // console.log(transactionDetails);
 
     const requestOptions = {
         method: 'POST',
@@ -175,10 +175,10 @@ export const createOrderKomship = async (transaction, adminAddress) => {
         //     ]
         // })
     };
-    console.log(requestOptions);
+    // console.log(requestOptions);
     try {
         const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/store`, requestOptions);
-        console.log(komshipResponse);
+        // console.log(komshipResponse);
 
         if (!komshipResponse.ok) {
             throw new Error("Failed to store order: " + komshipResponse.statusText);
@@ -214,7 +214,7 @@ export const requestPickUpKomship = async (orderNumber) => {
 
     try {
         const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/pickup/request`, requestOptions);
-        console.log(komshipResponse);
+        // console.log(komshipResponse);
         if (!komshipResponse.ok) {
             throw new Error(`Error: ${komshipResponse.statusText}`);
         }
@@ -234,7 +234,7 @@ export const deliveryDetailKomship = async (orderNumber) => {
 
     try {
         const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/detail?order_no=${orderNumber}`, requestOptions);
-        console.log(komshipResponse);
+        // console.log(komshipResponse);
 
         if (!komshipResponse.ok) {
             throw new Error(`Error: ${komshipResponse.statusText}`);

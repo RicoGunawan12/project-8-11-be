@@ -26,19 +26,19 @@ export const createCreditCardTransactionXendit = async (
     card_holder_last_name,
     card_holder_phone_number,
 ) => {
-    console.log(
-        amount,
-        card_number,
-        card_exp_month,
-        card_exp_year,
-        card_cvn,
-        is_multiple_use,
-        should_authenticate,
-        card_holder_email,
-        card_holder_first_name,
-        card_holder_last_name,
-        card_holder_phone_number
-    );
+    // console.log(
+    //     amount,
+    //     card_number,
+    //     card_exp_month,
+    //     card_exp_year,
+    //     card_cvn,
+    //     is_multiple_use,
+    //     should_authenticate,
+    //     card_holder_email,
+    //     card_holder_first_name,
+    //     card_holder_last_name,
+    //     card_holder_phone_number
+    // );
 
     // const data = {
     //     country : "ID",
@@ -176,7 +176,7 @@ export const createCustomerXendit = async (userId, username, email, phone) => {
         const result = await xenditResponse.json();
         return result;
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         throw new Error(error.message);
     }
 }
@@ -225,7 +225,7 @@ export const createPlanXendit = async (transaction, customerId) => {
         success_return_url: "http://localhost:4650/transactions/" + transaction.transactionId,
         failure_return_url: "https://www.xendit.co/failureisthemotherofsuccess"
     }
-    console.log(body);
+    // console.log(body);
 
     const requestOptions = {
         method: 'POST',
@@ -242,7 +242,7 @@ export const createPlanXendit = async (transaction, customerId) => {
         const result = await xenditResponse.json();
         return result;
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         throw new Error(error.message);
     }
 }

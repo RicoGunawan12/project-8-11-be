@@ -9,7 +9,7 @@ export const getAllVoucherTypesService =  async ()=> {
 
 export const getVoucherTypeByCodeService = async (code) => {
 
-  console.log(code)
+  // console.log(code)
   const voucherType =  await VoucherTypeModel.findOne({
     where: {
       voucherTypeCode : code

@@ -7,8 +7,8 @@ export const getPageService = async () => {
         const contentJSONEng = page.contentJSONEng ? JSON.parse(page.contentJSONEng) : {};
         const contentJSONIndo = page.contentJSONIndo ? JSON.parse(page.contentJSONIndo) : {};
         
-        console.log("Parsed contentJSONEng:", contentJSONEng);
-        console.log("Parsed contentJSONIndo:", contentJSONIndo);
+        // console.log("Parsed contentJSONEng:", contentJSONEng);
+        // console.log("Parsed contentJSONIndo:", contentJSONIndo);
         
         return {
             ...page.toJSON(),
@@ -83,7 +83,7 @@ export const migratePage = async () => {
             const contentJSONEng = JSON.stringify(body)
             const contentJSONIndo = JSON.stringify(body2)
             Page.create({ contentJSONEng, contentJSONIndo });
-            console.log("Migrate page success!");
+            // console.log("Migrate page success!");
         } catch (error) {
             console.error(error.message);
         }
@@ -101,7 +101,7 @@ export const migrateAboutPage = async () => {
             const whyEng = "why tyeso???"
             const whyIndo = "kenapa tyeso???"
             AboutPage.create({ contentEng, contentIndo, titleEng, titleIndo, whyEng, whyIndo });
-            console.log("Migrate page success!");
+            // console.log("Migrate page success!");
         } catch (error) {
             console.error(error.message);
         }

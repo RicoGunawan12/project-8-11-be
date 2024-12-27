@@ -75,9 +75,7 @@ app.use('/api/banners', BannerRoute);
     await migrateAboutPage();
     await migrateContactService();
     await migrateBanner();
-    // const adminAddress = await getPickUpPointService();
-    // console.log(adminAddress);
-    // console.log(adminAddress[0].senderName);
+
     app.listen(5000, () => {
       console.log('Server running on port 5000');
     });
