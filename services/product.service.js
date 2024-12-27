@@ -212,7 +212,7 @@ export const getProductByIdService = async (productId) => {
   });
 
   if (!product) {
-    throw new Error("Product not found!sdsdwds");
+    throw new Error("Product not found!");
   }
   return product;
 };

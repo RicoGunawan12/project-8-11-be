@@ -440,6 +440,8 @@ export const getCategoryWithProduct = async (req, res) => {
         const products = await getCategoryWithProductService();
         return res.status(200).json({ message: "Product fetched!", products })
     } catch (error) {
+        console.log(error);
+        
         return res.status(500).json({ message: error.message });
     }
 }

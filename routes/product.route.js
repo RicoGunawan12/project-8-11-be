@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProduct, deleteProduct, getBestSeller, getPaginateProduct, getProductById, getProductCount, getProducts, updateBestSeller, updateProduct, updateProductQuantity, updatePromo, updateVariant, validateProduct } from '../controllers/product.controller.js';
+import { createProduct, deleteProduct, getBestSeller, getCategoryWithProduct, getPaginateProduct, getProductById, getProductCount, getProducts, updateBestSeller, updateProduct, updateProductQuantity, updatePromo, updateVariant, validateProduct } from '../controllers/product.controller.js';
 import { adminMiddleware } from '../middleware/auth.middleware.js';
 import { upload } from '../utils/uploader.js';
 
@@ -7,6 +7,7 @@ import { upload } from '../utils/uploader.js';
 const ProductRoute = express.Router();
 
 ProductRoute.get('/', getProducts);
+ProductRoute.get('/category', getCategoryWithProduct)
 ProductRoute.get('/paginate', getPaginateProduct)
 ProductRoute.get('/getCount', getProductCount)
 ProductRoute.get('/bestseller', getBestSeller)
@@ -44,5 +45,6 @@ ProductRoute.put('/quantity/:id', adminMiddleware, updateProductQuantity)
 ProductRoute.put('/update/variant', adminMiddleware, updateVariant)
 
 ProductRoute.put('/update/bestseller/:id', adminMiddleware, updateBestSeller)
+
 
 export default ProductRoute;

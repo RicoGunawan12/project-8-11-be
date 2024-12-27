@@ -68,35 +68,66 @@ export const updateCategoryService = async (productCategoryId, productCategoryNa
 }
 
 export const getCategoryWithProductService = async () => {
-    const category = ProductCategoryModel.findAll({
+    const category = await ProductCategoryModel.findAll({
+        attributes: ["productCategoryName"], // Only fetch the category name
         include: [
             {
                 model: ProductModel,
+                as: "products", // Match this alias with the one defined in your association
+                attributes: [
+                    "productName",
+                    "productDescription",
+                    "defaultImage",
+                    "isPromo",
+                    "productPromo",
+                    "startDate",
+                    "endDate",
+                ],
                 include: [
                     {
-                        model: ProductVariantModel
+                        model: ProductVariantModel,
+                        as: "product_variants", // Match alias with your association
+                        attributes: [
+                            "productVariantId",
+                            "productSize",
+                            "productColor",
+                            "sku",
+                            "productPrice",
+                            "productStock",
+                            "productImage",
+                            "productWeight",
+                            "productLength",
+                            "productWidth",
+                            "productHeight",
+                        ],
                     },
                     {
                         model: PromoDetailModel,
-                        attributes: ['promoDetailId'],
+                        as: "promo_details", // Match alias with your association
+                        attributes: ["promoDetailId"],
                         include: [
                             {
                                 model: PromoModel,
+                                as: "promo", // Match alias with your association
+                                attributes: [], // Fetch only the necessary attributes
                                 where: {
                                     startDate: {
-                                        [Op.lte]: new Date(), 
+                                        [Op.lte]: new Date(),
                                     },
                                     endDate: {
                                         [Op.gte]: new Date(),
                                     },
                                 },
                             },
-                        ]
-                      }
+                        ],
+                    },
                 ],
-                limit: 8
-            }
-        ]
-    })
+                limit: 8, // Ensure proper placement of the limit
+            },
+        ],
+    });
+    
+    console.log(category);
+    
     return category
 }
