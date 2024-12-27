@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { ProductCategoryModel, ProductModel, ProductVariantModel } from "../association/association.js";
+import { ProductCategoryModel, ProductModel, ProductVariantModel, PromoDetailModel, PromoModel } from "../association/association.js";
 
 
 export const getCategoriesService = async (search) => {
@@ -75,7 +75,24 @@ export const getCategoryWithProductService = async () => {
                 include: [
                     {
                         model: ProductVariantModel
-                    }
+                    },
+                    {
+                        model: PromoDetailModel,
+                        attributes: ['promoDetailId'],
+                        include: [
+                            {
+                                model: PromoModel,
+                                where: {
+                                    startDate: {
+                                        [Op.lte]: new Date(), 
+                                    },
+                                    endDate: {
+                                        [Op.gte]: new Date(),
+                                    },
+                                },
+                            },
+                        ]
+                      }
                 ],
                 limit: 8
             }

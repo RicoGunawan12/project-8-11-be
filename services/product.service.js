@@ -285,6 +285,25 @@ export const updateBestSellerService = async (productId, isBestSeller) => {
 export const getBestSellerService = async () => {
   const bestSellerProduct = await ProductModel.findAll({
     where: { isBestSeller: true },
+    include: [
+      {
+        model: PromoDetailModel,
+        attributes: ['promoDetailId'],
+        include: [
+            {
+                model: PromoModel,
+                where: {
+                    startDate: {
+                        [Op.lte]: new Date(), 
+                    },
+                    endDate: {
+                        [Op.gte]: new Date(),
+                    },
+                },
+            },
+        ]
+      }
+    ]
   });
   console.log(bestSellerProduct);
 

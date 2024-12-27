@@ -40,6 +40,33 @@ export const registerUserService = async (username, email, password, phone) => {
   return {user, cart};
 };
 
+export const registerAdminService = async (username, email, password, phone) => {
+  const existingUser = await UserModel.findOne({ where: { email } });
+  if (existingUser) {
+    throw new Error('User already exists');
+  }
+  
+  // const hashedPassword = await hashPassword(password);
+  const user = await UserModel.create({ username, email, password: password, role: 'admin', phone });
+  // const cart = await createCart(user.userId);
+  
+  // const customer = await createCustomerXendit(user.userId, username, email, phone);
+  // console.log(customer);
+  // await UserModel.update(
+  //   { customerId: customer.id },
+  //   { where: { userId: user.userId }}
+  // )
+  
+  return user;
+};
+
+export const migrateAdminService = async () => {
+  const existingUser = await UserModel.findOne({ where: { email: "admin@gmail.com" } });
+  if (!existingUser) {
+    registerAdminService("admin", "admin@gmail.com", "admin", "-")  
+  }
+}
+
 export const loginUserService = async (email, password) => {
   const existingUser = await UserModel.findOne({ where: { email } });
   if (!existingUser) {

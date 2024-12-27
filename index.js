@@ -26,6 +26,7 @@ import { checkPromoService } from './services/promo.service.js';
 import EmailRoute from './routes/email.route.js';
 import BannerRoute from './routes/banner.route.js';
 import { migrateBanner } from './services/banner.service.js';
+import { migrateAdminService } from './services/user.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -64,9 +65,10 @@ app.use('/api/banners', BannerRoute);
 
 (async () => {
   try {
-    await sequelize.sync({ force:true, alter: true });
-    // await sequelize.sync();
+    // await sequelize.sync({ force:true, alter: true });
+    await sequelize.sync();
     
+    await migrateAdminService();
     await storeAllProvinceService();
     await storeAllCityService();
     await migratePage();
