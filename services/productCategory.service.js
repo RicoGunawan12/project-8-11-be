@@ -140,5 +140,58 @@ export const getCategoryWithProductService = async () => {
         })
     );
 
+    const allProducts = await ProductModel.findAll({
+        attributes: [
+            "productId",
+            "productName",
+            "productSize",
+            "productDescription",
+            "defaultImage",
+            "productWeight",
+            "productLength",
+            "productWidth",
+            "productHeight",
+        ],
+        include: [
+            {
+                model: ProductVariantModel,
+                attributes: [
+                    "productVariantId",
+                    "productColor",
+                    "sku",
+                    "productPrice",
+                    "productStock",
+                    "productImage",
+                ]
+            },
+            {
+                model: PromoDetailModel,
+                attributes: ['promoDetailId'],
+                required: false,
+                include: [
+                    {
+                        model: PromoModel,
+                        required: false,
+                        where: {
+                            startDate: {
+                                [Op.lte]: new Date(),
+                            },
+                            endDate: {
+                                [Op.gte]: new Date(),
+                            },
+                        },
+                    },
+                ]
+            }
+        ],
+        limit: 8
+    });
+
+    categoriesWithProducts.unshift({
+        productCategoryName: "All",
+        productCategoryId: null, 
+        products: allProducts
+    });
+
     return categoriesWithProducts;
 };

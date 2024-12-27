@@ -8,6 +8,7 @@ import {
 } from "../association/association.js";
 import { deleteDirectory, deletePostImage } from "../utils/uploader.js";
 import { getCategoryByName } from "./productCategory.service.js";
+import sequelize from "../config/database.js";
 
 export const getProductsService = async (search, category, limit) => {
   const products = ProductModel.findAll({
@@ -313,45 +314,90 @@ export const updateProductService = async (
   productCategoryName,
   defaultImage,
   productSize,
-  productWeight, 
-  productLength, 
-  productWidth, 
-  productHeight 
+  productWeight,
+  productLength,
+  productWidth,
+  productHeight,
+  variants
 ) => {
-  const category = await getCategoryByName(productCategoryName);
-  if (!category) {
-    throw new Error("There is no " + productCategoryName + " category");
+  const transaction = await sequelize.transaction();
+
+  try {
+    // Fetch the product and ensure it exists
+    const product = await ProductModel.findByPk(productId, { transaction });
+    if (!product) throw new Error("Product not found");
+
+    // Update product details
+    await product.update(
+      {
+        productName,
+        productDescription,
+        productCategoryName,
+        defaultImage,
+        productSize,
+        productWeight,
+        productLength,
+        productWidth,
+        productHeight,
+      },
+      { transaction }
+    );
+
+    // Fetch existing variants
+    const existingVariants = await ProductVariantModel.findAll({
+      where: { productId },
+      transaction,
+    });
+
+    // Identify variants to add, update, or delete
+    const existingVariantIds = existingVariants.map((v) => v.productVariantId);
+    const updatedVariantIds = variants.map((v) => v.productVariantId).filter(Boolean);
+
+    const variantsToDelete = existingVariantIds.filter((id) => !updatedVariantIds.includes(id));
+    const variantsToUpdate = variants.filter((v) => updatedVariantIds.includes(v.productVariantId));
+    const variantsToAdd = variants.filter((v) => !v.productVariantId);
+
+    // Delete removed variants
+    if (variantsToDelete.length > 0) {
+      await ProductVariantModel.destroy({
+        where: { productVariantId: variantsToDelete },
+        transaction,
+      });
+    }
+    console.log(variantsToUpdate);
+    
+    // Update existing variants
+    for (const variant of variantsToUpdate) {
+      const existingVariant = existingVariants.find((v) => v.productVariantId === variant.productVariantId);
+      await existingVariant.update(
+        {
+          productColor: variant.productColor,
+          productPrice: variant.productPrice,
+          productStock: variant.productStock,
+          productImage: variant.productImage,
+        },
+        { transaction }
+      );
+    }
+
+    // Add new variants
+    if (variantsToAdd.length > 0) {
+      const newVariants = variantsToAdd.map((variant) => ({
+        ...variant,
+        productId,
+      }));
+      await ProductVariantModel.bulkCreate(newVariants, { transaction });
+    }
+
+    // Commit the transaction
+    await transaction.commit();
+
+    return product;
+  } catch (error) {
+    // Rollback the transaction on error
+    await transaction.rollback();
+    throw error;
   }
-
-  const existingProduct = await ProductModel.findOne({
-    where: { productName },
-  });
-
-  if (existingProduct && existingProduct.productId !== productId) {
-    throw new Error("Product name already exists");
-  }
-
-  const product = await ProductModel.findByPk(productId);
-  if (!product) {
-    throw new Error("Product not found");
-  }
-  await deletePostImage(product.defaultImage);
- 
-  const productCategoryId = category.productCategoryId;
-
-  await product.update({
-    productName,
-    productDescription,
-    productCategoryId,
-    defaultImage,
-    productSize,
-    productWeight, 
-    productLength, 
-    productWidth, 
-    productHeight 
-  });
-
-  return product;
 };
 
 
