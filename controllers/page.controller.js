@@ -63,7 +63,7 @@ export const getAboutPage = async (req, res) => {
 
 export const updateEngAboutPage = async (req, res) => {
 
-    const { contentEng, titleEng } = req.body;
+    const { contentEng, titleEng, whyEng } = req.body;
     const id = req.params.id
     if (!id || typeof id !== 'string') {
         return res.status(400).json({ error: "Invalid or missing ID parameter." });
@@ -77,9 +77,13 @@ export const updateEngAboutPage = async (req, res) => {
         return res.status(400).json({ error: "Content must be a non-empty string." });
     }
 
+    if (!whyEng || typeof whyEng !== 'string' || whyEng.trim().length === 0) {
+        return res.status(400).json({ error: "Why Tyeso must be a non-empty string." });
+    }
+
 
     try {
-        const response = await updateEngAboutPageService(id, contentEng, titleEng);
+        const response = await updateEngAboutPageService(id, contentEng, titleEng, whyEng);
         return res.status(200).json({ message: "About Page updated!"});
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -88,7 +92,7 @@ export const updateEngAboutPage = async (req, res) => {
 
 export const updateIndoAboutPage = async (req, res) => {
 
-    const { contentIndo, titleIndo } = req.body;
+    const { contentIndo, titleIndo, whyIndo } = req.body;
     const id = req.params.id
 
     if (!id || typeof id !== 'string') {
@@ -103,9 +107,13 @@ export const updateIndoAboutPage = async (req, res) => {
         return res.status(400).json({ error: "Content must be a non-empty string." });
     }
 
+    if (!whyIndo || typeof whyIndo !== 'string' || whyIndo.trim().length === 0) {
+        return res.status(400).json({ error: "Why Tyeso must be a non-empty string." });
+    }
+
 
     try {
-        const response = await updateIndoAboutPageService(id, contentIndo, titleIndo);
+        const response = await updateIndoAboutPageService(id, contentIndo, titleIndo, whyIndo);
         return res.status(200).json({ message: "About Page updated!"});
     } catch (error) {
         return res.status(500).json({ message: error.message });

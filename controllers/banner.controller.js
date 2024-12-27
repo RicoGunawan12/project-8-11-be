@@ -17,7 +17,10 @@ export const updateBanner = async (req, res) => {
     if (
         page != "Contact Page" &&
         page != "About Page" &&
-        page != "Product Page" 
+        page != "Product Page" &&
+        page != "Blog Page" &&
+        page != "FAQ Page" &&
+        page != "Profile Page" 
     ) {
         return res.status(400).json({ message: "There is no such page" })
     }
