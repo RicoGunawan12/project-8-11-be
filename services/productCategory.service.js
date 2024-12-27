@@ -112,7 +112,27 @@ export const getCategoryWithProductService = async () => {
                             ['product_width', 'productWidth'],
                             ['product_height', 'productHeight']
                         ]
-                    }
+                    },
+                    {
+                        model: PromoDetailModel,
+                        attributes: ['promoDetailId'],
+                        required: false,
+                        include: [
+                            {
+                                model: PromoModel,
+                                required: false,
+                                where: {
+                                    startDate: {
+                                        [Op.lte]: new Date(), 
+                                    },
+                                    endDate: {
+                                        [Op.gte]: new Date(),
+                                    },
+                                },
+                            },
+                        ]
+                      }
+                      
                 ],
                 limit: 8
             });
