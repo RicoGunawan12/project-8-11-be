@@ -7,7 +7,7 @@ export const userSchema = {
       isLength: {
         options: { min: 3 },
         errorMessage: 'Username must be at least 3 characters long',
-      },
+      }
     },
     email: {
       isString: true,
