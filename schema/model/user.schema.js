@@ -1,12 +1,12 @@
 export const userSchema = {
-    username: {
+    fullName: {
       isString: true,
       notEmpty: {
-        errorMessage: 'Username is required',
+        errorMessage: 'Full name is required',
       },
       isLength: {
         options: { min: 3 },
-        errorMessage: 'Username must be at least 3 characters long',
+        errorMessage: 'Full name must be at least 3 characters long',
       }
     },
     email: {

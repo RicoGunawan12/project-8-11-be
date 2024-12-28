@@ -20,17 +20,17 @@ export const getUserByIdService = async (userId) => {
   return user;
 }
 
-export const registerUserService = async (username, email, password, phone) => {
+export const registerUserService = async (fullName, email, password, phone) => {
   const existingUser = await UserModel.findOne({ where: { email } });
   if (existingUser) {
     throw new Error('User already exists');
   }
 
   // const hashedPassword = await hashPassword(password);
-  const user = await UserModel.create({ username, email, password: password, role: 'user', phone });
+  const user = await UserModel.create({ fullName, email, password: password, role: 'user', phone });
   const cart = await createCart(user.userId);
 
-  const customer = await createCustomerXendit(user.userId, username, email, phone);
+  const customer = await createCustomerXendit(user.userId, fullName, email, phone);
   // console.log(customer);
   await UserModel.update(
     { customerId: customer.id },
@@ -40,17 +40,17 @@ export const registerUserService = async (username, email, password, phone) => {
   return {user, cart};
 };
 
-export const registerAdminService = async (username, email, password, phone) => {
+export const registerAdminService = async (fullName, email, password, phone) => {
   const existingUser = await UserModel.findOne({ where: { email } });
   if (existingUser) {
     throw new Error('User already exists');
   }
   
   // const hashedPassword = await hashPassword(password);
-  const user = await UserModel.create({ username, email, password: password, role: 'admin', phone });
+  const user = await UserModel.create({ fullName, email, password: password, role: 'admin', phone });
   // const cart = await createCart(user.userId);
   
-  // const customer = await createCustomerXendit(user.userId, username, email, phone);
+  // const customer = await createCustomerXendit(user.userId, fullName, email, phone);
   // console.log(customer);
   // await UserModel.update(
   //   { customerId: customer.id },
@@ -72,7 +72,7 @@ export const loginUserService = async (email, password) => {
   if (!existingUser) {
     throw new Error('User not found!');
   }
-
+  
   
   if (existingUser.role !== "user") {
     throw new Error('Invalid credential!');

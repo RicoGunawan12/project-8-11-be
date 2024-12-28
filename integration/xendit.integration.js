@@ -149,13 +149,13 @@ export const checkOutVATransactionXendit = async (transactionId, amount, bank, c
     return response
 }
 
-export const createCustomerXendit = async (userId, username, email, phone) => {
+export const createCustomerXendit = async (userId, fullName, email, phone) => {
     const body = {
         reference_id: userId,
         type: "INDIVIDUAL",
         individual_detail: {
-        given_names: username,
-        surname: username
+        given_names: fullName,
+        surname: fullName
         },
         email: email,
         mobile_number: phone

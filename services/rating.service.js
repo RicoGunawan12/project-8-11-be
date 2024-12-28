@@ -8,7 +8,7 @@ export const getRatingByProductService = async (productId) => {
         include: [
             {
                 model: UserModel,
-                attributes: ['username']
+                attributes: ['fullName']
             }
         ]
     })

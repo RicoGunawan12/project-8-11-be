@@ -10,11 +10,10 @@ const User = sequelize.define('users', {
     defaultValue: DataTypes.UUIDV4, 
     allowNull: false
   },
-  username: {
-    field: "username",
+  fullName: {
+    field: "full_name",
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
   },
   email: {
     field: "email",

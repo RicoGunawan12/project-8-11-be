@@ -20,7 +20,7 @@ export const getAllTransactionsService = async (status) => {
             },
             {
                 model: UserModel,
-                attributes: ['userId', 'username', 'email'],
+                attributes: ['userId', 'fullName', 'email'],
                 include: {
                     model: UserAddressModel,
                 }
@@ -50,7 +50,7 @@ export const getTransactionsByUserService = async (userId, status) => {
             },
             {
                 model: UserModel,
-                attributes: ['userId', 'username', 'email'],
+                attributes: ['userId', 'fullName', 'email'],
                 include: {
                     model: UserAddressModel,
                 }
@@ -80,7 +80,7 @@ export const getTransactionsByIdService = async (transactionId) => {
             },
             {
                 model: UserModel,
-                attributes: ['userId', 'username', 'email'],
+                attributes: ['userId', 'fullName', 'email'],
                 include: {
                     model: UserAddressModel,
                 }
@@ -203,7 +203,7 @@ export const checkOutQrisTransactionService = async (transactionId, amount) => {
 export const checkOutVATransactionService = async (transactionId, amount, bank) => {
     const getTransaction = await getTransactionsByIdService(transactionId);
 
-    const response = await checkOutVATransactionXendit(transactionId, amount, bank, getTransaction.user.username);
+    const response = await checkOutVATransactionXendit(transactionId, amount, bank, getTransaction.user.fullName);
     return response;
 }
 

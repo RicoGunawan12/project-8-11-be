@@ -2,11 +2,11 @@ import { registerUserService, getUsersService, loginUserService, getUserByIdServ
 
 
 export const registerUser = async (req, res) => {
-  const { username, email, password, confirmPassword, phoneNumber } = req.body;
+  const { fullName, email, password, confirmPassword, phoneNumber } = req.body;
   const phoneRegex = /^\+62\d+$/;
 
-  if (username.length < 5) {
-    return res.status(400).json({ path: 'username', message: 'Username length must be more than 4' });
+  if (fullName.length < 5) {
+    return res.status(400).json({ path: 'fullName', message: 'Full Name length must be more than 4' });
   }
   else if (email.length < 1) {
     return res.status(400).json({ path: 'email', message: 'Email must be filled' })
@@ -22,8 +22,8 @@ export const registerUser = async (req, res) => {
   }
   
   try {
-    const user = await registerUserService(username, email, password, phoneNumber);
-    return res.status(201).json({ message: 'User registered successfully', user: user.username });
+    const user = await registerUserService(fullName, email, password, phoneNumber);
+    return res.status(201).json({ message: 'User registered successfully', user: user.fullName });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
