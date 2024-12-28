@@ -430,7 +430,7 @@ export const updateProductService = async (
 
     // Add new variants
     if (variantsToAdd.length > 0) {
-      const newVariants = variantsToAdd.map((variant) => ({
+      const newVariants = variantsToAdd.map(({ productVariantId, ...variant }) => ({
         ...variant,
         productId,
       }));
@@ -443,8 +443,12 @@ export const updateProductService = async (
     return product;
   } catch (error) {
     // Rollback the transaction on error
+    console.log(error);
+    
     await transaction.rollback();
-    throw error;
+    if (error.name === "SequelizeUniqueConstraintError") {
+      throw new Error("Duplicate color variant");
+    }
   }
 };
 
