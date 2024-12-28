@@ -22,7 +22,7 @@ export const getProducts = async (req, res) => {
 }
 
 export const getPaginateProduct = async(req, res) => {
-    var {limit, offset, search} = req.query;
+    var {limit, offset, search, category} = req.query;
 
     if(limit < 0){
         return res.status(400).json({message: "Limit can't be under 0"})
@@ -31,10 +31,14 @@ export const getPaginateProduct = async(req, res) => {
     if(offset < 0){
         return res.status(400).json({message: "Offset can't be under 0"})
     }
+    
+    if (!category) {
+        category = ""
+    }
 
     try{
 
-        const products = await getProductPaginationService(limit, offset, search)
+        const products = await getProductPaginationService(limit, offset, search, category)
 
         return res.status(200).json(products)
 
@@ -46,10 +50,10 @@ export const getPaginateProduct = async(req, res) => {
 
 export const getProductCount = async(req, res) => {
 
-    var {search} = req.query;
+    var {search, category} = req.query;
 
     try {
-        const count = await getProductCountService(search)
+        const count = await getProductCountService(search, category)
         return res.status(200).json({total : count})
     } catch (error) {
         return res.status(500).json({message: error.message})
@@ -299,10 +303,13 @@ export const createProduct = async (req, res) => {
             productWidth, 
             productHeight
         );
+        
         const insertVariantPromise = variants.map(async (variant) => {
             // console.log("product id: " + product.productId);
             
-            await createProductVariantService(product.productId, variant);
+            const insertedProduct = await createProductVariantService(product.productId, variant);
+            console.log(insertedProduct);
+            
         })
         await Promise.all(insertVariantPromise);
         

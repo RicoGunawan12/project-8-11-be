@@ -25,7 +25,7 @@ export const getProductsService = async (search, category, limit) => {
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.fn("AVG", sequelize.col("ratings.rating")), "averageRating"]
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
     ],
     include: [
       {
@@ -63,16 +63,16 @@ export const getProductsService = async (search, category, limit) => {
             },
         ]
       },
-      {
-        model: RatingModel,
-        required: false,
-        attributes: [],
-      }
+      // {
+      //   model: RatingModel,
+      //   required: false,
+      //   attributes: [],
+      // }
     ],
     where: {
       productName: { [Op.like]: `%${search}%` },
     },
-    group: ["products.product_id"],
+    // group: ["products.product_id"],
     limit: parseInt(limit) || null,
   });
   return products;
@@ -144,7 +144,7 @@ export const getNewestProductsService = async () => {
 };
 
 
-export const getProductPaginationService = async (limit, offset, search) => {
+export const getProductPaginationService = async (limit, offset, search, category) => {
   const whereCondition = {};
   whereCondition.productName = {
     [Op.like]: `%${search}%`,
@@ -153,6 +153,99 @@ export const getProductPaginationService = async (limit, offset, search) => {
   // console.log(search)
 
   const products = ProductModel.findAll({
+    attributes: [
+      "productId",
+      "productName",
+      "productSize",
+      "productCode",
+      "productDescription",
+      "defaultImage",
+      "productWeight",
+      "productLength",
+      "productWidth",
+      "productHeight",
+      "isBestSeller",
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
+    ],
+    include: [
+      {
+        model: ProductCategoryModel,
+        attributes: ["productCategoryName"],
+        where: category ? { productCategoryName: category } : undefined,
+      },
+      {
+        model: ProductVariantModel,
+        attributes: [
+          "productVariantId",
+          "productColor",
+          "sku",
+          "productPrice",
+          "productStock",
+          "productImage",
+        ],
+      },
+      {
+        model: PromoDetailModel,
+        attributes: ['promoDetailId'],
+        required: false,
+        include: [
+            {
+                model: PromoModel,
+                required: false,
+                where: {
+                    startDate: {
+                        [Op.lte]: new Date(), 
+                    },
+                    endDate: {
+                        [Op.gte]: new Date(),
+                    },
+                },
+            },
+        ]
+      },
+      // {
+      //   model: RatingModel,
+      //   required: false,
+      //   attributes: [],
+      // }
+    ],
+    where: whereCondition,
+    // group: ["products.product_id"],
+    limit: parseInt(limit) || 0,
+    offset: parseInt(offset) || 0,
+  });
+  // console.log("asd")
+  // if (!products || products.length === 0) {
+  //   throw new Error("No products match the query parameters");
+  // }
+  // console.log(products)
+  return products;
+};
+
+export const getProductCountService = async (search, category) => {
+  const whereCondition = {};
+  whereCondition.productName = {
+    [Op.like]: `%${search}%`,
+  };
+  // console.log(search);
+
+  const count = await ProductModel.count({
+    where: whereCondition,
+    include: [
+      {
+        model: ProductCategoryModel,
+        attributes: ["productCategoryName"],
+        where: category ? { productCategoryName: category } : undefined,
+      },
+    ]
+  });
+  // console.log(count);
+
+  return count;
+};
+
+export const getProductByIdService = async (productId) => {
+  const product = await ProductModel.findOne({
     attributes: [
       "productId",
       "productName",
@@ -205,93 +298,8 @@ export const getProductPaginationService = async (limit, offset, search) => {
       // {
       //   model: RatingModel,
       //   required: false,
-      //   attributes: [],
+      //   // attributes: ['rating', 'comment'],
       // }
-    ],
-    where: whereCondition,
-    // group: ["products.product_id"],
-    limit: parseInt(limit) || 0,
-    offset: parseInt(offset) || 0,
-  });
-  // console.log("asd")
-  // if (!products || products.length === 0) {
-  //   throw new Error("No products match the query parameters");
-  // }
-  // console.log(products)
-  return products;
-};
-
-export const getProductCountService = async (search) => {
-  const whereCondition = {};
-  whereCondition.productName = {
-    [Op.like]: `%${search}%`,
-  };
-  // console.log(search);
-
-  const count = await ProductModel.count({
-    where: whereCondition,
-  });
-  // console.log(count);
-
-  return count;
-};
-
-export const getProductByIdService = async (productId) => {
-  const product = await ProductModel.findOne({
-    attributes: [
-      "productId",
-      "productName",
-      "productSize",
-      "productCode",
-      "productDescription",
-      "defaultImage",
-      "productWeight",
-      "productLength",
-      "productWidth",
-      "productHeight",
-      "isBestSeller",
-      [sequelize.fn("AVG", sequelize.col("ratings.rating")), "averageRating"]
-    ],
-    include: [
-      {
-        model: ProductCategoryModel,
-        attributes: ["productCategoryName"],
-      },
-      {
-        model: ProductVariantModel,
-        attributes: [
-          "productVariantId",
-          "productColor",
-          "sku",
-          "productPrice",
-          "productStock",
-          "productImage",
-        ],
-      },
-      {
-        model: PromoDetailModel,
-        attributes: ['promoDetailId'],
-        required: false,
-        include: [
-            {
-                model: PromoModel,
-                required: false,
-                where: {
-                    startDate: {
-                        [Op.lte]: new Date(), 
-                    },
-                    endDate: {
-                        [Op.gte]: new Date(),
-                    },
-                },
-            },
-        ]
-      },
-      {
-        model: RatingModel,
-        required: false,
-        // attributes: ['rating', 'comment'],
-      }
     ],
     where: { productId },
     // group: ["products.product_id"],
@@ -478,7 +486,7 @@ export const getBestSellerService = async () => {
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.fn("AVG", sequelize.col("ratings.rating")), "averageRating"]
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
     ],
     include: [
       {
@@ -515,13 +523,13 @@ export const getBestSellerService = async () => {
             },
         ]
       },
-      {
-        model: RatingModel,
-        required: false,
-        attributes: [],
-      }
+      // {
+      //   model: RatingModel,
+      //   required: false,
+      //   attributes: [],
+      // }
     ],
-    group: ["products.product_id"],
+    // group: ["products.product_id"],
   });
   console.log(bestSellerProduct);
 
