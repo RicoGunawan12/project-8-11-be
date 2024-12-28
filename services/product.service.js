@@ -17,6 +17,7 @@ export const getProductsService = async (search, category, limit) => {
       "productId",
       "productName",
       "productSize",
+      "productCode",
       "productDescription",
       "defaultImage",
       "productWeight",
@@ -24,7 +25,7 @@ export const getProductsService = async (search, category, limit) => {
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.fn("AVG", sequelize.col("ratings.rating")), "averageRating"]
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
     ],
     include: [
       {
@@ -62,16 +63,16 @@ export const getProductsService = async (search, category, limit) => {
             },
         ]
       },
-      {
-        model: RatingModel,
-        required: false,
-        attributes: [],
-      }
+      // {
+      //   model: RatingModel,
+      //   required: false,
+      //   attributes: [],
+      // }
     ],
     where: {
       productName: { [Op.like]: `%${search}%` },
     },
-    group: ["products.product_id"],
+    // group: ["products.product_id"],
     limit: parseInt(limit) || null,
   });
   return products;
@@ -83,6 +84,7 @@ export const getNewestProductsService = async () => {
       "productId",
       "productName",
       "productSize",
+      "productCode",
       "productDescription",
       "defaultImage",
       "productWeight",
@@ -91,7 +93,7 @@ export const getNewestProductsService = async () => {
       "productHeight",
       "createdAt",
       "isBestSeller",
-      [sequelize.fn("AVG", sequelize.col("ratings.rating")), "averageRating"]
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
     ],
     include: [
       {
@@ -128,13 +130,13 @@ export const getNewestProductsService = async () => {
             },
         ]
       },
-      {
-        model: RatingModel,
-        required: false,
-        attributes: [],
-      }
+      // {
+      //   model: RatingModel,
+      //   required: false,
+      //   attributes: [],
+      // }
     ],
-    group: ["products.product_id"],
+    // group: ["products.product_id"],
     limit: 3,
     order: [['createdAt', 'DESC']],
   });
@@ -142,7 +144,7 @@ export const getNewestProductsService = async () => {
 };
 
 
-export const getProductPaginationService = async (limit, offset, search) => {
+export const getProductPaginationService = async (limit, offset, search, category) => {
   const whereCondition = {};
   whereCondition.productName = {
     [Op.like]: `%${search}%`,
@@ -155,6 +157,7 @@ export const getProductPaginationService = async (limit, offset, search) => {
       "productId",
       "productName",
       "productSize",
+      "productCode",
       "productDescription",
       "defaultImage",
       "productWeight",
@@ -162,12 +165,13 @@ export const getProductPaginationService = async (limit, offset, search) => {
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.fn("AVG", sequelize.col("ratings.rating")), "averageRating"]
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
     ],
     include: [
       {
         model: ProductCategoryModel,
         attributes: ["productCategoryName"],
+        where: category ? { productCategoryName: category } : undefined,
       },
       {
         model: ProductVariantModel,
@@ -199,14 +203,14 @@ export const getProductPaginationService = async (limit, offset, search) => {
             },
         ]
       },
-      {
-        model: RatingModel,
-        required: false,
-        attributes: [],
-      }
+      // {
+      //   model: RatingModel,
+      //   required: false,
+      //   attributes: [],
+      // }
     ],
     where: whereCondition,
-    group: ["products.product_id"],
+    // group: ["products.product_id"],
     limit: parseInt(limit) || 0,
     offset: parseInt(offset) || 0,
   });
@@ -218,7 +222,7 @@ export const getProductPaginationService = async (limit, offset, search) => {
   return products;
 };
 
-export const getProductCountService = async (search) => {
+export const getProductCountService = async (search, category) => {
   const whereCondition = {};
   whereCondition.productName = {
     [Op.like]: `%${search}%`,
@@ -227,6 +231,13 @@ export const getProductCountService = async (search) => {
 
   const count = await ProductModel.count({
     where: whereCondition,
+    include: [
+      {
+        model: ProductCategoryModel,
+        attributes: ["productCategoryName"],
+        where: category ? { productCategoryName: category } : undefined,
+      },
+    ]
   });
   // console.log(count);
 
@@ -239,6 +250,7 @@ export const getProductByIdService = async (productId) => {
       "productId",
       "productName",
       "productSize",
+      "productCode",
       "productDescription",
       "defaultImage",
       "productWeight",
@@ -246,7 +258,7 @@ export const getProductByIdService = async (productId) => {
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.fn("AVG", sequelize.col("ratings.rating")), "averageRating"]
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
     ],
     include: [
       {
@@ -283,11 +295,11 @@ export const getProductByIdService = async (productId) => {
             },
         ]
       },
-      {
-        model: RatingModel,
-        required: false,
-        // attributes: ['rating', 'comment'],
-      }
+      // {
+      //   model: RatingModel,
+      //   required: false,
+      //   // attributes: ['rating', 'comment'],
+      // }
     ],
     where: { productId },
     // group: ["products.product_id"],
@@ -305,6 +317,7 @@ export const createProductService = async (
   productCategoryName,
   defaultImage,
   productSize,
+  productCode,
   productWeight, 
   productLength, 
   productWidth, 
@@ -330,6 +343,7 @@ export const createProductService = async (
     productCategoryId,
     defaultImage,
     productSize,
+    productCode,
     productWeight, 
     productLength, 
     productWidth, 
@@ -346,6 +360,7 @@ export const updateProductService = async (
   productCategoryName,
   defaultImage,
   productSize,
+  productCode,
   productWeight,
   productLength,
   productWidth,
@@ -367,6 +382,7 @@ export const updateProductService = async (
         productCategoryName,
         defaultImage,
         productSize,
+        productCode,
         productWeight,
         productLength,
         productWidth,
@@ -414,7 +430,7 @@ export const updateProductService = async (
 
     // Add new variants
     if (variantsToAdd.length > 0) {
-      const newVariants = variantsToAdd.map((variant) => ({
+      const newVariants = variantsToAdd.map(({ productVariantId, ...variant }) => ({
         ...variant,
         productId,
       }));
@@ -427,8 +443,12 @@ export const updateProductService = async (
     return product;
   } catch (error) {
     // Rollback the transaction on error
+    console.log(error);
+    
     await transaction.rollback();
-    throw error;
+    if (error.name === "SequelizeUniqueConstraintError") {
+      throw new Error("Duplicate color variant");
+    }
   }
 };
 
@@ -462,6 +482,7 @@ export const getBestSellerService = async () => {
       "productId",
       "productName",
       "productSize",
+      "productCode",
       "productDescription",
       "defaultImage",
       "productWeight",
@@ -469,7 +490,7 @@ export const getBestSellerService = async () => {
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.fn("AVG", sequelize.col("ratings.rating")), "averageRating"]
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
     ],
     include: [
       {
@@ -506,13 +527,13 @@ export const getBestSellerService = async () => {
             },
         ]
       },
-      {
-        model: RatingModel,
-        required: false,
-        attributes: [],
-      }
+      // {
+      //   model: RatingModel,
+      //   required: false,
+      //   attributes: [],
+      // }
     ],
-    group: ["products.product_id"],
+    // group: ["products.product_id"],
   });
   console.log(bestSellerProduct);
 

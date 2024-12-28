@@ -1,5 +1,6 @@
 import { Op, Sequelize } from "sequelize";
-import { ProductCategoryModel, ProductModel, ProductVariantModel, PromoDetailModel, PromoModel } from "../association/association.js";
+import { ProductCategoryModel, ProductModel, ProductVariantModel, PromoDetailModel, PromoModel, RatingModel } from "../association/association.js";
+import sequelize from "../config/database.js";
 
 
 export const getCategoriesService = async (search) => {
@@ -48,7 +49,7 @@ export const deleteCategoryService = async (productCategoryId) => {
 }
 
 
-export const updateCategoryService = async (productCategoryId, productCategoryName) => {
+export const updateCategoryService = async (productCategoryId, productCategoryName, productCategoryPhoto) => {
     const category = ProductCategoryModel.findOne({ productCategoryId });
     if (!category) {
         throw new Error(`Category not found!`);
@@ -60,7 +61,10 @@ export const updateCategoryService = async (productCategoryId, productCategoryNa
     }
 
     await ProductCategoryModel.update(
-        { productCategoryName: productCategoryName },
+        { 
+            productCategoryName: productCategoryName,
+            productCategoryPhoto: productCategoryPhoto
+        },
         { where: { productCategoryId: productCategoryId } }
     );
 
@@ -90,13 +94,15 @@ export const getCategoryWithProductService = async () => {
                     "productId",
                     "productName",
                     "productSize",
+                    "productCode",
                     "productDescription",
                     "defaultImage",
                     "productWeight",
                     "productLength",
                     "productWidth",
                     "productHeight",
-                    "isBestSeller"
+                    "isBestSeller",
+                    [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
                 ],
                 include: [
                     {
@@ -128,9 +134,16 @@ export const getCategoryWithProductService = async () => {
                                 },
                             },
                         ]
-                      }
+                      },
+                    //   {
+                    //     model: RatingModel,
+                    //     required: false,
+                    //     attributes: [],
+                    //     // attributes: ['rating', 'comment'],
+                    //   }
                       
                 ],
+                // group: ["products.product_id"],
                 limit: 8
             });
 
@@ -146,12 +159,14 @@ export const getCategoryWithProductService = async () => {
             "productId",
             "productName",
             "productSize",
+            "productCode",
             "productDescription",
             "defaultImage",
             "productWeight",
             "productLength",
             "productWidth",
             "productHeight",
+            [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
         ],
         include: [
             {
@@ -183,8 +198,15 @@ export const getCategoryWithProductService = async () => {
                         },
                     },
                 ]
-            }
+            },
+            // {
+            //     model: RatingModel,
+            //     required: false,
+            //     // attributes: [],
+            //     attributes: ['rating', 'comment'],
+            // }
         ],
+        // group: ["products.product_id"],
         limit: 8
     });
 
