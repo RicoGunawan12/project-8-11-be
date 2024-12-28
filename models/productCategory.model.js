@@ -14,7 +14,12 @@ const ProductCategory = sequelize.define('product_categories', {
     type: DataTypes.STRING,
     length: 100,
     allowNull: false
-  }
+  },
+  productCategoryPhoto: {
+    field: "product_category_photo",
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
 },{
   timestamps: false
 })

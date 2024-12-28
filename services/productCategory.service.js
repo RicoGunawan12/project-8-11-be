@@ -13,12 +13,12 @@ export const getCategoriesService = async (search) => {
     return categories;
 }
 
-export const createCategoryService = async (productCategoryName) => {
+export const createCategoryService = async (productCategoryName, productCategoryPhoto) => {
     const existingCategory = await ProductCategoryModel.findOne({ where: { productCategoryName } });
     if (existingCategory) {
         throw new Error('Product category already exists');
     }
-    const insertedCategory = await ProductCategoryModel.create({ productCategoryName });
+    const insertedCategory = await ProductCategoryModel.create({ productCategoryName, productCategoryPhoto });
     return insertedCategory;
 }
 
@@ -55,7 +55,7 @@ export const updateCategoryService = async (productCategoryId, productCategoryNa
     }
 
     const existingCategory = await ProductCategoryModel.findOne({ where: { productCategoryName } });
-    if (existingCategory) {
+    if (existingCategory && existingCategory.productCategoryId !== productCategoryId) {
         throw new Error('Product category already exists');
     }
 

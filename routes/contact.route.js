@@ -13,7 +13,13 @@ ContactRoute.post('/',
     ]),
     createContact
 );
-ContactRoute.put('/:id', adminMiddleware, updateContact);
+ContactRoute.put('/:id', 
+    adminMiddleware,
+    uploadContact.fields([
+        { name: 'contactImage', maxCount: 20 }
+    ]), 
+    updateContact
+);
 ContactRoute.delete('/:id', adminMiddleware, deleteContact);
 
 ContactRoute.get('/admin', adminMiddleware, getContactToSend);
