@@ -24,10 +24,16 @@ export const userSchema = {
         errorMessage: 'Password is required',
       },
     },
+    confirmPassword: {
+      isString: true,
+      notEmpty: {
+        errorMessage: 'Confirm password is required',
+      },
+    },
     phoneNumber: {
       isString: true,
       notEmpty: {
-        errorMessage: 'PhoneNumber is required',
+        errorMessage: 'Phone Number is required',
       },
     },
   };
