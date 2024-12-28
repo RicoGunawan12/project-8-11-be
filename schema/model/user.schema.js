@@ -8,9 +8,6 @@ export const userSchema = {
         options: { min: 3 },
         errorMessage: 'Username must be at least 3 characters long',
       },
-      isAlphanumeric: {
-        errorMessage: 'Username must be alphanumeric',
-      },
     },
     email: {
       isString: true,

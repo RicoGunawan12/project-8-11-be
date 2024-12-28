@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
 
 const storageBlog = multer.diskStorage({
     destination: async function (req, file, cb) {
-        const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'blog');
+        const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'blog/' + req.body.postTitle);
 
         if (!fs.existsSync(uploadPath)) {
           fs.mkdirSync(uploadPath, { recursive: true });

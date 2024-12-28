@@ -12,13 +12,15 @@ PostRoute.get("/", getAllPost);
 PostRoute.get("/:id", getPostById);
 PostRoute.post("/", adminMiddleware,
 uploadBlog.fields([
-    { name: "postImage", maxCount: 20 }
+    { name: "postImage", maxCount: 20 },
+    { name: "postBanner", maxCount: 20 }
 ]), createPost);
 PostRoute.put("/:id", 
     adminMiddleware, 
     // generalValidator(postSchema), validateSchema,
     uploadBlog.fields([
-        { name: "postImage", maxCount: 20 }
+        { name: "postImage", maxCount: 20 },
+        { name: "postBanner", maxCount: 20 }
     ]), 
     updatePost
 );

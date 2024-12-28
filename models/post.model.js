@@ -15,6 +15,11 @@ const Post = sequelize.define("posts", {
       type: DataTypes.TEXT,
       primaryKey: false,
     },
+    postBanner: {
+      field: "post_banner",
+      type: DataTypes.TEXT,
+      primaryKey: false,
+    },
     postTitle: {
       field: "post_title",
       type: DataTypes.STRING,
