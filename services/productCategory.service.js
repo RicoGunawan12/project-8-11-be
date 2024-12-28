@@ -1,5 +1,6 @@
 import { Op, Sequelize } from "sequelize";
-import { ProductCategoryModel, ProductModel, ProductVariantModel, PromoDetailModel, PromoModel } from "../association/association.js";
+import { ProductCategoryModel, ProductModel, ProductVariantModel, PromoDetailModel, PromoModel, RatingModel } from "../association/association.js";
+import sequelize from "../config/database.js";
 
 
 export const getCategoriesService = async (search) => {
@@ -90,13 +91,15 @@ export const getCategoryWithProductService = async () => {
                     "productId",
                     "productName",
                     "productSize",
+                    "productCode",
                     "productDescription",
                     "defaultImage",
                     "productWeight",
                     "productLength",
                     "productWidth",
                     "productHeight",
-                    "isBestSeller"
+                    "isBestSeller",
+                    [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
                 ],
                 include: [
                     {
@@ -128,9 +131,16 @@ export const getCategoryWithProductService = async () => {
                                 },
                             },
                         ]
-                      }
+                      },
+                    //   {
+                    //     model: RatingModel,
+                    //     required: false,
+                    //     attributes: [],
+                    //     // attributes: ['rating', 'comment'],
+                    //   }
                       
                 ],
+                // group: ["products.product_id"],
                 limit: 8
             });
 
@@ -146,12 +156,14 @@ export const getCategoryWithProductService = async () => {
             "productId",
             "productName",
             "productSize",
+            "productCode",
             "productDescription",
             "defaultImage",
             "productWeight",
             "productLength",
             "productWidth",
             "productHeight",
+            [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
         ],
         include: [
             {
@@ -183,8 +195,15 @@ export const getCategoryWithProductService = async () => {
                         },
                     },
                 ]
-            }
+            },
+            // {
+            //     model: RatingModel,
+            //     required: false,
+            //     // attributes: [],
+            //     attributes: ['rating', 'comment'],
+            // }
         ],
+        // group: ["products.product_id"],
         limit: 8
     });
 

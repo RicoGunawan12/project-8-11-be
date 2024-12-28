@@ -158,6 +158,7 @@ export const createProduct = async (req, res) => {
             productCategoryName, 
             productVariants, 
             productSize,
+            productCode,
             productWeight, 
             productLength, 
             productWidth, 
@@ -167,6 +168,7 @@ export const createProduct = async (req, res) => {
         if (!productName || typeof productName !== "string" || productName.trim().length < 1) {
             return res.status(400).json({ message: "Product name must be filled" });
         }
+        
 
         // Manual validation for productDescription
         // if (!productDescription || typeof productDescription !== "string" || productDescription.trim().length < 1) {
@@ -179,6 +181,9 @@ export const createProduct = async (req, res) => {
         }
         if (!productSize || typeof productSize !== "string" || productSize.trim().length < 1) {
             throw new Error(`Variant ${index + 1} must have product size`);
+        }
+        if (!productCode || typeof productCode !== "string" || productCode.trim().length < 1) {
+            return res.status(400).json({ message: "Product code must be filled" });
         }
         if (
             isValidNumber(productWeight) &&
@@ -288,6 +293,7 @@ export const createProduct = async (req, res) => {
             productCategoryName, 
             defaultImageString, 
             productSize,
+            productCode,
             productWeight, 
             productLength, 
             productWidth, 
@@ -316,6 +322,7 @@ export const updateProduct = async (req, res) => {
             productCategoryName, 
             productVariants, 
             productSize,
+            productCode,
             productWeight, 
             productLength, 
             productWidth, 
@@ -342,6 +349,9 @@ export const updateProduct = async (req, res) => {
         }
         if (!productSize || typeof productSize !== "string" || productSize.trim().length < 1) {
             throw new Error(`Variant ${index + 1} must have product size`);
+        }
+        if (!productCode || typeof productCode !== "string" || productCode.trim().length < 1) {
+            return res.status(400).json({ message: "Product code must be filled" });
         }
         if (
             isValidNumber(productWeight) &&
@@ -448,6 +458,7 @@ export const updateProduct = async (req, res) => {
             productCategoryName,
             defaultImageString,
             productSize,
+            productCode,
             productWeight,
             productLength,
             productWidth,
@@ -598,7 +609,7 @@ export const getCategoryWithProduct = async (req, res) => {
         const products = await getCategoryWithProductService();
         return res.status(200).json({ message: "Product fetched!", products })
     } catch (error) {
-        // console.log(error);
+        console.log(error);
         
         return res.status(500).json({ message: error.message });
     }
