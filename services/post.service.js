@@ -16,9 +16,10 @@ export const getPostByIdService = async (postId) => {
     return post;
 }
 
-export const createPostService = async (postImage, postTitle, postContent) => {
+export const createPostService = async (postImage, postTitle, postContent, postBanner) => {
     const post = await Post.create({ 
         postImage,
+        postBanner,
         postTitle: postTitle,
         postContent: postContent,
         createdAt: new Date() 
@@ -27,13 +28,15 @@ export const createPostService = async (postImage, postTitle, postContent) => {
     return post;
 }
 
-export const updatePostService = async (postId, postImage, postTitle, postContent) => {
+export const updatePostService = async (postId, postImage, postTitle, postContent, postBanner) => {
     const post = await getPostByIdService(postId);
     await deletePostImage('../' + post.postImage);
+    await deletePostImage('../' + post.postBanner);
 
     const updatedPost = await Post.update(
         {
             postImage,
+            postBanner,
             postTitle: postTitle,
             postContent: postContent
         },
