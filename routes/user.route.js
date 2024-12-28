@@ -5,6 +5,7 @@ import { validateSchema } from '../validator/validate.js';
 import { generalValidator } from '../validator/general/general.validator.js';
 import { userSchema } from '../schema/model/user.schema.js';
 import { userMiddleware } from '../middleware/auth.middleware.js';
+import { loginSchema } from '../schema/auth/login.schema.js';
 
 const userRoute = express.Router();
 
@@ -13,7 +14,7 @@ userRoute.get('/', getUsers);
 userRoute.get('/data', userMiddleware, getUserById)
 
 userRoute.post('/register',generalValidator(userSchema),validateSchema, registerUser);
-userRoute.post('/login', loginUser);
+userRoute.post('/login',generalValidator(loginSchema),validateSchema, loginUser);
 userRoute.post('/login/admin', loginAdmin);
 
 export default userRoute;

@@ -6,19 +6,19 @@ export const registerUser = async (req, res) => {
   const phoneRegex = /^\+62\d+$/;
 
   if (username.length < 5) {
-    return res.status(400).json({ message: 'Username length must be more than 4' });
+    return res.status(400).json({ path: 'username', message: 'Username length must be more than 4' });
   }
   else if (email.length < 1) {
-    return res.status(400).json({ message: 'Email must be filled' })
+    return res.status(400).json({ path: 'email', message: 'Email must be filled' })
   }
   else if (password.length < 1) {
-    return res.status(400).json({ password: 'Password must be filled' })
+    return res.status(400).json({ path: 'password', message: 'Password must be filled' })
   }
   else if (password !== confirmPassword) {
-    return res.status(400).json({ password: 'Password and confirm password doesn\'t match' })
+    return res.status(400).json({ path: 'confirmPassword', password: 'Password and confirm password doesn\'t match' })
   }
   else if (!phoneRegex.test(phoneNumber)) {
-    return res.status(400).json({ message: 'Phone must start with +62' });
+    return res.status(400).json({ path: 'phoneNumber', message: 'Phone must start with +62' });
   }
   
   try {
@@ -54,10 +54,10 @@ export const loginUser = async (req, res) => {
   const { email, password } = req.body;
   
   if (email.length < 1) {
-    return res.status(400).json({ message: 'Email must be filled' });
+    return res.status(400).json({ path: 'email', message: 'Email must be filled' });
   }
   else if (password.length < 1) {
-    return res.status(400).json({ message: 'Password must be filled' });
+    return res.status(400).json({ path: 'password', message: 'Password must be filled' });
   }
 
   try {
