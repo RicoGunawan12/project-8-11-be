@@ -165,7 +165,7 @@ export const getProductPaginationService = async (limit, offset, search) => {
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.fn("AVG", sequelize.col("ratings.rating")), "averageRating"]
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
     ],
     include: [
       {
@@ -202,14 +202,14 @@ export const getProductPaginationService = async (limit, offset, search) => {
             },
         ]
       },
-      {
-        model: RatingModel,
-        required: false,
-        attributes: [],
-      }
+      // {
+      //   model: RatingModel,
+      //   required: false,
+      //   attributes: [],
+      // }
     ],
     where: whereCondition,
-    group: ["products.product_id"],
+    // group: ["products.product_id"],
     limit: parseInt(limit) || 0,
     offset: parseInt(offset) || 0,
   });

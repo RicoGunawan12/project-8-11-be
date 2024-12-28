@@ -49,7 +49,7 @@ export const deleteCategoryService = async (productCategoryId) => {
 }
 
 
-export const updateCategoryService = async (productCategoryId, productCategoryName) => {
+export const updateCategoryService = async (productCategoryId, productCategoryName, productCategoryPhoto) => {
     const category = ProductCategoryModel.findOne({ productCategoryId });
     if (!category) {
         throw new Error(`Category not found!`);
@@ -61,7 +61,10 @@ export const updateCategoryService = async (productCategoryId, productCategoryNa
     }
 
     await ProductCategoryModel.update(
-        { productCategoryName: productCategoryName },
+        { 
+            productCategoryName: productCategoryName,
+            productCategoryPhoto: productCategoryPhoto
+        },
         { where: { productCategoryId: productCategoryId } }
     );
 

@@ -42,6 +42,7 @@ export const deleteCategory = async (req, res) => {
 export const updateCategory = async (req, res) => {
     const categoryId = req.params.id;
     const { productCategoryName } = req.body;
+    const productCategoryPhoto = req.files['productCategoryPhoto']
 
     if (!categoryId) {
         return res.status(400).json({ message: "Category Id must be filled" });
@@ -51,8 +52,9 @@ export const updateCategory = async (req, res) => {
     }
     
 
+    const productCategoryPhotoString = `/${UPLOAD_FOLDER}category/${productCategoryPhoto[0].filename}`
     try {
-        const message = await updateCategoryService(categoryId, productCategoryName);
+        const message = await updateCategoryService(categoryId, productCategoryName, productCategoryPhotoString);
         return res.status(200).json(message);
     } catch (error) {
         return res.status(500).json({ message: error.message });   

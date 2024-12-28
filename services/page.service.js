@@ -47,7 +47,14 @@ export const migratePage = async () => {
                     pageId: 3,
                     page: "Main Page",
                     title: "Best Cup Since 2014",
-                    content: "Meet the TYESO Cup, our best-seller that’s been making waves! Known for its sleek design and superior insulation, this cup keeps your drinks at the perfect temperature for hours, whether hot or cold. Made from eco-friendly, durable materials and available in multiple colors, the TYESO Cup has become a favorite for its blend of style, sustainability, and function. Perfect for on-the-go lifestyles, it's the go-to choice for those who value both quality and the environment."
+                    content: "Meet the TYESO Cup, our best-seller that’s been making waves! Known for its sleek design and superior insulation, this cup keeps your drinks at the perfect temperature for hours, whether hot or cold. Made from eco-friendly, durable materials and available in multiple colors, the TYESO Cup has become a favorite for its blend of style, sustainability, and function. Perfect for on-the-go lifestyles, it's the go-to choice for those who value both quality and the environment.",
+                    bestNumber1: "8900+",
+                    bestTitle1: "Interact",
+                    bestNumber2: "3105+",
+                    bestTitle2: "Purchase",
+                    bestNumber3: "2014+",
+                    bestTitle3: "Reviews",
+
                 },
                 {
                     pageId: 4,
@@ -75,7 +82,13 @@ export const migratePage = async () => {
                     pageId: 3,
                     page: "Main Page",
                     title: "Gelas Terbaik Sejak 2014",
-                    content: "Meet the TYESO Cup, our best-seller that’s been making waves! Known for its sleek design and superior insulation, this cup keeps your drinks at the perfect temperature for hours, whether hot or cold. Made from eco-friendly, durable materials and available in multiple colors, the TYESO Cup has become a favorite for its blend of style, sustainability, and function. Perfect for on-the-go lifestyles, it's the go-to choice for those who value both quality and the environment."
+                    content: "Meet the TYESO Cup, our best-seller that’s been making waves! Known for its sleek design and superior insulation, this cup keeps your drinks at the perfect temperature for hours, whether hot or cold. Made from eco-friendly, durable materials and available in multiple colors, the TYESO Cup has become a favorite for its blend of style, sustainability, and function. Perfect for on-the-go lifestyles, it's the go-to choice for those who value both quality and the environment.",
+                    bestNumber1: "8900+",
+                    bestTitle1: "Interact",
+                    bestNumber2: "3105+",
+                    bestTitle2: "Purchase",
+                    bestNumber3: "2014+",
+                    bestTitle3: "Reviews",
                 },
                 {
                     pageId: 4,
