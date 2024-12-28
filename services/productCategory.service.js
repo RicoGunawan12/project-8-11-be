@@ -13,12 +13,12 @@ export const getCategoriesService = async (search) => {
     return categories;
 }
 
-export const createCategoryService = async (productCategoryName) => {
+export const createCategoryService = async (productCategoryName, productCategoryPhoto) => {
     const existingCategory = await ProductCategoryModel.findOne({ where: { productCategoryName } });
     if (existingCategory) {
         throw new Error('Product category already exists');
     }
-    const insertedCategory = await ProductCategoryModel.create({ productCategoryName });
+    const insertedCategory = await ProductCategoryModel.create({ productCategoryName, productCategoryPhoto });
     return insertedCategory;
 }
 
@@ -55,7 +55,7 @@ export const updateCategoryService = async (productCategoryId, productCategoryNa
     }
 
     const existingCategory = await ProductCategoryModel.findOne({ where: { productCategoryName } });
-    if (existingCategory) {
+    if (existingCategory && existingCategory.productCategoryId !== productCategoryId) {
         throw new Error('Product category already exists');
     }
 
@@ -96,6 +96,7 @@ export const getCategoryWithProductService = async () => {
                     "productLength",
                     "productWidth",
                     "productHeight",
+                    "isBestSeller"
                 ],
                 include: [
                     {
@@ -139,6 +140,59 @@ export const getCategoryWithProductService = async () => {
             };
         })
     );
+
+    const allProducts = await ProductModel.findAll({
+        attributes: [
+            "productId",
+            "productName",
+            "productSize",
+            "productDescription",
+            "defaultImage",
+            "productWeight",
+            "productLength",
+            "productWidth",
+            "productHeight",
+        ],
+        include: [
+            {
+                model: ProductVariantModel,
+                attributes: [
+                    "productVariantId",
+                    "productColor",
+                    "sku",
+                    "productPrice",
+                    "productStock",
+                    "productImage",
+                ]
+            },
+            {
+                model: PromoDetailModel,
+                attributes: ['promoDetailId'],
+                required: false,
+                include: [
+                    {
+                        model: PromoModel,
+                        required: false,
+                        where: {
+                            startDate: {
+                                [Op.lte]: new Date(),
+                            },
+                            endDate: {
+                                [Op.gte]: new Date(),
+                            },
+                        },
+                    },
+                ]
+            }
+        ],
+        limit: 8
+    });
+
+    categoriesWithProducts.unshift({
+        productCategoryName: "All",
+        productCategoryId: null, 
+        products: allProducts
+    });
 
     return categoriesWithProducts;
 };

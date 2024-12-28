@@ -1,4 +1,5 @@
 import { createCategoryService, deleteCategoryService, getCategoriesService, updateCategoryService } from "../services/productCategory.service.js";
+import { UPLOAD_FOLDER } from "../utils/uploader.js";
 
 
 export const getCategories = async (req, res) => {
@@ -12,9 +13,11 @@ export const getCategories = async (req, res) => {
 
 export const createCategory = async (req, res) => {
     const { productCategoryName } = req.body;
+    const productCategoryPhoto = req.files['productCategoryPhoto']
 
+    const productCategoryPhotoString = `/${UPLOAD_FOLDER}category/${productCategoryPhoto[0].filename}`
     try {
-        const insertedCategory = await createCategoryService(productCategoryName);
+        const insertedCategory = await createCategoryService(productCategoryName, productCategoryPhotoString);
         return res.status(200).json({ message: "New category added!"});
     } catch (error) {
         return res.status(500).json({ message: error.message });

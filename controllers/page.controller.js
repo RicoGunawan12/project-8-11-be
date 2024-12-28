@@ -1,4 +1,6 @@
 import { getAboutPageService, getPageService, updateEngAboutPageService, updateEngPageService, updateIndoAboutPageService, updateIndoPageService } from "../services/page.service.js";
+import { UPLOAD_FOLDER } from "../utils/uploader.js";
+import { isValidNumber } from "../utils/utility.js";
 
 
 export const getPage = async (req, res) => {
@@ -50,6 +52,26 @@ export const updateIndoPage = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
+}
+
+export const updateBackgroundPage = async (req, res) => {
+    
+    return res.status(200).json({ message: "Image updated!" });
+    // var { index } = req.body;
+    // const images = req.files['background'];
+
+    // if (isValidNumber(index)) {
+    //     index = parseInt(index);
+    // }
+    // if (!images || !Array.isArray(images) || images.length < 1) {
+    //     return res.status(400).json({ message: "Variant image is required" });
+    // }
+
+    // try {
+    //     const response = await updateBackgroundPageService(index, images[0])
+    // } catch (error) {
+    //     return res.status(500).json({ message: error.message });
+    // }
 }
 
 export const getAboutPage = async (req, res) => {

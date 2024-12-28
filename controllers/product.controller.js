@@ -417,10 +417,12 @@ export const updateProduct = async (req, res) => {
         }
         
         const hash = new Map();
+        console.log(images);
+        
         images.forEach((image) => {
             // console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
             
-            hash.set(image.originalname.substring(0, image.originalname.length - 4), `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`);
+            hash.set(image.originalname, `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`);
         });
         
         
@@ -439,26 +441,21 @@ export const updateProduct = async (req, res) => {
 
         // console.log(defaultImage);
         const defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${defaultImage[0].filename}`
-        const product = await updateProductService(
-            productId, 
-            productName, 
-            productDescription, 
-            productCategoryName, 
+        const updatedProduct = await updateProductService(
+            productId,
+            productName,
+            productDescription,
+            productCategoryName,
             defaultImageString,
             productSize,
-            productWeight, 
-            productLength, 
-            productWidth, 
-            productHeight 
-        );
-        const insertVariantPromise = variants.map(async (variant) => {
-            // console.log("product id: " + product.productId);
-            
-            await updateProductVariantService(product.productId, variant);
-        })
-        await Promise.all(insertVariantPromise);
+            productWeight,
+            productLength,
+            productWidth,
+            productHeight,
+            variants
+          );
         
-        return res.status(200).json({ message: "New product added!", product });
+        return res.status(200).json({ message: "Product updated!", updatedProduct });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

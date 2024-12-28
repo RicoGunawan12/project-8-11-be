@@ -1,12 +1,21 @@
 import express from 'express';
 import { adminMiddleware } from '../middleware/auth.middleware.js';
-import { getAboutPage, getPage, updateEngAboutPage, updateEngPage, updateIndoAboutPage, updateIndoPage } from '../controllers/page.controller.js';
+import { getAboutPage, getPage, updateBackgroundPage, updateEngAboutPage, updateEngPage, updateIndoAboutPage, updateIndoPage } from '../controllers/page.controller.js';
+import { uploadBackground } from '../utils/uploader.js';
 
 const PageRoute = express.Router();
 
 PageRoute.get('/', getPage);
 PageRoute.put('/eng/:id', adminMiddleware, updateEngPage);
 PageRoute.put('/indo/:id', adminMiddleware, updateIndoPage);
+PageRoute.put('/background/:id', 
+    adminMiddleware, 
+    uploadBackground.fields([
+        { name: 'background', maxCount: 20 },
+        { name: 'photo', maxCount: 20 }
+    ]), 
+    updateBackgroundPage
+);
 
 PageRoute.get('/about', getAboutPage);
 PageRoute.put('/about/eng/:id', adminMiddleware, updateEngAboutPage);

@@ -27,6 +27,7 @@ import EmailRoute from './routes/email.route.js';
 import BannerRoute from './routes/banner.route.js';
 import { migrateBanner } from './services/banner.service.js';
 import { migrateAdminService } from './services/user.service.js';
+import RatingRoute from './routes/rating.route.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -62,6 +63,7 @@ app.use('/api/contacts', ContactRoute);
 app.use('/api/promos', PromoRoute);
 app.use('/api/emails', EmailRoute);
 app.use('/api/banners', BannerRoute);
+app.use('/api/ratings', RatingRoute);
 
 (async () => {
   try {
