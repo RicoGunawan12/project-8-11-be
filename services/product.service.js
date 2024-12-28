@@ -22,6 +22,7 @@ export const getProductsService = async (search, category, limit) => {
       "productLength",
       "productWidth",
       "productHeight",
+      "isBestSeller"
     ],
     include: [
       {
@@ -81,7 +82,8 @@ export const getNewestProductsService = async () => {
       "productLength",
       "productWidth",
       "productHeight",
-      "createdAt"
+      "createdAt",
+      "isBestSeller"
     ],
     include: [
       {
@@ -145,6 +147,7 @@ export const getProductPaginationService = async (limit, offset, search) => {
       "productLength",
       "productWidth",
       "productHeight",
+      "isBestSeller"
     ],
     include: [
       {
@@ -221,6 +224,7 @@ export const getProductByIdService = async (productId) => {
       "productLength",
       "productWidth",
       "productHeight",
+      "isBestSeller"
     ],
     include: [
       {

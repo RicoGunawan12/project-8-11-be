@@ -2,6 +2,8 @@ import multer from "multer";
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url';
+import { getPageService } from "../services/page.service.js";
+import { isValidNumber } from "./utility.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -65,10 +67,67 @@ const storageBanner = multer.diskStorage({
     }
 });
 
+const storageBackground = multer.diskStorage({
+    destination: async function (req, file, cb) {
+      let uploadPath = '';
+      if (file.fieldname === 'background') {
+          uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'background');
+        } 
+      else if (file.fieldname === 'photo') {
+        uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'photo');
+      }
+
+      if (!fs.existsSync(uploadPath)) {
+          fs.mkdirSync(uploadPath, { recursive: true });
+      }
+      cb(null, uploadPath);
+    },
+    filename: async function (req, file, cb) {
+      console.log("asdasdasd");
+      try {
+          // Validate index from the request body
+          // var { index } = req.body;
+          console.log(req.body);
+          if (!isValidNumber(req.body.index)) {
+              return cb(new Error("Invalid index"));
+          }
+          
+          
+          let uploadPath = '';
+          if (file.fieldname === 'background') {
+            uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'background');
+          } 
+          else if (file.fieldname === 'photo') {
+            uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'photo');
+          }
+          const pages = await getPageService();
+          const index = parseInt(req.body.index);
+          const page = pages[0].contentJSONEng[index].page;
+          const newFilename = `${page}${index + 1}.png`;
+          console.log(newFilename);
+          
+          // Check if a previous file exists and delete it
+          const previousFilePath = path.join(uploadPath, newFilename);
+          if (fs.existsSync(previousFilePath)) {
+              fs.unlinkSync(previousFilePath); // Deletes the file
+          }
+
+          // Set the new filename
+          cb(null, newFilename);
+      } catch (error) {
+        console.log("asdasdas");
+        
+          console.error("Error in filename function:", error);
+          cb(error); // Handle any errors gracefully
+      }
+    }
+});
+
 export const upload = multer({ storage: storage });
 export const uploadBlog = multer({ storage: storageBlog });
 export const uploadContact = multer({ storage: storageContact });
 export const uploadBanner = multer({ storage: storageBanner });
+export const uploadBackground = multer({ storage: storageBackground });
 
 
 export const deleteDirectory = (productName) => {

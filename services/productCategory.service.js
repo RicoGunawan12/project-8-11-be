@@ -96,6 +96,7 @@ export const getCategoryWithProductService = async () => {
                     "productLength",
                     "productWidth",
                     "productHeight",
+                    "isBestSeller"
                 ],
                 include: [
                     {

@@ -33,7 +33,9 @@ export const migratePage = async () => {
                     pageId: 1,
                     page: "Main Page",
                     title: "Find The Best Cup For Your",
-                    content: "Upgrade your hydration with our stylish, eco-friendly cups and bottles! Designed to keep drinks hot or cold for hours, they’re perfect for any adventure. Available in a variety of colors and sizes, there’s a match for everyone. Sip in style—get yours today!"
+                    content: "Upgrade your hydration with our stylish, eco-friendly cups and bottles! Designed to keep drinks hot or cold for hours, they’re perfect for any adventure. Available in a variety of colors and sizes, there’s a match for everyone. Sip in style—get yours today!",
+                    background: "/assets/background/Main Page1.png",
+                    photo: "/assets/photo/Main Page1.png"
                 },
                 {
                     pageId: 2,
@@ -59,7 +61,9 @@ export const migratePage = async () => {
                     pageId: 1,
                     page: "Main Page",
                     title: "Cari Botol Terbaik Untukmu!",
-                    content: "Upgrade your hydration with our stylish, eco-friendly cups and bottles! Designed to keep drinks hot or cold for hours, they’re perfect for any adventure. Available in a variety of colors and sizes, there’s a match for everyone. Sip in style—get yours today!"
+                    content: "Upgrade your hydration with our stylish, eco-friendly cups and bottles! Designed to keep drinks hot or cold for hours, they’re perfect for any adventure. Available in a variety of colors and sizes, there’s a match for everyone. Sip in style—get yours today!",
+                    background: "/assets/background/MainPage1.png",
+                    photo: "/assets/photo/Main Page1.png"
                 },
                 {
                     pageId: 2,
