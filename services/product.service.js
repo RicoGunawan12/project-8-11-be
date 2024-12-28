@@ -93,7 +93,7 @@ export const getNewestProductsService = async () => {
       "productHeight",
       "createdAt",
       "isBestSeller",
-      [sequelize.fn("AVG", sequelize.col("ratings.rating")), "averageRating"]
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
     ],
     include: [
       {
@@ -130,13 +130,13 @@ export const getNewestProductsService = async () => {
             },
         ]
       },
-      {
-        model: RatingModel,
-        required: false,
-        attributes: [],
-      }
+      // {
+      //   model: RatingModel,
+      //   required: false,
+      //   attributes: [],
+      // }
     ],
-    group: ["products.product_id"],
+    // group: ["products.product_id"],
     limit: 3,
     order: [['createdAt', 'DESC']],
   });
