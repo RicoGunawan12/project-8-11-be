@@ -5,6 +5,7 @@ import {
   ProductVariantModel,
   PromoDetailModel,
   PromoModel,
+  RatingModel,
 } from "../association/association.js";
 import { deleteDirectory, deletePostImage } from "../utils/uploader.js";
 import { getCategoryByName } from "./productCategory.service.js";
@@ -22,7 +23,8 @@ export const getProductsService = async (search, category, limit) => {
       "productLength",
       "productWidth",
       "productHeight",
-      "isBestSeller"
+      "isBestSeller",
+      [sequelize.fn("AVG", sequelize.col("ratings.rating")), "averageRating"]
     ],
     include: [
       {
@@ -59,12 +61,17 @@ export const getProductsService = async (search, category, limit) => {
                 },
             },
         ]
+      },
+      {
+        model: RatingModel,
+        required: false,
+        attributes: [],
       }
-      
     ],
     where: {
       productName: { [Op.like]: `%${search}%` },
     },
+    group: ["products.product_id"],
     limit: parseInt(limit) || null,
   });
   return products;
@@ -83,7 +90,8 @@ export const getNewestProductsService = async () => {
       "productWidth",
       "productHeight",
       "createdAt",
-      "isBestSeller"
+      "isBestSeller",
+      [sequelize.fn("AVG", sequelize.col("ratings.rating")), "averageRating"]
     ],
     include: [
       {
@@ -119,8 +127,14 @@ export const getNewestProductsService = async () => {
                 },
             },
         ]
+      },
+      {
+        model: RatingModel,
+        required: false,
+        attributes: [],
       }
     ],
+    group: ["products.product_id"],
     limit: 3,
     order: [['createdAt', 'DESC']],
   });
@@ -147,7 +161,8 @@ export const getProductPaginationService = async (limit, offset, search) => {
       "productLength",
       "productWidth",
       "productHeight",
-      "isBestSeller"
+      "isBestSeller",
+      [sequelize.fn("AVG", sequelize.col("ratings.rating")), "averageRating"]
     ],
     include: [
       {
@@ -183,9 +198,15 @@ export const getProductPaginationService = async (limit, offset, search) => {
                 },
             },
         ]
+      },
+      {
+        model: RatingModel,
+        required: false,
+        attributes: [],
       }
     ],
     where: whereCondition,
+    group: ["products.product_id"],
     limit: parseInt(limit) || 0,
     offset: parseInt(offset) || 0,
   });
@@ -224,7 +245,8 @@ export const getProductByIdService = async (productId) => {
       "productLength",
       "productWidth",
       "productHeight",
-      "isBestSeller"
+      "isBestSeller",
+      [sequelize.fn("AVG", sequelize.col("ratings.rating")), "averageRating"]
     ],
     include: [
       {
@@ -260,9 +282,15 @@ export const getProductByIdService = async (productId) => {
                 },
             },
         ]
+      },
+      {
+        model: RatingModel,
+        required: false,
+        // attributes: ['rating', 'comment'],
       }
     ],
     where: { productId },
+    // group: ["products.product_id"],
   });
 
   if (!product) {
@@ -430,6 +458,19 @@ export const updateBestSellerService = async (productId, isBestSeller) => {
 export const getBestSellerService = async () => {
   const bestSellerProduct = await ProductModel.findAll({
     where: { isBestSeller: true },
+    attributes: [
+      "productId",
+      "productName",
+      "productSize",
+      "productDescription",
+      "defaultImage",
+      "productWeight",
+      "productLength",
+      "productWidth",
+      "productHeight",
+      "isBestSeller",
+      [sequelize.fn("AVG", sequelize.col("ratings.rating")), "averageRating"]
+    ],
     include: [
       {
         model: ProductCategoryModel,
@@ -464,8 +505,14 @@ export const getBestSellerService = async () => {
                 },
             },
         ]
+      },
+      {
+        model: RatingModel,
+        required: false,
+        attributes: [],
       }
     ],
+    group: ["products.product_id"],
   });
   console.log(bestSellerProduct);
 

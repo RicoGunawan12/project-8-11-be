@@ -11,10 +11,10 @@ Product.belongsTo(ProductCategory, { foreignKey: 'ref_product_category_id' } );
 Product.hasMany(ProductVariant, { foreignKey: 'ref_product_id', onDelete: 'CASCADE' } );
 ProductVariant.belongsTo(Product, { foreignKey: 'ref_product_id' } );
 
-// Product.hasMany(Rating, { foreignKey: 'product_id', onDelete: 'CASCADE' })
-// Rating.belongsTo(Product, { foreignKey: 'product_id' })
+Product.hasMany(Rating, { foreignKey: 'product_id', onDelete: 'CASCADE' })
+Rating.belongsTo(Product, { foreignKey: 'product_id' })
 
-// User.hasMany(Rating, { foreignKey: 'user_id', onDelete: 'CASCADE' })
-// Rating.belongsTo(User, { foreignKey: 'user_id' })
+User.hasMany(Rating, { foreignKey: 'user_id', onDelete: 'CASCADE' })
+Rating.belongsTo(User, { foreignKey: 'user_id' })
 
 export { Product, ProductVariant, ProductCategory, Rating, User };

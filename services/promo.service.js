@@ -10,11 +10,11 @@ export const getPromoService = async () => {
                 include: [
                     {
                         model: ProductModel,
-                        attributes: ['productName', 'defaultImage'],
+                        attributes: ['productName', 'defaultImage', 'productSize'],
                         include: [
                             {
                                 model: ProductVariantModel,
-                                attributes: ['productImage', 'productSize', 'productColor', 'productPrice'],
+                                attributes: ['productImage', 'productColor', 'productPrice'],
                             }
                         ]
                     },
@@ -85,10 +85,11 @@ export const getPromoByIdService = async (promoId) => {
                             "productName",
                             "productDescription",
                             "defaultImage",
-                            "isPromo",
-                            "productPromo",
-                            "startDate",
-                            "endDate",
+                            "productSize",
+                            "productWeight",
+                            "productLength",
+                            "productWidth",
+                            "productHeight",
                         ],
                         include: [
                             {
@@ -99,16 +100,11 @@ export const getPromoByIdService = async (promoId) => {
                                 model: ProductVariantModel,
                                 attributes: [
                                     "productVariantId",
-                                    "productSize",
                                     "productColor",
                                     "sku",
                                     "productPrice",
                                     "productStock",
                                     "productImage",
-                                    "productWeight",
-                                    "productLength",
-                                    "productWidth",
-                                    "productHeight",
                                 ],
                             },
                         ]

@@ -38,6 +38,13 @@ export const updateFAQ = async (req, res) => {
     if (!faqId) {
         return res.status(400).json({ message: "FAQ id must not null" })
     }
+    if (!faqQuestion || typeof faqQuestion !== "string" || faqQuestion.trim() === "") {
+        return res.status(400).json({ message: "FAQ question must not be null or empty." });
+    }
+    
+    if (!faqAnswer || typeof faqAnswer !== "string" || faqAnswer.trim() === "") {
+        return res.status(400).json({ message: "FAQ answer must not be null or empty." });
+    }
 
     try {
         const updatedFAQ = await updateFAQService(faqId, faqQuestion, faqAnswer);

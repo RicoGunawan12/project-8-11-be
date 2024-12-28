@@ -21,9 +21,9 @@ export const updateContactService = async (id, contact, contactAccount) => {
         }
     )
 
-    if (updatedContact[0] === 0) {
-        throw new Error("There is no changes or contact");
-    }
+    // if (updatedContact[0] === 0) {
+    //     throw new Error("There is no changes or contact");
+    // }
     return updatedContact
 }
 
