@@ -24,14 +24,6 @@ export const addressSchema = {
       errorMessage: "Subdistrict ID is required",
     },
   },
-  postalCode: {
-    isPostalCode: {
-      errorMessage: "Postal Code must be a valid postal code",
-    },
-    notEmpty: {
-      errorMessage: "Postal Code is required",
-    },
-  },
   addressDetail: {
     notEmpty: {
       errorMessage: "Address Detail is required",
