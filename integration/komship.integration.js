@@ -43,15 +43,19 @@ export const calculateDeliveryFeeKomship = async (shipperDestinationId, receiver
 
 
     try {
-
-        const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/tariff/api/v1/calculate?shipper_destination_id=${shipperDestinationId}&receiver_destination_id=${receiverDestinationId}&weight=${weight}&item_value=${itemValue}&cod=${cod}`, requestOptions);
+        
+        const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/tariff/api/v1/calculate?shipper_destination_id=${shipperDestinationId}&receiver_destination_id=${receiverDestinationId}&weight=${Math.ceil(weight / 1000)}&item_value=${itemValue}&cod=${cod}`, requestOptions);
         if (!komshipResponse.ok) {
             throw new Error("Failed to calculate delivery fee: " + komshipResponse.statusText);
         }
 
         const calculation = await komshipResponse.json();
+        
+        
         return calculation
     } catch (error) {
+        console.log(error);
+        
         throw new Error(error.message);
     }
 
