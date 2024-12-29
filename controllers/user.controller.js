@@ -1,4 +1,4 @@
-import { registerUserService, getUsersService, loginUserService, getUserByIdService, loginAdminService } from '../services/user.service.js';
+import { registerUserService, getUsersService, loginUserService, getUserByIdService, loginAdminService, registerAdminService } from '../services/user.service.js';
 
 
 export const registerUser = async (req, res) => {
@@ -81,6 +81,24 @@ export const loginAdmin = async (req, res) => {
   try {
     const token = await loginAdminService(email, password);
     return res.status(200).json({ message: 'Login success!', token: token })
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+
+export const storeUser = async (req, res) => {
+  const { role, fullName, email, phone, password, confirmPassword } = req.body;
+
+  try {
+    if (role === 'admin') {
+      const user = await registerAdminService(fullName, email, password, phone);
+      return res.status(201).json({ message: 'User registered successfully', user: user.fullName });
+    } else if (role === 'user') {
+      const user = await registerUserService(fullName, email, password, phone);
+      return res.status(201).json({ message: 'User registered successfully', user: user.fullName });
+    } else {
+      return res.status(500).json({ message: 'Invalid request' });
+    }
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
