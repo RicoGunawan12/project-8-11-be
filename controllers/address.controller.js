@@ -87,7 +87,11 @@ export const getAllSubdistrict = async (req, res) => {
 }
 
 export const searchDestination = async (req, res) => {
-    const { keyword } = req.query;
+    var { keyword } = req.query;
+
+    if (!keyword) {
+        keyword = "";
+    }
 
     try {
         const searchResult = await searchDestinationService(keyword);
@@ -112,7 +116,7 @@ export const calculateDeliveryFee = async (req, res) => {
 }
 
 export const updatePickUpPoint = async (req, res) => {
-    const { senderName, senderPhoneNumber, province, city, subdistrict, postalCode, addressDetail } = req.body;
+    const { senderName, senderPhoneNumber, city, subdistrict, district, postalCode, addressDetail, komshipAddressId, label } = req.body;
 
     if (senderName.length === 0) {
         return res.status(400).json({ message: "Sender name must be filled" });
@@ -125,24 +129,40 @@ export const updatePickUpPoint = async (req, res) => {
             message: "Sender phone number must start with '62' and be valid phone" 
         });
     }
-    if (province.length === 0) {
-        return res.status(400).json({ message: "Province must be filled" });
-    }
-    if (city.length === 0) {
+    if (!city || city.length === 0) {
         return res.status(400).json({ message: "City number must be filled" });
     }
-    if (subdistrict.length === 0) {
+    if (!subdistrict || subdistrict.length === 0) {
         return res.status(400).json({ message: "Subdistrict number must be filled" });
     }
-    if (postalCode.length === 0) {
+    if (!district || district.trim().length === 0) {
+        return res.status(400).json({ message: "District must be filled" });
+    }
+    if (!postalCode || postalCode.length === 0) {
         return res.status(400).json({ message: "Postal code number must be filled" });
     }
-    if (addressDetail.length === 0) {
+    if (!addressDetail || addressDetail.length === 0) {
         return res.status(400).json({ message: "Address detail must be filled" });
+    }
+    if (!komshipAddressId || typeof komshipAddressId !== "number") {
+        return res.status(400).json({ message: "Komship address ID must be a valid number" });
+    }
+    if (!label || label.trim().length === 0) {
+        return res.status(400).json({ message: "Label must be filled" });
     }
 
     try {
-        const response = await updatePickUpPointService(senderName, senderPhoneNumber, province, city, subdistrict, postalCode, addressDetail);
+        const response = await updatePickUpPointService(
+            senderName, 
+            senderPhoneNumber, 
+            city, 
+            subdistrict, 
+            district, 
+            postalCode, 
+            addressDetail, 
+            komshipAddressId, 
+            label
+        );
         return res.status(200).json({ message: "Address updated!" });
     } catch (error) {
         return res.status(500).json({ message: error.message });

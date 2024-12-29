@@ -43,7 +43,9 @@ app.use(
     credentials: true, // Set to false if cookies are not needed
   })
 );
-app.use(express.json());
+// app.use(express.json());
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 app.use(morgan('dev'));
 
 app.use('/assets', express.static(path.join(__dirname, '/assets')));

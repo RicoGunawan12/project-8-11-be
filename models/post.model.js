@@ -28,7 +28,7 @@ const Post = sequelize.define("posts", {
     },
     postContent: {
       field: "post_content",
-      type: DataTypes.TEXT,
+      type: DataTypes.TEXT("long"),
       primaryKey: false
     },
     createdAt: {

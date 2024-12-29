@@ -32,11 +32,6 @@ const AdminAddress = sequelize.define('admin_addresses', {
       type: DataTypes.STRING,
       allowNull: false
     },
-    addressProvince: {
-      field: "address_province",
-      type: DataTypes.STRING,
-      allowNull: false
-    },
     addressCity: {
       field: "address_city",
       type: DataTypes.STRING,
@@ -46,6 +41,11 @@ const AdminAddress = sequelize.define('admin_addresses', {
         field: "address_subdistrict",
         type: DataTypes.STRING,
         allowNull: false
+    },
+    addressDistrict: {
+      field: "address_district",
+      type: DataTypes.STRING,
+      allowNull: false
     },
     postalCode: {
         field: "postal_code",
