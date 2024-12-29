@@ -14,6 +14,7 @@ export const getVoucherByCodeService = async (code) => {
       voucherCode: code
     }
   })
+  console.log(voucher)
   return voucher
 }
 

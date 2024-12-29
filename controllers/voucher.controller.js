@@ -31,7 +31,10 @@ export const getVoucherByCode = async (req, res) => {
   const voucherHasUsed = await checkTransactionWithVoucher(code, userId);
   if (!voucherHasUsed) {
       const vouchers = await getVoucherByCodeService(code);
-      return res.status(200).json(vouchers);
+      if(vouchers){
+        return res.status(200).json(vouchers);
+      }
+      return res.status(400).json({ message: "Voucher not found!" });
     }
     return res.status(400).json({ message: "Voucher has used!" });
 };
