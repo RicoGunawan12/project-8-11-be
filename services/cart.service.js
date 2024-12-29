@@ -29,7 +29,7 @@ export const getCartItemsByUserService = async (userId) => {
                 include: [
                     {
                         model: ProductModel,
-                        attributes: ['productName'],
+                        attributes: ['productName', 'productWeight', 'productSize'],
                         include: [
                             {
                                 model: PromoDetailModel,

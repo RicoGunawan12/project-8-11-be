@@ -3,11 +3,13 @@ import { UPLOAD_FOLDER } from "../utils/uploader.js";
 
 
 export const getCategories = async (req, res) => {
-    var { search } = req.query
-    if (!search) {
-        search = '';
-    }
-    const categories = await getCategoriesService(search);
+    let { search, limit } = req.query;
+
+    search = search || '';
+
+    limit = limit ? parseInt(limit, 10) : null;
+
+    const categories = await getCategoriesService(search, limit);
     return res.status(200).json(categories)
 }
 

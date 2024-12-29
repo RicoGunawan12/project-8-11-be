@@ -3,16 +3,22 @@ import { ProductCategoryModel, ProductModel, ProductVariantModel, PromoDetailMod
 import sequelize from "../config/database.js";
 
 
-export const getCategoriesService = async (search) => {
-    const categories = await ProductCategoryModel.findAll({
+export const getCategoriesService = async (search, limit) => {
+    const query = {
         where: {
             productCategoryName: {
                 [Op.like]: `%${search}%`
             }
         }
-    });
+    };
+
+    if (limit) {
+        query.limit = limit;
+    }
+
+    const categories = await ProductCategoryModel.findAll(query);
     return categories;
-}
+};
 
 export const createCategoryService = async (productCategoryName, productCategoryPhoto) => {
     const existingCategory = await ProductCategoryModel.findOne({ where: { productCategoryName } });
