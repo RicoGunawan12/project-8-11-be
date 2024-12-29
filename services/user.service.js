@@ -68,7 +68,7 @@ export const migrateAdminService = async () => {
 }
 
 export const loginUserService = async (email, password) => {
-  const existingUser = await UserModel.findOne({ where: { email } });
+  const existingUser = await UserModel.findOne({ where: { email, status: "active" } });
   if (!existingUser) {
     throw new Error('User not found!');
   }
@@ -89,7 +89,7 @@ export const loginUserService = async (email, password) => {
 }
 
 export const loginAdminService = async (email, password) => {
-  const existingUser = await UserModel.findOne({ where: { email } });
+  const existingUser = await UserModel.findOne({ where: { email, status: "active" } });
   if (!existingUser) {
     throw new Error('User not found!');
   }
