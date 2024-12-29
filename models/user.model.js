@@ -46,6 +46,17 @@ const User = sequelize.define('users', {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+  status: {
+    field: "status",
+    type: DataTypes.ENUM('active', 'inactive'),
+    defaultValue: "active",
+    allowNull: false,
+  },
+  updatedBy: {
+    field: "updated_by",
+    type: DataTypes.UUID,
+    allowNull: true,
+  }
 }, {
   hooks: {
     beforeCreate: async (user) => {

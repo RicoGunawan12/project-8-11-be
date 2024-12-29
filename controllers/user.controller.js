@@ -1,4 +1,4 @@
-import { registerUserService, getUsersService, loginUserService, getUserByIdService, loginAdminService, registerAdminService } from '../services/user.service.js';
+import { registerUserService, getUsersService, loginUserService, getUserByIdService, loginAdminService, registerAdminService, activateUserService, deactivateUserService } from '../services/user.service.js';
 
 
 export const registerUser = async (req, res) => {
@@ -100,7 +100,29 @@ export const storeUser = async (req, res) => {
       return res.status(500).json({ message: 'Invalid request' });
     }
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+export const activateUser = async (req, res) => {
+  const { userId } = req.body;
+
+  try {
+    const user = await activateUserService(userId);
+    return res.status(200).json({ message: 'User account is activated', user: user.fullName });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+export const deactivateUser = async (req, res) => {
+  const { userId } = req.body;
+
+  try {
+    const user = await deactivateUserService(userId);
+    return res.status(200).json({ message: 'User account is deactivated', user: user.fullName });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
   }
 }
 

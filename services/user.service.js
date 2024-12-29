@@ -68,7 +68,7 @@ export const migrateAdminService = async () => {
 }
 
 export const loginUserService = async (email, password) => {
-  const existingUser = await UserModel.findOne({ where: { email } });
+  const existingUser = await UserModel.findOne({ where: { email, status: "active" } });
   if (!existingUser) {
     throw new Error('User not found!');
   }
@@ -89,7 +89,7 @@ export const loginUserService = async (email, password) => {
 }
 
 export const loginAdminService = async (email, password) => {
-  const existingUser = await UserModel.findOne({ where: { email } });
+  const existingUser = await UserModel.findOne({ where: { email, status: "active" } });
   if (!existingUser) {
     throw new Error('User not found!');
   }
@@ -109,6 +109,26 @@ export const loginAdminService = async (email, password) => {
   const token = jwt.sign({ userId: existingUser.dataValues.userId }, process.env.JWT_KEY, { expiresIn: process.env.JWT_EXPIRY });
   
   return token;
+}
+
+export const activateUserService = async (userId) => {
+  const updatedUser = await UserModel.update({ status: "active" } , { where: { userId } });
+
+  if (updatedUser[0] == 0) {
+    throw new Error("Product variant not found!");
+  }
+
+  return updatedUser;
+}
+
+export const deactivateUserService = async (userId) => {
+  const updatedUser = await UserModel.update({ status: "inactive" } , { where: { userId } });
+
+  if (updatedUser[0] == 0) {
+    throw new Error("Product variant not found!");
+  }
+  
+  return updatedUser;
 }
 
 
