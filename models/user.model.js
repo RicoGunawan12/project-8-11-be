@@ -49,6 +49,7 @@ const User = sequelize.define('users', {
   status: {
     field: "status",
     type: DataTypes.ENUM('active', 'inactive'),
+    defaultValue: "active",
     allowNull: false,
   },
   updatedBy: {

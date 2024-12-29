@@ -111,6 +111,26 @@ export const loginAdminService = async (email, password) => {
   return token;
 }
 
+export const activateUserService = async (userId) => {
+  const updatedUser = await UserModel.update({ status: "active" } , { where: { userId } });
+
+  if (updatedUser[0] == 0) {
+    throw new Error("Product variant not found!");
+  }
+
+  return updatedUser;
+}
+
+export const deactivateUserService = async (userId) => {
+  const updatedUser = await UserModel.update({ status: "inactive" } , { where: { userId } });
+
+  if (updatedUser[0] == 0) {
+    throw new Error("Product variant not found!");
+  }
+  
+  return updatedUser;
+}
+
 
 
 
