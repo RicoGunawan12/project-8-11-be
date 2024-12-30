@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import { registerUserService, getUsersService, loginUserService, getUserByIdService, loginAdminService, registerAdminService, activateUserService, deactivateUserService } from '../services/user.service.js';
 
 
@@ -126,7 +127,44 @@ export const deactivateUser = async (req, res) => {
   }
 }
 
+export const getLoggedInUser = async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  const tokenType = req.headers.authorization?.split(" ")[0];
 
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  if (tokenType === "Bearer") {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_KEY);
+
+      const userId = decoded.userId;
+
+      const user = await getUserByIdService(userId);
+      console.log(user, decoded, userId);
+
+      if (!(user.role == "admin" || user.role == "user")) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      return res.status(200).json({ message: "User successfully fetched", user: {
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        status: user.status
+      }});
+    } catch (error) {
+      console.log(error);
+      if (error.name == "TokenExpiredError") {
+        return res.status(401).json({ message: "Token has expired" });
+      }
+      return res.status(401).json({ message: "Invalid token" });
+    }
+  } else {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+};
 
 
 
