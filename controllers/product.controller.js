@@ -30,7 +30,7 @@ export const getProducts = async (req, res) => {
   if (!category) {
     category = "";
   }
-  if (!all) {
+  if (!status) {
     status = "active";
   }
 
