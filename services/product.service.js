@@ -11,7 +11,7 @@ import { deleteDirectory, deletePostImage } from "../utils/uploader.js";
 import { getCategoryByName } from "./productCategory.service.js";
 import sequelize from "../config/database.js";
 
-export const getProductsService = async (search, category, limit) => {
+export const getProductsService = async (search, category, limit, status = "active") => {
   const products = ProductModel.findAll({
     attributes: [
       "productId",
@@ -71,6 +71,7 @@ export const getProductsService = async (search, category, limit) => {
     ],
     where: {
       productName: { [Op.like]: `%${search}%` },
+      productActivityStatus: status
     },
     // group: ["products.product_id"],
     limit: parseInt(limit) || null,
@@ -137,6 +138,9 @@ export const getNewestProductsService = async () => {
       // }
     ],
     // group: ["products.product_id"],
+    where: {
+      productActivityStatus: "active"
+    },
     limit: 3,
     order: [['createdAt', 'DESC']],
   });
@@ -149,6 +153,7 @@ export const getProductPaginationService = async (limit, offset, search, categor
   whereCondition.productName = {
     [Op.like]: `%${search}%`,
   };
+  whereCondition.productActivityStatus = "active";
 
   // console.log(search)
 
@@ -227,6 +232,7 @@ export const getProductCountService = async (search, category) => {
   whereCondition.productName = {
     [Op.like]: `%${search}%`,
   };
+  whereCondition.productActivityStatus = "active";
   // console.log(search);
 
   const count = await ProductModel.count({
@@ -301,7 +307,7 @@ export const getProductByIdService = async (productId) => {
       //   // attributes: ['rating', 'comment'],
       // }
     ],
-    where: { productId },
+    where: { productId, productActivityStatus: "active" },
     // group: ["products.product_id"],
   });
 
@@ -482,7 +488,7 @@ export const updateBestSellerService = async (productId, isBestSeller) => {
 
 export const getBestSellerService = async () => {
   const bestSellerProduct = await ProductModel.findAll({
-    where: { isBestSeller: true },
+    where: { isBestSeller: true, productActivityStatus: 'active' },
     attributes: [
       "productId",
       "productName",
