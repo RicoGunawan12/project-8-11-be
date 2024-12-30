@@ -222,8 +222,8 @@ export const createPlanXendit = async (transaction, customerId) => {
         //             subcategory: "Open World"
         //         }
         //     ],
-        success_return_url: "http://localhost:4650/transactions/" + transaction.transactionId,
-        failure_return_url: "https://www.xendit.co/failureisthemotherofsuccess"
+        success_return_url: process.env.PRODUCTION__WEB + "/transactions/" + transaction.transactionId,
+        failure_return_url: process.env.PRODUCTION__WEB
     }
     // console.log(body);
 
