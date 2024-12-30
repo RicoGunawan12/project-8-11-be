@@ -864,7 +864,7 @@ export const deleteProducts = async (req, res) => {
   const { productId } = req.body;
   
   try {
-    const deletedProduct = await deleteProductsService(id);
+    const deletedProduct = await deleteProductsService(productId);
     return res
       .status(200)
       .json({ message: "Products deleted successfully" });
