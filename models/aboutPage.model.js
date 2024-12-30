@@ -22,12 +22,12 @@ const AboutPage = sequelize.define('about_pages', {
   },
   contentEng: {
     field: "content_eng",
-    type: DataTypes.TEXT,
+    type: DataTypes.TEXT("long"),
     allowNull: false
   },
   contentIndo: {
     field: "content_indo",
-    type: DataTypes.TEXT,
+    type: DataTypes.TEXT("long"),
     allowNull: false
   },
   whyEng: {
