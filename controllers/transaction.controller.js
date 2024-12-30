@@ -92,7 +92,7 @@ export const createTransaction = async (req, res) => {
                     product.product_variant.realizedPromo = promoDetails.promo.promoAmount;
                 }
                 // console.log(product.product_variant.productPrice);
-
+                
                 const itemTotal = product.product_variant.productPrice * product.quantity;
                 totalPrice += itemTotal;
                 totalWeight += product.product_variant.productWeight;
