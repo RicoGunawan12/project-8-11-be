@@ -492,9 +492,12 @@ export const checkTransactionWithVoucher = async (voucherCode, userId) => {
 };
 
 export const updatePaymentLinkService = async (transaction, paymentLink) => {
+    console.log(paymentLink);
+    console.log(transaction.transactionId);
+    
     const updatedTransaction = await TransactionHeaderModel.update(
         {
-            paymenLink: paymentLink
+            paymentLink: paymentLink
         },
         {
             where: {
