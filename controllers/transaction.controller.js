@@ -2,7 +2,7 @@ import sequelize from "../config/database.js";
 import { createQrisTransactionXendit } from "../integration/xendit.integration.js";
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
 import { checkPromoService } from "../services/promo.service.js";
-import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, payTransactionService, printLabelService, requestPickupTransactionService, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionStatusService } from "../services/transaction.service.js";
+import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, payTransactionService, printLabelService, requestPickupTransactionService, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionStatusService } from "../services/transaction.service.js";
 import { applyVoucherService } from "../services/voucher.service.js";
 
 
@@ -18,6 +18,19 @@ export const getAllTransactions = async (req, res) => {
         return res.status(500).json({ message: error.message })
     }
 }
+
+export const getTransactionCount = async (req, res) => {
+    try {
+        const { status, startDate, endDate } = req.query;
+
+        const transactionCount = await countTransactionsService(status, startDate, endDate);
+
+        res.status(200).json({ count: transactionCount });
+    } catch (error) {
+        console.error("Error fetching transaction count:", error);
+        res.status(500).json({ message: "Failed to fetch transaction count." });
+    }
+};
 
 export const getTransactionsByUser = async (req, res) => {
     var { status } = req.query
@@ -320,8 +333,8 @@ export const updateTransactionStatus = async (req, res) => {
         const getTransactionById = await getTransactionsByIdService(reference_id);
 
         const response = await createKomshipOrderService(getTransactionById);
-        // return res.status(200).json({ response });
-        return res.redirect('/');
+        return res.status(200).json({ message: "Transaction updated!", response });
+        // return res.redirect('/');
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

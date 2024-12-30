@@ -51,6 +51,31 @@ export const getAllTransactionsService = async (status, startDate, endDate, offs
     return transactions;
 };
 
+export const countTransactionsService = async (status, startDate, endDate) => {
+    const whereConditions = {
+        status: status
+            ? { [Op.and]: [{ [Op.eq]: status }, { [Op.ne]: 'Unpaid' }, { [Op.ne]: 'Cancelled' }] }
+            : { [Op.and]: [{ [Op.ne]: 'Unpaid' }, { [Op.ne]: 'Cancelled' }] }
+    };
+
+    if (startDate) {
+        whereConditions.transactionDate = { [Op.gte]: new Date(startDate) };
+    }
+
+    if (endDate) {
+        whereConditions.transactionDate = whereConditions.transactionDate
+            ? { ...whereConditions.transactionDate, [Op.lte]: new Date(endDate) }
+            : { [Op.lte]: new Date(endDate) };
+    }
+
+    const transactionCount = await TransactionHeaderModel.count({
+        where: whereConditions,
+    });
+
+    return transactionCount;
+};
+
+
 export const getTransactionsByUserService = async (userId, status) => {
     const transactions = await TransactionHeaderModel.findAll({
         include: [
@@ -305,7 +330,7 @@ export const monthlySalesReportService = async (year, month) => {
             [Op.between]: [prevStartDate, prevEndDate],
           },
           status: {
-            [Op.ne]: "Unpaid",
+            [Op.notIn]: ["Unpaid", "Cancelled"],
           },
         },
     })
@@ -316,7 +341,7 @@ export const monthlySalesReportService = async (year, month) => {
             [Op.between]: [startDate, endDate],
           },
           status: {
-            [Op.ne]: "Unpaid",
+            [Op.notIn]: ["Unpaid", "Cancelled"],
           },
         },
     })
@@ -359,7 +384,7 @@ export const allMonthSalesAnalyticService = async (year) => {
                 ],
             },
             status: {
-                [Op.ne]: "Unpaid",
+                [Op.notIn]: ["Unpaid", "Cancelled"],
             },
         },
         group: [Sequelize.fn("MONTH", Sequelize.col("transaction_date"))], 
@@ -391,7 +416,7 @@ export const fetchSalesByCategoryService = async (year, month) => {
             [Op.between]: [startDate, endDate], 
           },
           status: {
-            [Op.ne]: "Unpaid",
+            [Op.notIn]: ["Unpaid", "Cancelled"],
           },
         },
         include: [
