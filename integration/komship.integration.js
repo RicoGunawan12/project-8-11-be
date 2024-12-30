@@ -123,7 +123,7 @@ export const createOrderKomship = async (transaction, adminAddress) => {
             brand_name: "Tyeso",
             shipper_name: adminAddress.senderName,
             shipper_phone: adminAddress.senderPhoneNumber,
-            shipper_destination_id: adminAddress.komshipAddressId,
+            shipper_destination_id: parseInt(adminAddress.komshipAddressId),
             shipper_address: adminAddress.addressDetail,
             shipper_email: "test@gmail.com",
             receiver_name: transaction.user.user_addresses[0].receiverName, //ambil dari transaction

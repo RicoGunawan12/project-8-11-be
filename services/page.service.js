@@ -54,7 +54,7 @@ export const migratePage = async () => {
                     bestTitle2: "Purchase",
                     bestNumber3: "2014+",
                     bestTitle3: "Reviews",
-
+                    photo: "/assets/photo/Main Page3.png"
                 },
                 {
                     pageId: 4,
@@ -89,6 +89,7 @@ export const migratePage = async () => {
                     bestTitle2: "Purchase",
                     bestNumber3: "2014+",
                     bestTitle3: "Reviews",
+                    photo: "/assets/photo/Main Page3.png"
                 },
                 {
                     pageId: 4,

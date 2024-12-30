@@ -37,11 +37,6 @@ const UserAddress = sequelize.define('user_addresses', {
       type: DataTypes.STRING,
       allowNull: false
     },
-    addressProvince: {
-      field: "address_province",
-      type: DataTypes.STRING,
-      allowNull: false
-    },
     addressCity: {
       field: "address_city",
       type: DataTypes.STRING,
@@ -49,6 +44,11 @@ const UserAddress = sequelize.define('user_addresses', {
     },
     addressSubdistrict: {
         field: "address_subdistrict",
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    addressDistrict: {
+        field: "address_district",
         type: DataTypes.STRING,
         allowNull: false
     },

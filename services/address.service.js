@@ -16,17 +16,21 @@ export const getAddresByUserIdService = async (ref_user_id) => {
     return userAddresses;
 }
 
-export const createAddresService = async (receiverName, receiverPhoneNumber, addressProvince, addressCity, addressSubdistrict, postalCode, userId, addressDetail) => {
-    addressProvince = addressProvince.toUpperCase();
-    addressCity = addressCity.toUpperCase();
-    addressSubdistrict = addressSubdistrict.toUpperCase();
-    
-    const destination = await searchDestinationKomship(postalCode);
-    
-    var komshipAddressId = destination.data[0].id;
-    var komshipLabel = destination.data[0].label;
-
-    const insertedAddress = await UserAddressModel.create({ userId, receiverName, receiverPhoneNumber, komshipAddressId, komshipLabel, addressProvince, addressCity, addressSubdistrict, postalCode, addressDetail });
+export const createAddresService = async (receiverName, receiverPhoneNumber, city, subdistrict, district, postalCode, userId, addressDetail, komshipAddressId, label) => {
+    const insertedAddress = await UserAddressModel.create(
+        { 
+            userId, 
+            receiverName, 
+            receiverPhoneNumber, 
+            city, 
+            komshipAddressId: komshipAddressId, 
+            komshipLabel: label, 
+            addressCity: city, 
+            addressSubdistrict: subdistrict, 
+            addressDistrict: district,
+            postalCode, 
+            addressDetail 
+        });
     return insertedAddress;
 }
 

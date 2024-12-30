@@ -373,13 +373,18 @@ export const updateProductService = async (
     // Fetch the product and ensure it exists
     const product = await ProductModel.findByPk(productId, { transaction });
     if (!product) throw new Error("Product not found");
-
+    const category = await getCategoryByName(productCategoryName);
+    if (!category) {
+      throw new Error("There is no " + productCategoryName + " category");
+    }
+    
+    const productCategoryId = category.productCategoryId;
     // Update product details
     await product.update(
       {
         productName,
         productDescription,
-        productCategoryName,
+        productCategoryId,
         defaultImage,
         productSize,
         productCode,

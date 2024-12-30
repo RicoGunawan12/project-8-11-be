@@ -6,7 +6,23 @@ import { generateReadableId } from "../utils/utility.js";
 import { getPickUpPointService } from "./address.service.js";
 import sequelize from "../config/database.js";
 
-export const getAllTransactionsService = async (status) => {
+export const getAllTransactionsService = async (status, startDate, endDate, offset, limit) => {
+    const whereConditions = {
+        status: status
+            ? { [Op.and]: [{ [Op.eq]: status }, { [Op.ne]: 'Unpaid' }] }
+            : { [Op.ne]: 'Unpaid' }
+    };
+
+    if (startDate) {
+        whereConditions.transactionDate = { [Op.gte]: new Date(startDate) };
+    }
+
+    if (endDate) {
+        whereConditions.transactionDate = whereConditions.transactionDate
+            ? { ...whereConditions.transactionDate, [Op.lte]: new Date(endDate) }
+            : { [Op.lte]: new Date(endDate) };
+    }
+
     const transactions = await TransactionHeaderModel.findAll({
         include: [
             {
@@ -14,27 +30,26 @@ export const getAllTransactionsService = async (status) => {
                 include: {
                     model: ProductVariantModel,
                     include: {
-                        model: ProductModel
-                    }
-                }
+                        model: ProductModel,
+                    },
+                },
             },
             {
                 model: UserModel,
-                attributes: ['userId', 'fullName', 'email'],
+                attributes: ["userId", "fullName", "email"],
                 include: {
                     model: UserAddressModel,
-                }
-            }
+                },
+            },
         ],
-        where: {
-            status: status
-                ? { [Op.and]: [{ [Op.eq]: status }, { [Op.ne]: 'Unpaid' }] }
-                : { [Op.ne]: 'Unpaid' }
-        },
-        order: [['transactionDate', 'DESC']]
-    })
+        where: whereConditions,
+        order: [["transactionDate", "DESC"]],
+        offset: parseInt(offset, 10),
+        limit: parseInt(limit, 10),
+    });
+
     return transactions;
-}
+};
 
 export const getTransactionsByUserService = async (userId, status) => {
     const transactions = await TransactionHeaderModel.findAll({
@@ -289,6 +304,9 @@ export const monthlySalesReportService = async (year, month) => {
           transactionDate: {
             [Op.between]: [prevStartDate, prevEndDate],
           },
+          status: {
+            [Op.ne]: "Unpaid",
+          },
         },
     })
 
@@ -296,6 +314,9 @@ export const monthlySalesReportService = async (year, month) => {
         where: {
           transactionDate: {
             [Op.between]: [startDate, endDate],
+          },
+          status: {
+            [Op.ne]: "Unpaid",
           },
         },
     })
@@ -337,6 +358,9 @@ export const allMonthSalesAnalyticService = async (year) => {
                     new Date(year, 11, 31, 23, 59, 59), 
                 ],
             },
+            status: {
+                [Op.ne]: "Unpaid",
+            },
         },
         group: [Sequelize.fn("MONTH", Sequelize.col("transaction_date"))], 
         order: [[Sequelize.fn("MONTH", Sequelize.col("transaction_date")), "ASC"]], 
@@ -365,6 +389,9 @@ export const fetchSalesByCategoryService = async (year, month) => {
         where: {
           transactionDate: {
             [Op.between]: [startDate, endDate], 
+          },
+          status: {
+            [Op.ne]: "Unpaid",
           },
         },
         include: [
@@ -395,7 +422,10 @@ export const fetchSalesByCategoryService = async (year, month) => {
           [Sequelize.fn("SUM", Sequelize.col("transaction_details.paid_product_price")), "totalSales"],
           [Sequelize.col("transaction_details->product_variant->product->product_category.product_category_name"), "categoryName"],
         ],
-        group: ["transaction_details->product_variant->product->product_category.product_category_name"], // Group by category name
+        group: [
+            "transaction_details->product_variant->product->product_category.product_category_name",
+            "transaction_details->product_variant->product->product_category.product_category_id",
+        ], // Group by category name
         raw: true, // Return raw data
       });
       

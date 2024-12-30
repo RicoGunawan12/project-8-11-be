@@ -7,12 +7,12 @@ import { applyVoucherService } from "../services/voucher.service.js";
 
 
 export const getAllTransactions = async (req, res) => {
-    var { status } = req.query
+    var { status, startDate, endDate, offset, limit } = req.query
     if (status === undefined) {
         status = ""
     }
     try {
-        const transactions = await getAllTransactionsService(status);
+        const transactions = await getAllTransactionsService(status, startDate, endDate, offset, limit);
         return res.status(200).json({ message: "Transaction fetched successfully", transactions })
     } catch (error) {
         return res.status(500).json({ message: error.message })
