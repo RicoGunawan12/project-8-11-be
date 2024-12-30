@@ -166,7 +166,7 @@ export const createTransaction = async (req, res) => {
             };
         });
         const insertedTransactionDetails = await createTransactionDetailService(transactionDetails);
-        // const deletedCartItem = await removeAllCartItemInUserService(userId);
+        const deletedCartItem = await removeAllCartItemInUserService(userId);
         const payTransactionResponse = await payTransactionService(transaction, req.user.customerId)
         console.log(payTransactionResponse);
         
