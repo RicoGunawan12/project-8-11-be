@@ -68,6 +68,12 @@ const Product = sequelize.define('products', {
     type: DataTypes.FLOAT,
     allowNull: false
   },
+  productAvailabilityStatus: {
+    field: "product_avaiability_status",
+    type: DataTypes.ENUM("active", "inactive"),
+    defaultValue: "active",
+    allowNull: false,
+  },
   createdAt: {
     field: "created_at",
     type: DataTypes.DATE
