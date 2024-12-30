@@ -10,6 +10,7 @@ import {
   updateBestSellerService,
   updateProductService,
   getNewestProductsService,
+  deleteProductsService,
 } from "../services/product.service.js";
 import { getCategoryWithProductService } from "../services/productCategory.service.js";
 import {
@@ -858,3 +859,16 @@ export const updateInactiveBestSellers = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+export const deleteProducts = async (req, res) => {
+  const { productId } = req.body;
+  
+  try {
+    const deletedProduct = await deleteProductsService(id);
+    return res
+      .status(200)
+      .json({ message: "Products deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}

@@ -574,3 +574,15 @@ export const updatePromoService = async (
   }
   return updatedProduct;
 };
+
+export const deleteProductsService = async (productId) => {
+  const products = await ProductModel.findAll({ where: { productId } });
+  products.forEach(product => {
+    deleteDirectory(product.productName);
+  });
+
+  const deletedProduct = await ProductModel.destroy({
+    where: { productId: productId },
+  });
+  return deletedProduct;
+};
