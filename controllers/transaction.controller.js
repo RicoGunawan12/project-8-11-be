@@ -163,6 +163,8 @@ export const createTransaction = async (req, res) => {
         return res.status(200).json({ message: "Transaction created!", payTransactionResponse, transaction, insertedTransactionDetails });
         
     } catch (error) {
+        console.log(error);
+        
         await seqTransaction.rollback();
         return res.status(500).json({ message: error.message });
     }

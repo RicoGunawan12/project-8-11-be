@@ -222,8 +222,8 @@ export const createPlanXendit = async (transaction, customerId) => {
         //             subcategory: "Open World"
         //         }
         //     ],
-        success_return_url: process.env.PRODUCTION__WEB + "/transactions/" + transaction.transactionId,
-        failure_return_url: process.env.PRODUCTION__WEB
+        success_return_url: process.env.PRODUCTION_WEB + "/transactions/" + transaction.transactionId,
+        failure_return_url: process.env.PRODUCTION_WEB
     }
     // console.log(body);
 
