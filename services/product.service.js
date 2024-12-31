@@ -12,6 +12,11 @@ import { getCategoryByName } from "./productCategory.service.js";
 import sequelize from "../config/database.js";
 
 export const getProductsService = async (search, category, limit, status = "active") => {
+  const whereCondition = {};
+  whereCondition.productName = { [Op.like]: `%${search}%` };
+  
+  if (status !== "all") whereCondition.productActivityStatus = status; 
+
   const products = ProductModel.findAll({
     attributes: [
       "productId",
@@ -25,6 +30,7 @@ export const getProductsService = async (search, category, limit, status = "acti
       "productWidth",
       "productHeight",
       "isBestSeller",
+      "productActivityStatus",
       [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
     ],
     include: [
@@ -69,10 +75,7 @@ export const getProductsService = async (search, category, limit, status = "acti
       //   attributes: [],
       // }
     ],
-    where: {
-      productName: { [Op.like]: `%${search}%` },
-      productActivityStatus: status
-    },
+    where: whereCondition,
     // group: ["products.product_id"],
     limit: parseInt(limit) || null,
   });
@@ -477,6 +480,18 @@ export const deleteProductService = async (productId) => {
 export const updateBestSellerService = async (productId, isBestSeller) => {
   const update = ProductModel.update(
     { isBestSeller: isBestSeller },
+    {
+      where: {
+        productId: productId,
+      },
+    }
+  );
+  return update;
+};
+
+export const updateActivityStatusService = async (productId, status) => {
+  const update = ProductModel.update(
+    { productActivityStatus: status },
     {
       where: {
         productId: productId,
