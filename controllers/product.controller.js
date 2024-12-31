@@ -11,6 +11,7 @@ import {
   updateProductService,
   getNewestProductsService,
   deleteProductsService,
+  updateActivityStatusService,
 } from "../services/product.service.js";
 import { getCategoryWithProductService } from "../services/productCategory.service.js";
 import {
@@ -854,6 +855,28 @@ export const updateInactiveBestSellers = async (req, res) => {
 
   try {
     const updatedProduct = await updateBestSellerService(productId, false);
+    return res.status(200).json({ message: "Product best seller updated!" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateActiveStatusProducts = async (req, res) => {
+  const { productId } = req.body;
+
+  try {
+    const updatedProduct = await updateActivityStatusService(productId, "active");
+    return res.status(200).json({ message: "Product best seller updated!" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateInactiveStatusProducts = async (req, res) => {
+  const { productId } = req.body;
+
+  try {
+    const updatedProduct = await updateActivityStatusService(productId, "inactive");
     return res.status(200).json({ message: "Product best seller updated!" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
