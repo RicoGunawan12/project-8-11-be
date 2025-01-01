@@ -1,5 +1,4 @@
-import { VoucherModel, VoucherTypeModel } from "../association/association.js";
-import { getVoucherTypeByCodeService } from "./voucherType.service.js";
+import { VoucherModel } from "../association/association.js";
 
 
 // #region GET

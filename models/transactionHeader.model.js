@@ -43,9 +43,8 @@ const TransactionHeader = sequelize.define('transaction_headers', {
   },
   gatewayResponse: {
     field: "gateway_response",
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT("long"),
     allowNull: true,
-    length: 255
   },
   status: {
     field: "status",
