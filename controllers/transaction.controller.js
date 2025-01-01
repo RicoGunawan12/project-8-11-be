@@ -2,22 +2,35 @@ import sequelize from "../config/database.js";
 import { createQrisTransactionXendit } from "../integration/xendit.integration.js";
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
 import { checkPromoService } from "../services/promo.service.js";
-import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, payTransactionService, printLabelService, requestPickupTransactionService, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionStatusService } from "../services/transaction.service.js";
+import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, payTransactionService, printLabelService, requestPickupTransactionService, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionStatusService } from "../services/transaction.service.js";
 import { applyVoucherService } from "../services/voucher.service.js";
 
 
 export const getAllTransactions = async (req, res) => {
-    var { status } = req.query
+    var { status, startDate, endDate, offset, limit } = req.query
     if (status === undefined) {
         status = ""
     }
     try {
-        const transactions = await getAllTransactionsService(status);
+        const transactions = await getAllTransactionsService(status, startDate, endDate, offset, limit);
         return res.status(200).json({ message: "Transaction fetched successfully", transactions })
     } catch (error) {
         return res.status(500).json({ message: error.message })
     }
 }
+
+export const getTransactionCount = async (req, res) => {
+    try {
+        const { status, startDate, endDate } = req.query;
+
+        const transactionCount = await countTransactionsService(status, startDate, endDate);
+
+        res.status(200).json({ count: transactionCount });
+    } catch (error) {
+        console.error("Error fetching transaction count:", error);
+        res.status(500).json({ message: "Failed to fetch transaction count." });
+    }
+};
 
 export const getTransactionsByUser = async (req, res) => {
     var { status } = req.query
@@ -74,7 +87,7 @@ export const createTransaction = async (req, res) => {
             return res.status(400).json({ message: "There is no items in cart!" });
         }
         const productsInCart = userCart;
-        console.log(userCart);
+        // console.log(userCart);
 
         // calculate the total price
         // calculate the total weight
@@ -84,21 +97,21 @@ export const createTransaction = async (req, res) => {
             productsInCart.map(async (product) => {
                 // console.log(product.product_variant.ref_product_id);
                 const promoDetails = await checkPromoService(product.product_variant.ref_product_id);
-                console.log(product.product_variant.productPrice);
+                // console.log(product.product_variant.productPrice);
                 if (promoDetails) {
                     product.product_variant.productPrice = 
                     product.product_variant.productPrice - promoDetails.promo.promoAmount <= 0 ? 0 :
                     product.product_variant.productPrice - promoDetails.promo.promoAmount;
                     product.product_variant.realizedPromo = promoDetails.promo.promoAmount;
                 }
-                console.log(product.product_variant.productPrice);
-
+                // console.log(product.product_variant.productPrice);
+                
                 const itemTotal = product.product_variant.productPrice * product.quantity;
                 totalPrice += itemTotal;
                 totalWeight += product.product_variant.productWeight;
             })
         );
-        console.log(totalWeight);
+        // console.log(totalWeight);
 
         if (voucherCode) {
             // minus the totalprice
@@ -153,14 +166,18 @@ export const createTransaction = async (req, res) => {
             };
         });
         const insertedTransactionDetails = await createTransactionDetailService(transactionDetails);
-        // const deletedCartItem = await removeAllCartItemInUserService(userId);
+        const deletedCartItem = await removeAllCartItemInUserService(userId);
         const payTransactionResponse = await payTransactionService(transaction, req.user.customerId)
+        console.log(payTransactionResponse);
+        
         const updatePaymentLink = await updatePaymentLinkService(transaction, payTransactionResponse.actions[0].url);
         
         await seqTransaction.commit();
         return res.status(200).json({ message: "Transaction created!", payTransactionResponse, transaction, insertedTransactionDetails });
         
     } catch (error) {
+        console.log(error);
+        
         await seqTransaction.rollback();
         return res.status(500).json({ message: error.message });
     }
@@ -316,8 +333,8 @@ export const updateTransactionStatus = async (req, res) => {
         const getTransactionById = await getTransactionsByIdService(reference_id);
 
         const response = await createKomshipOrderService(getTransactionById);
-        // return res.status(200).json({ response });
-        return res.redirect('/');
+        return res.status(200).json({ message: "Transaction updated!", response });
+        // return res.redirect('/');
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

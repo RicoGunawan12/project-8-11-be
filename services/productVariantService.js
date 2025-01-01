@@ -3,8 +3,8 @@ import { deletePostImage } from "../utils/uploader.js";
 
 
 export const createProductVariantService = async (productId, variant) => {
-    const { sku, productSize, productColor, productPrice, productStock, productWeight, productWidth, productLength, productHeight, productImage } = variant;
-    const productVariant = await ProductVariantModel.create({ productId, sku, productSize, productColor, productPrice, productStock, productImage, productWeight, productWidth, productLength, productHeight })
+    const { sku, productColor, productPrice, productStock, productImage } = variant;
+    const productVariant = await ProductVariantModel.create({ productId, sku, productColor, productPrice, productStock, productImage })
     return productVariant;
 }
 
@@ -30,14 +30,9 @@ export const updateProductVariantService = async (productId, variant) => {
   const {
     productVariantId, // Ensure this ID exists in the `variant` object for identification
     sku,
-    productSize,
     productColor,
     productPrice,
     productStock,
-    productWeight,
-    productWidth,
-    productLength,
-    productHeight,
     productImage,
   } = variant;
 
@@ -56,14 +51,9 @@ export const updateProductVariantService = async (productId, variant) => {
   // Update the product variant fields
   await productVariant.update({
     sku,
-    productSize,
     productColor,
     productPrice,
     productStock,
-    productWeight,
-    productWidth,
-    productLength,
-    productHeight,
     productImage,
   });
 

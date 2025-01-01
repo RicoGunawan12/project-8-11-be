@@ -5,10 +5,6 @@ export const migrateBanner = async () => {
     if (banners.length === 0) {
         const body = [
             {
-                page: "Main Page",
-                image: "/assets/banner/MainPage.png"
-            },
-            {
                 page: "About Page",
                 image: "/assets/banner/AboutPage.png"
             },
@@ -19,6 +15,18 @@ export const migrateBanner = async () => {
             {
                 page: "Product Page",
                 image: "/assets/banner/ProductPage.png"
+            },
+            {
+                page: "FAQ Page",
+                image: "/assets/banner/FAQPage.png"
+            },
+            {
+                page: "Blog Page",
+                image: "/assets/banner/BlogPage.png"
+            },
+            {
+                page: "Profile Page",
+                image: "/assets/banner/ProfilePage.png"
             },
         ]
         await Banner.bulkCreate(body);

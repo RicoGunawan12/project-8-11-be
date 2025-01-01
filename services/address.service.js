@@ -16,17 +16,21 @@ export const getAddresByUserIdService = async (ref_user_id) => {
     return userAddresses;
 }
 
-export const createAddresService = async (receiverName, receiverPhoneNumber, addressProvince, addressCity, addressSubdistrict, postalCode, userId, addressDetail) => {
-    addressProvince = addressProvince.toUpperCase();
-    addressCity = addressCity.toUpperCase();
-    addressSubdistrict = addressSubdistrict.toUpperCase();
-    
-    const destination = await searchDestinationKomship(postalCode);
-    
-    var komshipAddressId = destination.data[0].id;
-    var komshipLabel = destination.data[0].label;
-
-    const insertedAddress = await UserAddressModel.create({ userId, receiverName, receiverPhoneNumber, komshipAddressId, komshipLabel, addressProvince, addressCity, addressSubdistrict, postalCode, addressDetail });
+export const createAddresService = async (receiverName, receiverPhoneNumber, city, subdistrict, district, postalCode, userId, addressDetail, komshipAddressId, label) => {
+    const insertedAddress = await UserAddressModel.create(
+        { 
+            userId, 
+            receiverName, 
+            receiverPhoneNumber, 
+            city, 
+            komshipAddressId: komshipAddressId, 
+            komshipLabel: label, 
+            addressCity: city, 
+            addressSubdistrict: subdistrict, 
+            addressDistrict: district,
+            postalCode, 
+            addressDetail 
+        });
     return insertedAddress;
 }
 
@@ -129,28 +133,20 @@ export const calculateDeliveryFeeService = async (shipperDestinationId, receiver
     return calculationResult;
 }
 
-export const updatePickUpPointService = async (senderName, senderPhoneNumber, province, city, subdistrict, postalCode, addressDetail) => {
+export const updatePickUpPointService = async (senderName, senderPhoneNumber, city, subdistrict, district, postalCode, addressDetail, komshipAddressId, label) => {
     const insertedAddress = await AdminAddress.findAll();
-    province = province.toUpperCase();
-    city = city.toUpperCase();
-    subdistrict = subdistrict.toUpperCase();
-
-    const destination = await searchDestinationKomship(postalCode);
-    console.log(destination);
-    var komshipAddressId = destination.data[0].id;
-    var komshipLabel = destination.data[0].label;
-
+    
     if (insertedAddress.length === 0) {
         const response = await AdminAddress.create({
             senderName: senderName,
             senderPhoneNumber: senderPhoneNumber,
-            addressProvince: province,
             addressCity: city,
             addressSubdistrict: subdistrict,
+            addressDistrict: district,
             postalCode: postalCode,
             addressDetail: addressDetail,
             komshipAddressId: komshipAddressId, 
-            komshipLabel: komshipLabel,
+            komshipLabel: label,
         })
         return response;
     }
@@ -159,13 +155,13 @@ export const updatePickUpPointService = async (senderName, senderPhoneNumber, pr
             {
                 senderName: senderName,
                 senderPhoneNumber: senderPhoneNumber,
-                addressProvince: province,
                 addressCity: city,
                 addressSubdistrict: subdistrict,
+                addressDistrict: district,
                 postalCode: postalCode,
                 addressDetail: addressDetail,
                 komshipAddressId: komshipAddressId, 
-                komshipLabel: komshipLabel,
+                komshipLabel: label,
             },
             {
                 where: {

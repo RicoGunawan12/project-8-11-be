@@ -7,8 +7,8 @@ export const getPageService = async () => {
         const contentJSONEng = page.contentJSONEng ? JSON.parse(page.contentJSONEng) : {};
         const contentJSONIndo = page.contentJSONIndo ? JSON.parse(page.contentJSONIndo) : {};
         
-        console.log("Parsed contentJSONEng:", contentJSONEng);
-        console.log("Parsed contentJSONIndo:", contentJSONIndo);
+        // console.log("Parsed contentJSONEng:", contentJSONEng);
+        // console.log("Parsed contentJSONIndo:", contentJSONIndo);
         
         return {
             ...page.toJSON(),
@@ -33,7 +33,9 @@ export const migratePage = async () => {
                     pageId: 1,
                     page: "Main Page",
                     title: "Find The Best Cup For Your",
-                    content: "Upgrade your hydration with our stylish, eco-friendly cups and bottles! Designed to keep drinks hot or cold for hours, they’re perfect for any adventure. Available in a variety of colors and sizes, there’s a match for everyone. Sip in style—get yours today!"
+                    content: "Upgrade your hydration with our stylish, eco-friendly cups and bottles! Designed to keep drinks hot or cold for hours, they’re perfect for any adventure. Available in a variety of colors and sizes, there’s a match for everyone. Sip in style—get yours today!",
+                    background: "/assets/background/Main Page1.png",
+                    photo: "/assets/photo/Main Page1.png"
                 },
                 {
                     pageId: 2,
@@ -45,7 +47,14 @@ export const migratePage = async () => {
                     pageId: 3,
                     page: "Main Page",
                     title: "Best Cup Since 2014",
-                    content: "Meet the TYESO Cup, our best-seller that’s been making waves! Known for its sleek design and superior insulation, this cup keeps your drinks at the perfect temperature for hours, whether hot or cold. Made from eco-friendly, durable materials and available in multiple colors, the TYESO Cup has become a favorite for its blend of style, sustainability, and function. Perfect for on-the-go lifestyles, it's the go-to choice for those who value both quality and the environment."
+                    content: "Meet the TYESO Cup, our best-seller that’s been making waves! Known for its sleek design and superior insulation, this cup keeps your drinks at the perfect temperature for hours, whether hot or cold. Made from eco-friendly, durable materials and available in multiple colors, the TYESO Cup has become a favorite for its blend of style, sustainability, and function. Perfect for on-the-go lifestyles, it's the go-to choice for those who value both quality and the environment.",
+                    bestNumber1: "8900+",
+                    bestTitle1: "Interact",
+                    bestNumber2: "3105+",
+                    bestTitle2: "Purchase",
+                    bestNumber3: "2014+",
+                    bestTitle3: "Reviews",
+                    photo: "/assets/photo/Main Page3.png"
                 },
                 {
                     pageId: 4,
@@ -59,7 +68,9 @@ export const migratePage = async () => {
                     pageId: 1,
                     page: "Main Page",
                     title: "Cari Botol Terbaik Untukmu!",
-                    content: "Upgrade your hydration with our stylish, eco-friendly cups and bottles! Designed to keep drinks hot or cold for hours, they’re perfect for any adventure. Available in a variety of colors and sizes, there’s a match for everyone. Sip in style—get yours today!"
+                    content: "Upgrade your hydration with our stylish, eco-friendly cups and bottles! Designed to keep drinks hot or cold for hours, they’re perfect for any adventure. Available in a variety of colors and sizes, there’s a match for everyone. Sip in style—get yours today!",
+                    background: "/assets/background/Main Page1.png",
+                    photo: "/assets/photo/Main Page1.png"
                 },
                 {
                     pageId: 2,
@@ -71,7 +82,14 @@ export const migratePage = async () => {
                     pageId: 3,
                     page: "Main Page",
                     title: "Gelas Terbaik Sejak 2014",
-                    content: "Meet the TYESO Cup, our best-seller that’s been making waves! Known for its sleek design and superior insulation, this cup keeps your drinks at the perfect temperature for hours, whether hot or cold. Made from eco-friendly, durable materials and available in multiple colors, the TYESO Cup has become a favorite for its blend of style, sustainability, and function. Perfect for on-the-go lifestyles, it's the go-to choice for those who value both quality and the environment."
+                    content: "Meet the TYESO Cup, our best-seller that’s been making waves! Known for its sleek design and superior insulation, this cup keeps your drinks at the perfect temperature for hours, whether hot or cold. Made from eco-friendly, durable materials and available in multiple colors, the TYESO Cup has become a favorite for its blend of style, sustainability, and function. Perfect for on-the-go lifestyles, it's the go-to choice for those who value both quality and the environment.",
+                    bestNumber1: "8900+",
+                    bestTitle1: "Interact",
+                    bestNumber2: "3105+",
+                    bestTitle2: "Purchase",
+                    bestNumber3: "2014+",
+                    bestTitle3: "Reviews",
+                    photo: "/assets/photo/Main Page3.png"
                 },
                 {
                     pageId: 4,
@@ -83,7 +101,7 @@ export const migratePage = async () => {
             const contentJSONEng = JSON.stringify(body)
             const contentJSONIndo = JSON.stringify(body2)
             Page.create({ contentJSONEng, contentJSONIndo });
-            console.log("Migrate page success!");
+            // console.log("Migrate page success!");
         } catch (error) {
             console.error(error.message);
         }
@@ -98,8 +116,10 @@ export const migrateAboutPage = async () => {
             const contentIndo = "Dengan banyaknya botol di pasar ...."
             const titleEng = "test english"
             const titleIndo = "test indo"
-            AboutPage.create({ contentEng, contentIndo, titleEng, titleIndo });
-            console.log("Migrate page success!");
+            const whyEng = "why tyeso???"
+            const whyIndo = "kenapa tyeso???"
+            AboutPage.create({ contentEng, contentIndo, titleEng, titleIndo, whyEng, whyIndo });
+            // console.log("Migrate page success!");
         } catch (error) {
             console.error(error.message);
         }
@@ -136,11 +156,12 @@ export const updateIndoPageService = async (id, contentJSONIndo) => {
     return updatedPage;
 }
 
-export const updateEngAboutPageService = async (id, contentEng, titleEng) => {
+export const updateEngAboutPageService = async (id, contentEng, titleEng, whyEng) => {
     const updatedPage = await AboutPage.update(
         { 
             contentEng: contentEng, 
-            titleEng: titleEng
+            titleEng: titleEng,
+            whyEng: whyEng
         },
         { 
             where: {
@@ -154,11 +175,12 @@ export const updateEngAboutPageService = async (id, contentEng, titleEng) => {
     return updatedPage;
 }
 
-export const updateIndoAboutPageService = async (id, contentIndo, titleIndo) => {
+export const updateIndoAboutPageService = async (id, contentIndo, titleIndo, whyIndo) => {
     const updatedPage = await AboutPage.update(
         { 
             contentIndo: contentIndo, 
-            titleIndo: titleIndo 
+            titleIndo: titleIndo,
+            whyIndo: whyIndo
         },
         { 
             where: {

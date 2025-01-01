@@ -1,16 +1,13 @@
 export const userSchema = {
-    username: {
+    fullName: {
       isString: true,
       notEmpty: {
-        errorMessage: 'Username is required',
+        errorMessage: 'Full name is required',
       },
       isLength: {
         options: { min: 3 },
-        errorMessage: 'Username must be at least 3 characters long',
-      },
-      isAlphanumeric: {
-        errorMessage: 'Username must be alphanumeric',
-      },
+        errorMessage: 'Full name must be at least 3 characters long',
+      }
     },
     email: {
       isString: true,
@@ -25,6 +22,18 @@ export const userSchema = {
       isString: true,
       notEmpty: {
         errorMessage: 'Password is required',
+      },
+    },
+    confirmPassword: {
+      isString: true,
+      notEmpty: {
+        errorMessage: 'Confirm password is required',
+      },
+    },
+    phoneNumber: {
+      isString: true,
+      notEmpty: {
+        errorMessage: 'Phone Number is required',
       },
     },
   };

@@ -10,11 +10,10 @@ const User = sequelize.define('users', {
     defaultValue: DataTypes.UUIDV4, 
     allowNull: false
   },
-  username: {
-    field: "username",
+  fullName: {
+    field: "full_name",
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
   },
   email: {
     field: "email",
@@ -47,6 +46,17 @@ const User = sequelize.define('users', {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+  status: {
+    field: "status",
+    type: DataTypes.ENUM('active', 'inactive'),
+    defaultValue: "active",
+    allowNull: false,
+  },
+  updatedBy: {
+    field: "updated_by",
+    type: DataTypes.UUID,
+    allowNull: true,
+  }
 }, {
   hooks: {
     beforeCreate: async (user) => {

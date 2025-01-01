@@ -29,7 +29,7 @@ export const getCartItemsByUserService = async (userId) => {
                 include: [
                     {
                         model: ProductModel,
-                        attributes: ['productName'],
+                        attributes: ['productName', 'productWeight', 'productSize'],
                         include: [
                             {
                                 model: PromoDetailModel,
@@ -61,7 +61,7 @@ export const getCartItemsByUserService = async (userId) => {
 export const addCartItemService = async (userId, productVariantId, quantity) => {
 
     const productVariant = await ProductVariantModel.findOne({ where: { productVariantId } });
-    console.log(productVariant);
+    // console.log(productVariant);
     
     if (productVariant.productStock < quantity) {
         throw new Error("There are only " + productVariant.productStock + " stock");

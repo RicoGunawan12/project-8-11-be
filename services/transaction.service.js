@@ -6,7 +6,23 @@ import { generateReadableId } from "../utils/utility.js";
 import { getPickUpPointService } from "./address.service.js";
 import sequelize from "../config/database.js";
 
-export const getAllTransactionsService = async (status) => {
+export const getAllTransactionsService = async (status, startDate, endDate, offset, limit) => {
+    const whereConditions = {
+        status: status
+            ? { [Op.and]: [{ [Op.eq]: status }, { [Op.ne]: 'Unpaid' }] }
+            : { [Op.ne]: 'Unpaid' }
+    };
+
+    if (startDate) {
+        whereConditions.transactionDate = { [Op.gte]: new Date(startDate) };
+    }
+
+    if (endDate) {
+        whereConditions.transactionDate = whereConditions.transactionDate
+            ? { ...whereConditions.transactionDate, [Op.lte]: new Date(endDate) }
+            : { [Op.lte]: new Date(endDate) };
+    }
+
     const transactions = await TransactionHeaderModel.findAll({
         include: [
             {
@@ -14,27 +30,51 @@ export const getAllTransactionsService = async (status) => {
                 include: {
                     model: ProductVariantModel,
                     include: {
-                        model: ProductModel
-                    }
-                }
+                        model: ProductModel,
+                    },
+                },
             },
             {
                 model: UserModel,
-                attributes: ['userId', 'username', 'email'],
+                attributes: ["userId", "fullName", "email"],
                 include: {
                     model: UserAddressModel,
-                }
-            }
+                },
+            },
         ],
-        where: {
-            status: status
-                ? { [Op.and]: [{ [Op.eq]: status }, { [Op.ne]: 'Unpaid' }] }
-                : { [Op.ne]: 'Unpaid' }
-        },
-        order: [['transactionDate', 'DESC']]
-    })
+        where: whereConditions,
+        order: [["transactionDate", "DESC"]],
+        offset: parseInt(offset, 10),
+        limit: parseInt(limit, 10),
+    });
+
     return transactions;
-}
+};
+
+export const countTransactionsService = async (status, startDate, endDate) => {
+    const whereConditions = {
+        status: status
+            ? { [Op.and]: [{ [Op.eq]: status }, { [Op.ne]: 'Unpaid' }, { [Op.ne]: 'Cancelled' }] }
+            : { [Op.and]: [{ [Op.ne]: 'Unpaid' }, { [Op.ne]: 'Cancelled' }] }
+    };
+
+    if (startDate) {
+        whereConditions.transactionDate = { [Op.gte]: new Date(startDate) };
+    }
+
+    if (endDate) {
+        whereConditions.transactionDate = whereConditions.transactionDate
+            ? { ...whereConditions.transactionDate, [Op.lte]: new Date(endDate) }
+            : { [Op.lte]: new Date(endDate) };
+    }
+
+    const transactionCount = await TransactionHeaderModel.count({
+        where: whereConditions,
+    });
+
+    return transactionCount;
+};
+
 
 export const getTransactionsByUserService = async (userId, status) => {
     const transactions = await TransactionHeaderModel.findAll({
@@ -50,7 +90,7 @@ export const getTransactionsByUserService = async (userId, status) => {
             },
             {
                 model: UserModel,
-                attributes: ['userId', 'username', 'email'],
+                attributes: ['userId', 'fullName', 'email'],
                 include: {
                     model: UserAddressModel,
                 }
@@ -80,7 +120,7 @@ export const getTransactionsByIdService = async (transactionId) => {
             },
             {
                 model: UserModel,
-                attributes: ['userId', 'username', 'email'],
+                attributes: ['userId', 'fullName', 'email'],
                 include: {
                     model: UserAddressModel,
                 }
@@ -203,7 +243,7 @@ export const checkOutQrisTransactionService = async (transactionId, amount) => {
 export const checkOutVATransactionService = async (transactionId, amount, bank) => {
     const getTransaction = await getTransactionsByIdService(transactionId);
 
-    const response = await checkOutVATransactionXendit(transactionId, amount, bank, getTransaction.user.username);
+    const response = await checkOutVATransactionXendit(transactionId, amount, bank, getTransaction.user.fullName);
     return response;
 }
 
@@ -223,8 +263,25 @@ export const updateTransactionStatusService = async (transactionId, gatewayRespo
 }
 
 export const createKomshipOrderService = async (transaction) => {
-    const adminAddress = await getPickUpPointService();
-    const createdKomshipOrder = await createOrderKomship(transaction, adminAddress);
+
+    const adminAddress = await getPickUpPointService(); 
+    // if (adminAddress.length === 0) {
+
+    // }
+    const createdKomshipOrder = await createOrderKomship(transaction, adminAddress[0]);
+    const updatedTransaction = await TransactionHeaderModel.update(
+        {
+            komshipOrderNumber: createdKomshipOrder.komshipResponse.data.order_no,
+            komshipOrderId: createdKomshipOrder.komshipResponse.data.order_id,
+            status: 'Shipping'
+        },
+        {
+            where: {
+                transactionId: transaction.transactionId
+            },
+        }
+    )
+
     return createdKomshipOrder
 }
 
@@ -272,6 +329,9 @@ export const monthlySalesReportService = async (year, month) => {
           transactionDate: {
             [Op.between]: [prevStartDate, prevEndDate],
           },
+          status: {
+            [Op.notIn]: ["Unpaid", "Cancelled"],
+          },
         },
     })
 
@@ -279,6 +339,9 @@ export const monthlySalesReportService = async (year, month) => {
         where: {
           transactionDate: {
             [Op.between]: [startDate, endDate],
+          },
+          status: {
+            [Op.notIn]: ["Unpaid", "Cancelled"],
           },
         },
     })
@@ -320,6 +383,9 @@ export const allMonthSalesAnalyticService = async (year) => {
                     new Date(year, 11, 31, 23, 59, 59), 
                 ],
             },
+            status: {
+                [Op.notIn]: ["Unpaid", "Cancelled"],
+            },
         },
         group: [Sequelize.fn("MONTH", Sequelize.col("transaction_date"))], 
         order: [[Sequelize.fn("MONTH", Sequelize.col("transaction_date")), "ASC"]], 
@@ -348,6 +414,9 @@ export const fetchSalesByCategoryService = async (year, month) => {
         where: {
           transactionDate: {
             [Op.between]: [startDate, endDate], 
+          },
+          status: {
+            [Op.notIn]: ["Unpaid", "Cancelled"],
           },
         },
         include: [
@@ -378,7 +447,10 @@ export const fetchSalesByCategoryService = async (year, month) => {
           [Sequelize.fn("SUM", Sequelize.col("transaction_details.paid_product_price")), "totalSales"],
           [Sequelize.col("transaction_details->product_variant->product->product_category.product_category_name"), "categoryName"],
         ],
-        group: ["transaction_details->product_variant->product->product_category.product_category_name"], // Group by category name
+        group: [
+            "transaction_details->product_variant->product->product_category.product_category_name",
+            "transaction_details->product_variant->product->product_category.product_category_id",
+        ], // Group by category name
         raw: true, // Return raw data
       });
       
@@ -420,7 +492,7 @@ export const cancelTransactionService = async (transactionId) => {
 
 export const payTransactionService = async (transaction, customerId) => {
     const response = await createPlanXendit(transaction, customerId);
-    console.log(response);
+    // console.log(response);
     return response
 }
 
@@ -445,9 +517,12 @@ export const checkTransactionWithVoucher = async (voucherCode, userId) => {
 };
 
 export const updatePaymentLinkService = async (transaction, paymentLink) => {
+    console.log(paymentLink);
+    console.log(transaction.transactionId);
+    
     const updatedTransaction = await TransactionHeaderModel.update(
         {
-            paymenLink: paymentLink
+            paymentLink: paymentLink
         },
         {
             where: {

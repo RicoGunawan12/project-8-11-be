@@ -15,6 +15,11 @@ const Post = sequelize.define("posts", {
       type: DataTypes.TEXT,
       primaryKey: false,
     },
+    postBanner: {
+      field: "post_banner",
+      type: DataTypes.TEXT,
+      primaryKey: false,
+    },
     postTitle: {
       field: "post_title",
       type: DataTypes.STRING,
@@ -23,7 +28,7 @@ const Post = sequelize.define("posts", {
     },
     postContent: {
       field: "post_content",
-      type: DataTypes.TEXT,
+      type: DataTypes.TEXT("long"),
       primaryKey: false
     },
     createdAt: {

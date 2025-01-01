@@ -42,3 +42,7 @@ export const generateReadableId = () => {
     
     return readableId;
 };
+
+export function isValidNumber(value) {
+  return !isNaN(value) && value !== null && value !== '';
+}

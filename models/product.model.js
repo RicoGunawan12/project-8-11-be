@@ -20,6 +20,12 @@ const Product = sequelize.define('products', {
     length: 255,
     allowNull: false
   },
+  productCode: {
+    field: "product_code",
+    type: DataTypes.STRING,
+    length: 255,
+    allowNull: false
+  },
   productDescription: {
     field: "product_description",
     type: DataTypes.STRING,
@@ -37,29 +43,45 @@ const Product = sequelize.define('products', {
     defaultValue: false,
     allowNull: false,
   },
-  isPromo: {
-    field: "is_promo",
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
+  productSize: {
+    field: "product_size",
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  productWeight: {
+    field: "product_weight",
+    type: DataTypes.FLOAT,
+    allowNull: false
+  },
+  productWidth: {
+    field: "product_width",
+    type: DataTypes.FLOAT,
+    allowNull: false
+  },
+  productLength: {
+    field: "product_length",
+    type: DataTypes.FLOAT,
+    allowNull: false
+  },
+  productHeight: {
+    field: "product_height",
+    type: DataTypes.FLOAT,
+    allowNull: false
+  },
+  productActivityStatus: {
+    field: "product_activity_status",
+    type: DataTypes.ENUM("active", "inactive"),
+    defaultValue: "active",
     allowNull: false,
   },
-  productPromo: {
-    field: "product_promo",
-    type: DataTypes.INTEGER,
-    allowNull: true,
-  },
-  startDate: {
-    field: "start_date",
-    type: DataTypes.DATE,
-    allowNull: true,
-  },
-  endDate: {
-    field: "end_date",
-    type: DataTypes.DATE,
-    allowNull: true,
+  createdAt: {
+    field: "created_at",
+    type: DataTypes.DATE
   }
 },{
-  timestamps: false
+  timestamps: true,
+  createdAt: 'created_at', // Match database column name
+  updatedAt: 'updated_at',
 })
 
 

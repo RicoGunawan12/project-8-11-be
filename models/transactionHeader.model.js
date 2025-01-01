@@ -81,12 +81,12 @@ const TransactionHeader = sequelize.define('transaction_headers', {
   },
   totalPrice: {
     field: "total_price",
-    type: DataTypes.FLOAT,
+    type: DataTypes.INTEGER,
     allowNull: false, 
   },
   totalWeight: {
     field: "total_weight",
-    type: DataTypes.FLOAT,
+    type: DataTypes.INTEGER,
     allowNull: false, 
   },
   notes: {

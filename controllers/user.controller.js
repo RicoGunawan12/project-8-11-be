@@ -1,26 +1,30 @@
-import { registerUserService, getUsersService, loginUserService, getUserByIdService } from '../services/user.service.js';
+import jwt from 'jsonwebtoken';
+import { registerUserService, getUsersService, loginUserService, getUserByIdService, loginAdminService, registerAdminService, activateUserService, deactivateUserService } from '../services/user.service.js';
 
 
 export const registerUser = async (req, res) => {
-  const { username, email, password, phone } = req.body;
+  const { fullName, email, password, confirmPassword, phoneNumber } = req.body;
   const phoneRegex = /^\+62\d+$/;
 
-  if (username.length < 5) {
-    return res.status(400).json({ message: 'Username length must be more than 4' });
+  if (fullName.length < 5) {
+    return res.status(400).json({ path: 'fullName', message: 'Full Name length must be more than 4' });
   }
   else if (email.length < 1) {
-    return res.status(400).json({ message: 'Email must be filled' })
+    return res.status(400).json({ path: 'email', message: 'Email must be filled' })
   }
   else if (password.length < 1) {
-    return res.status(400).json({ password: 'Password must be filled' })
+    return res.status(400).json({ path: 'password', message: 'Password must be filled' })
   }
-  else if (!phoneRegex.test(phone)) {
-    return res.status(400).json({ message: 'Phone must start with +62' });
+  else if (password !== confirmPassword) {
+    return res.status(400).json({ path: 'confirmPassword', password: 'Password and confirm password doesn\'t match' })
+  }
+  else if (!phoneRegex.test(phoneNumber)) {
+    return res.status(400).json({ path: 'phoneNumber', message: 'Phone must start with +62' });
   }
   
   try {
-    const user = await registerUserService(username, email, password, phone);
-    return res.status(201).json({ message: 'User registered successfully', user: user.username });
+    const user = await registerUserService(fullName, email, password, phoneNumber);
+    return res.status(201).json({ message: 'User registered successfully', user: user.fullName });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -38,7 +42,7 @@ export const getUsers = async (req, res) => {
 export const getUserById = async (req, res) => {
   const userId = req.user.userId;
 
-  console.log(userId)
+  // console.log(userId)
   try {
     const user = await getUserByIdService(userId);
     return res.status(200).json(user)
@@ -51,10 +55,10 @@ export const loginUser = async (req, res) => {
   const { email, password } = req.body;
   
   if (email.length < 1) {
-    return res.status(400).json({ message: 'Email must be filled' });
+    return res.status(400).json({ path: 'email', message: 'Email must be filled' });
   }
   else if (password.length < 1) {
-    return res.status(400).json({ message: 'Password must be filled' });
+    return res.status(400).json({ path: 'password', message: 'Password must be filled' });
   }
 
   try {
@@ -65,7 +69,102 @@ export const loginUser = async (req, res) => {
   }
 }
 
+export const loginAdmin = async (req, res) => {
+  const { email, password } = req.body;
+  
+  if (email.length < 1) {
+    return res.status(400).json({ message: 'Email must be filled' });
+  }
+  else if (password.length < 1) {
+    return res.status(400).json({ message: 'Password must be filled' });
+  }
 
+  try {
+    const token = await loginAdminService(email, password);
+    return res.status(200).json({ message: 'Login success!', token: token })
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+
+export const storeUser = async (req, res) => {
+  const { role, fullName, email, phone, password, confirmPassword } = req.body;
+
+  try {
+    if (role === 'admin') {
+      const user = await registerAdminService(fullName, email, password, phone);
+      return res.status(201).json({ message: 'User registered successfully', user: user.fullName });
+    } else if (role === 'user') {
+      const user = await registerUserService(fullName, email, password, phone);
+      return res.status(201).json({ message: 'User registered successfully', user: user.fullName });
+    } else {
+      return res.status(500).json({ message: 'Invalid request' });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+export const activateUser = async (req, res) => {
+  const { userId } = req.body;
+
+  try {
+    const user = await activateUserService(userId);
+    return res.status(200).json({ message: 'User account is activated', user: user.fullName });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+export const deactivateUser = async (req, res) => {
+  const { userId } = req.body;
+
+  try {
+    const user = await deactivateUserService(userId);
+    return res.status(200).json({ message: 'User account is deactivated', user: user.fullName });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+export const getLoggedInUser = async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  const tokenType = req.headers.authorization?.split(" ")[0];
+
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  if (tokenType === "Bearer") {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_KEY);
+
+      const userId = decoded.userId;
+
+      const user = await getUserByIdService(userId);
+      console.log(user, decoded, userId);
+
+      if (!(user.role == "admin" || user.role == "user")) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      return res.status(200).json({ message: "User successfully fetched", user: {
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        status: user.status
+      }});
+    } catch (error) {
+      console.log(error);
+      if (error.name == "TokenExpiredError") {
+        return res.status(401).json({ message: "Token has expired" });
+      }
+      return res.status(401).json({ message: "Invalid token" });
+    }
+  } else {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+};
 
 
 

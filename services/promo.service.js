@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { ProductModel, ProductVariantModel, PromoDetailModel, PromoModel } from "../association/association.js"
+import { ProductCategoryModel, ProductModel, ProductVariantModel, PromoDetailModel, PromoModel } from "../association/association.js"
 
 
 export const getPromoService = async () => {
@@ -10,11 +10,11 @@ export const getPromoService = async () => {
                 include: [
                     {
                         model: ProductModel,
-                        attributes: ['productName', 'defaultImage'],
+                        attributes: ['productName', 'defaultImage', 'productSize'],
                         include: [
                             {
                                 model: ProductVariantModel,
-                                attributes: ['productImage', 'productSize', 'productColor', 'productPrice'],
+                                attributes: ['productImage', 'productColor', 'productPrice'],
                             }
                         ]
                     },
@@ -50,24 +50,119 @@ export const deletePromoService = async (promoId) => {
 
 export const checkPromoService = async (productId) => {
     try {
-    const today = new Date();
+        const today = new Date();
 
-    const promoDetail = await PromoDetailModel.findOne({
-      where: { productId },
-      include: [
-        {
-          model: PromoModel,
-          as: "promo",
-          where: {
-            startDate: { [Op.lte]: today },
-            endDate: { [Op.gte]: today },  
-          },
-        },
-      ],
-    });
-    return promoDetail;
-  } catch (error) {
-    console.error("Error checking promo:", error);
-    throw new Error("Failed to check promotion status");
-  } 
+        const promoDetail = await PromoDetailModel.findOne({
+            where: { productId },
+            include: [
+                {
+                    model: PromoModel,
+                    as: "promo",
+                    where: {
+                        startDate: { [Op.lte]: today },
+                        endDate: { [Op.gte]: today },
+                    },
+                },
+            ],
+        });
+        return promoDetail;
+    } catch (error) {
+        console.error("Error checking promo:", error);
+        throw new Error("Failed to check promotion status");
+    }
 }
+
+export const getPromoByIdService = async (promoId) => {
+    const promo = await PromoModel.findOne({
+        include: [
+            {
+                model: PromoDetailModel,
+                include: [
+                    {
+                        model: ProductModel,
+                        attributes: [
+                            "productId",
+                            "productName",
+                            "productDescription",
+                            "defaultImage",
+                            "productSize",
+                            "productWeight",
+                            "productLength",
+                            "productWidth",
+                            "productHeight",
+                        ],
+                        include: [
+                            {
+                                model: ProductCategoryModel,
+                                attributes: ["productCategoryName"],
+                            },
+                            {
+                                model: ProductVariantModel,
+                                attributes: [
+                                    "productVariantId",
+                                    "productColor",
+                                    "sku",
+                                    "productPrice",
+                                    "productStock",
+                                    "productImage",
+                                ],
+                            },
+                        ]
+                    },
+                ],
+            },
+        ],
+        where: { promoId }
+    });
+    return promo;
+}
+
+export const updatePromoService = async (promoId, promoName, promoAmount, startDate, endDate, products) => {
+
+    const existingPromoDetails = await PromoDetailModel.findAll({
+        where: { promoId },
+    });
+
+    const existingProductIds = existingPromoDetails.map((detail) => detail.productId);
+
+    const newProductIds = products.map((product) => product.productId);
+
+    const productsToRemove = existingProductIds.filter(
+        (productId) => !newProductIds.includes(productId)
+    );
+
+    const productsToAdd = products.filter(
+        (product) => !existingProductIds.includes(product.productId)
+    );
+
+    if (productsToRemove.length > 0) {
+        await PromoDetailModel.destroy({
+            where: {
+                promoId,
+                productId: productsToRemove,
+            },
+        });
+    }
+
+    if (productsToAdd.length > 0) {
+        const promoDetailsToAdd = productsToAdd.map((product) => ({
+            productId: product.productId,
+            promoId,
+        }));
+        await PromoDetailModel.bulkCreate(promoDetailsToAdd);
+    }
+
+    const updatedPromo = await PromoModel.update(
+        {
+            promoName,
+            promoAmount,
+            startDate,
+            endDate,
+        },
+        {
+            where: { promoId },
+        }
+    );
+
+    return updatedPromo;
+};

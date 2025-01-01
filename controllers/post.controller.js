@@ -27,6 +27,7 @@ export const getPostById = async (req, res) => {
 export const createPost = async (req, res) => {
     const { postTitle, postContent } = req.body;
     const postImageFile = req.files['postImage'];
+    const postBannerFile = req.files['postBanner'];
     
     if (postTitle.length <= 0) {
         return res.status(400).json({ message: "Post title must be filled" });
@@ -37,10 +38,14 @@ export const createPost = async (req, res) => {
     else if (!postImageFile) {
         return res.status(400).json({ message: "Post image must be filled" });
     }
+    else if (!postBannerFile) {
+        return res.status(400).json({ message: "Post banner must be filled" });
+    }
     
-    const postImage = `/${UPLOAD_FOLDER}blog/${postImageFile[0].filename}`
+    const postImage = `/${UPLOAD_FOLDER}blog/${postTitle}/${postImageFile[0].filename}`
+    const postBanner = `/${UPLOAD_FOLDER}blog/${postTitle}/${postBannerFile[0].filename}`
     try {
-        const post = await createPostService(postImage, postTitle, postContent);
+        const post = await createPostService(postImage, postTitle, postContent, postBanner);
         return res.status(200).json({ message: "Post created successfully", post });
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -51,6 +56,7 @@ export const updatePost = async (req, res) => {
     const { postTitle, postContent } = req.body
     const postId = req.params.id;
     const postImageFile = req.files['postImage'];
+    const postBannerFile = req.files['postBanner'];
     
     if (!postId) {
         return res.status(400).json({ message: "Post ID is required" });
@@ -67,9 +73,10 @@ export const updatePost = async (req, res) => {
     
     
     
-    const postImage = `/${UPLOAD_FOLDER}blog/${postImageFile[0].filename}`
+    const postImage = `/${UPLOAD_FOLDER}blog/${postTitle}/${postImageFile[0].filename}`
+    const postBanner = `/${UPLOAD_FOLDER}blog/${postTitle}/${postBannerFile[0].filename}`
     try {
-        const updatedPost = await updatePostService(postId, postImage, postTitle, postContent);
+        const updatedPost = await updatePostService(postId, postImage, postTitle, postContent, postBanner);
         return res.status(200).json({ message: "Post updated successfully", updatedPost });
     } catch (error) {
         return res.status(500).json({ message: error.message });

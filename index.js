@@ -26,6 +26,8 @@ import { checkPromoService } from './services/promo.service.js';
 import EmailRoute from './routes/email.route.js';
 import BannerRoute from './routes/banner.route.js';
 import { migrateBanner } from './services/banner.service.js';
+import { migrateAdminService } from './services/user.service.js';
+import RatingRoute from './routes/rating.route.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,7 +43,9 @@ app.use(
     credentials: true, // Set to false if cookies are not needed
   })
 );
-app.use(express.json());
+// app.use(express.json());
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 app.use(morgan('dev'));
 
 app.use('/assets', express.static(path.join(__dirname, '/assets')));
@@ -61,21 +65,21 @@ app.use('/api/contacts', ContactRoute);
 app.use('/api/promos', PromoRoute);
 app.use('/api/emails', EmailRoute);
 app.use('/api/banners', BannerRoute);
+app.use('/api/ratings', RatingRoute);
 
 (async () => {
   try {
-    await sequelize.sync({ force:true, alter: true });
-    // await sequelize.sync();
+    // await sequelize.sync({ force:true, alter: true });
+    await sequelize.sync();
     
+    await migrateAdminService();
     await storeAllProvinceService();
     await storeAllCityService();
     await migratePage();
     await migrateAboutPage();
     await migrateContactService();
     await migrateBanner();
-    // const adminAddress = await getPickUpPointService();
-    // console.log(adminAddress);
-    // console.log(adminAddress[0].senderName);
+
     app.listen(5000, () => {
       console.log('Server running on port 5000');
     });

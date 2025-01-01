@@ -22,7 +22,7 @@ export const userMiddleware = async (req, res, next) => {
             }
     
             req.user = user;
-            console.log(user)
+            // console.log(user)
             
             next();
             

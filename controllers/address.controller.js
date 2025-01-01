@@ -2,7 +2,7 @@ import { calculateDeliveryFeeService, createAddresService, deleteAddressService,
 
 
 export const getAddressByUserId = async (req, res) => {
-    
+
     const user = req.user;
 
     try {
@@ -14,11 +14,11 @@ export const getAddressByUserId = async (req, res) => {
 }
 
 export const createAddress = async (req, res) => {
-    const { receiverName, receiverPhoneNumber, province, city, subdistrict, postalCode, addressDetail } = req.body;
+    const { receiverName, receiverPhoneNumber, city, subdistrict, district, postalCode, addressDetail, komshipAddressId, label } = req.body;
     const userId = req.user.userId;
-    
+
     try {
-        const insertedAddress = await createAddresService(receiverName, receiverPhoneNumber, province, city, subdistrict, postalCode, userId, addressDetail);
+        const insertedAddress = await createAddresService(receiverName, receiverPhoneNumber, city, subdistrict, district, postalCode, userId, addressDetail, komshipAddressId, label);
         return res.status(200).json(insertedAddress);
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -32,7 +32,7 @@ export const deleteAddress = async (req, res) => {
     }
     try {
         const deletedAddress = await deleteAddressService(addressId);
-        return res.status(200).json({ message: "Address deleted!" , deletedAddress});
+        return res.status(200).json({ message: "Address deleted!", deletedAddress });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
@@ -46,7 +46,7 @@ export const updateAddress = async (req, res) => {
     }
     try {
         const updatedAddress = await updateAddresService(addressId, receiverName, receiverPhoneNumber, province, city, subdistrict, postalCode, addressDetail);
-        return res.status(200).json({ message: "Address updated!" , updatedAddress });
+        return res.status(200).json({ message: "Address updated!", updatedAddress });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
@@ -59,7 +59,7 @@ export const getAllProvince = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
-} 
+}
 
 export const getAllCity = async (req, res) => {
     const { province } = req.query;
@@ -69,75 +69,103 @@ export const getAllCity = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
-} 
+}
 
 export const getAllSubdistrict = async (req, res) => {
     const { city } = req.query;
-    
+
     if (city === undefined) {
-        return res.status(400).json({ message: "City ID cannot be null"})
+        return res.status(400).json({ message: "City ID cannot be null" })
     }
-    
+
     try {
         const subdistrict = await getAllSubdistrictService(city);
         return res.status(200).json({ subdistrict });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
-} 
+}
 
 export const searchDestination = async (req, res) => {
-    const { keyword } = req.query;
-    
+    var { keyword } = req.query;
+
+    if (!keyword) {
+        keyword = "";
+    }
+
     try {
         const searchResult = await searchDestinationService(keyword);
         return res.status(200).json({ message: "Fetch success!", searchResult });
     } catch (error) {
-        return res.status(500).json({ message: error.message });   
+        return res.status(500).json({ message: error.message });
     }
 }
 
 export const calculateDeliveryFee = async (req, res) => {
-    const { shipperDestinationId, receiverDestinationId, weight, itemValue, cod } = req.query;
-    
+    const { receiverDestinationId, weight, itemValue, cod } = req.query;
+
     try {
-        const calculationResult = await calculateDeliveryFeeService(shipperDestinationId, receiverDestinationId, weight, itemValue, cod);
+        const adminAddress = await getPickUpPointService();
+        console.log(adminAddress);
+        
+        const calculationResult = await calculateDeliveryFeeService(adminAddress[0].komshipAddressId, receiverDestinationId, weight, itemValue, cod);
         return res.status(200).json({ message: "Fetch success!", calculationResult });
     } catch (error) {
-        return res.status(500).json({ message: error.message });   
+        return res.status(500).json({ message: error.message });
     }
 }
 
 export const updatePickUpPoint = async (req, res) => {
-    const { senderName, senderPhoneNumber, province, city, subdistrict, postalCode, addressDetail } = req.body;
-    
+    const { senderName, senderPhoneNumber, city, subdistrict, district, postalCode, addressDetail, komshipAddressId, label } = req.body;
+
     if (senderName.length === 0) {
         return res.status(400).json({ message: "Sender name must be filled" });
     }
-    else if (senderPhoneNumber.length === 0) {
-        return res.status(400).json({ message: "Phone number must be filled" });
+    if (!senderPhoneNumber || typeof senderPhoneNumber !== "string") {
+        return res.status(400).json({ message: "Sender phone number is required and must be a string" });
     }
-    else if (province.length === 0) {
-        return res.status(400).json({ message: "Province must be filled" });
+    if (!/^62\d{8,11}$/.test(senderPhoneNumber)) {
+        return res.status(400).json({ 
+            message: "Sender phone number must start with '62' and be valid phone" 
+        });
     }
-    else if (city.length === 0) {
+    if (!city || city.length === 0) {
         return res.status(400).json({ message: "City number must be filled" });
     }
-    else if (subdistrict.length === 0) {
+    if (!subdistrict || subdistrict.length === 0) {
         return res.status(400).json({ message: "Subdistrict number must be filled" });
     }
-    else if (postalCode.length === 0) {
+    if (!district || district.trim().length === 0) {
+        return res.status(400).json({ message: "District must be filled" });
+    }
+    if (!postalCode || postalCode.length === 0) {
         return res.status(400).json({ message: "Postal code number must be filled" });
     }
-    else if (addressDetail.length === 0) {
+    if (!addressDetail || addressDetail.length === 0) {
         return res.status(400).json({ message: "Address detail must be filled" });
+    }
+    if (!komshipAddressId || typeof komshipAddressId !== "number") {
+        return res.status(400).json({ message: "Komship address ID must be a valid number" });
+    }
+    if (!label || label.trim().length === 0) {
+        return res.status(400).json({ message: "Label must be filled" });
     }
 
     try {
-        const response = await updatePickUpPointService(senderName, senderPhoneNumber, province, city, subdistrict, postalCode, addressDetail);
+        const response = await updatePickUpPointService(
+            senderName, 
+            senderPhoneNumber, 
+            city, 
+            subdistrict, 
+            district, 
+            postalCode, 
+            addressDetail, 
+            komshipAddressId, 
+            label
+        );
         return res.status(200).json({ message: "Address updated!" });
     } catch (error) {
-        return res.status(500).json({ message: error.message }); 
+        return res.status(500).json({ message: error.message });
     }
 }
 
@@ -146,6 +174,6 @@ export const getPickUpPoint = async (req, res) => {
         const response = await getPickUpPointService();
         return res.status(200).json({ message: "Fetch successful", response });
     } catch (error) {
-        return res.status(500).json({ message: error.message }); 
+        return res.status(500).json({ message: error.message });
     }
 }

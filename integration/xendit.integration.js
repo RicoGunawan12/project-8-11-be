@@ -26,19 +26,19 @@ export const createCreditCardTransactionXendit = async (
     card_holder_last_name,
     card_holder_phone_number,
 ) => {
-    console.log(
-        amount,
-        card_number,
-        card_exp_month,
-        card_exp_year,
-        card_cvn,
-        is_multiple_use,
-        should_authenticate,
-        card_holder_email,
-        card_holder_first_name,
-        card_holder_last_name,
-        card_holder_phone_number
-    );
+    // console.log(
+    //     amount,
+    //     card_number,
+    //     card_exp_month,
+    //     card_exp_year,
+    //     card_cvn,
+    //     is_multiple_use,
+    //     should_authenticate,
+    //     card_holder_email,
+    //     card_holder_first_name,
+    //     card_holder_last_name,
+    //     card_holder_phone_number
+    // );
 
     // const data = {
     //     country : "ID",
@@ -149,13 +149,13 @@ export const checkOutVATransactionXendit = async (transactionId, amount, bank, c
     return response
 }
 
-export const createCustomerXendit = async (userId, username, email, phone) => {
+export const createCustomerXendit = async (userId, fullName, email, phone) => {
     const body = {
         reference_id: userId,
         type: "INDIVIDUAL",
         individual_detail: {
-        given_names: username,
-        surname: username
+        given_names: fullName,
+        surname: fullName
         },
         email: email,
         mobile_number: phone
@@ -176,7 +176,7 @@ export const createCustomerXendit = async (userId, username, email, phone) => {
         const result = await xenditResponse.json();
         return result;
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         throw new Error(error.message);
     }
 }
@@ -222,10 +222,10 @@ export const createPlanXendit = async (transaction, customerId) => {
         //             subcategory: "Open World"
         //         }
         //     ],
-        success_return_url: "http://localhost:4650/transactions/" + transaction.transactionId,
-        failure_return_url: "https://www.xendit.co/failureisthemotherofsuccess"
+        success_return_url: process.env.PRODUCTION_WEB + "/transactions/" + transaction.transactionId,
+        failure_return_url: process.env.PRODUCTION_WEB
     }
-    console.log(body);
+    // console.log(body);
 
     const requestOptions = {
         method: 'POST',
@@ -242,7 +242,7 @@ export const createPlanXendit = async (transaction, customerId) => {
         const result = await xenditResponse.json();
         return result;
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         throw new Error(error.message);
     }
 }

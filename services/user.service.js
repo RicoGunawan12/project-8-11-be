@@ -11,7 +11,7 @@ export const getUsersService = async () => {
 }
 
 export const getUserByIdService = async (userId) => {
-  console.log("pong")
+  // console.log("pong")
   const user = await UserModel.findOne({ where: { userId }});
   if (!user) {
     throw new Error('User not found!');
@@ -20,18 +20,18 @@ export const getUserByIdService = async (userId) => {
   return user;
 }
 
-export const registerUserService = async (username, email, password, phone) => {
+export const registerUserService = async (fullName, email, password, phone) => {
   const existingUser = await UserModel.findOne({ where: { email } });
   if (existingUser) {
     throw new Error('User already exists');
   }
 
   // const hashedPassword = await hashPassword(password);
-  const user = await UserModel.create({ username, email, password: password, role: 'user', phone });
+  const user = await UserModel.create({ fullName, email, password: password, role: 'user', phone });
   const cart = await createCart(user.userId);
 
-  const customer = await createCustomerXendit(user.userId, username, email, phone);
-  console.log(customer);
+  const customer = await createCustomerXendit(user.userId, fullName, email, phone);
+  // console.log(customer);
   await UserModel.update(
     { customerId: customer.id },
     { where: { userId: user.userId }}
@@ -40,12 +40,44 @@ export const registerUserService = async (username, email, password, phone) => {
   return {user, cart};
 };
 
-export const loginUserService = async (email, password) => {
+export const registerAdminService = async (fullName, email, password, phone) => {
   const existingUser = await UserModel.findOne({ where: { email } });
+  if (existingUser) {
+    throw new Error('User already exists');
+  }
+  
+  // const hashedPassword = await hashPassword(password);
+  const user = await UserModel.create({ fullName, email, password: password, role: 'admin', phone });
+  // const cart = await createCart(user.userId);
+  
+  // const customer = await createCustomerXendit(user.userId, fullName, email, phone);
+  // console.log(customer);
+  // await UserModel.update(
+  //   { customerId: customer.id },
+  //   { where: { userId: user.userId }}
+  // )
+  
+  return user;
+};
+
+export const migrateAdminService = async () => {
+  const existingUser = await UserModel.findOne({ where: { email: "admin@gmail.com" } });
+  if (!existingUser) {
+    registerAdminService("admin", "admin@gmail.com", "admin", "-")  
+  }
+}
+
+export const loginUserService = async (email, password) => {
+  const existingUser = await UserModel.findOne({ where: { email, status: "active" } });
   if (!existingUser) {
     throw new Error('User not found!');
   }
-
+  
+  
+  if (existingUser.role !== "user") {
+    throw new Error('Invalid credential!');
+  }
+  
   const isMatch = await matchPassword(password, existingUser.password);
   if (!isMatch) {
     throw new Error('Wrong credential!');
@@ -54,6 +86,49 @@ export const loginUserService = async (email, password) => {
   const token = jwt.sign({ userId: existingUser.dataValues.userId }, process.env.JWT_KEY, { expiresIn: process.env.JWT_EXPIRY });
   
   return token;
+}
+
+export const loginAdminService = async (email, password) => {
+  const existingUser = await UserModel.findOne({ where: { email, status: "active" } });
+  if (!existingUser) {
+    throw new Error('User not found!');
+  }
+
+  if (existingUser.role !== "admin") {
+    throw new Error('Invalid credential!');
+  }
+
+  console.log(password);
+  console.log(existingUser.password);
+  
+  const isMatch = await matchPassword(password, existingUser.password);
+  if (!isMatch) {
+    throw new Error('Wrong credential!');
+  }
+  
+  const token = jwt.sign({ userId: existingUser.dataValues.userId }, process.env.JWT_KEY, { expiresIn: process.env.JWT_EXPIRY });
+  
+  return token;
+}
+
+export const activateUserService = async (userId) => {
+  const updatedUser = await UserModel.update({ status: "active" } , { where: { userId } });
+
+  if (updatedUser[0] == 0) {
+    throw new Error("Product variant not found!");
+  }
+
+  return updatedUser;
+}
+
+export const deactivateUserService = async (userId) => {
+  const updatedUser = await UserModel.update({ status: "inactive" } , { where: { userId } });
+
+  if (updatedUser[0] == 0) {
+    throw new Error("Product variant not found!");
+  }
+  
+  return updatedUser;
 }
 
 

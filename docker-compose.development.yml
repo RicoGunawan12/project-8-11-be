@@ -1,0 +1,50 @@
+version: '3.9'
+
+services:
+  api:
+    container_name: dev_tyeso-app
+    build:
+      dockerfile: Dockerfile
+      context: .
+      # Only will build development stage from our dockerfile
+    volumes:
+      - .:/usr/src/app
+    env_file:
+      - .env.development
+    networks:
+      - default
+    depends_on:
+      - db
+    ports:
+      - 3001:5000
+
+  db:
+    container_name: dev_tyeso-db
+    image: 'mysql:latest'
+    environment:
+      MYSQL_ROOT_PASSWORD: dev_tyeso
+      MYSQL_USER: dev_tyeso
+      MYSQL_PASSWORD: dev_tyeso
+      MYSQL_DATABASE: dev_tyeso
+    networks:
+      - default
+    ports:
+      - 3306:3306
+  
+  pma:
+    container_name: dev_tyeso-pma
+    image: 'phpmyadmin/phpmyadmin'
+    ports:
+      - 8080:80
+    networks:
+      - default
+    environment:
+      PMA_HOST: db
+    depends_on:
+      - db
+
+networks:
+  default:
+    name: dev_tyeso-network_default
+    driver: bridge
+    

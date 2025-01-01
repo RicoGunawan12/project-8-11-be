@@ -1,4 +1,4 @@
-import { createContactService, deleteContactService, getContactService, updateContactService } from "../services/contact.service.js";
+import { createContactService, deleteContactService, getContactService, getContactToSendService, updateContactService, updateContactToSendService } from "../services/contact.service.js";
 import { UPLOAD_FOLDER } from "../utils/uploader.js";
 
 
@@ -63,10 +63,31 @@ export const deleteContact = async (req, res) => {
     if (!id) {
         return res.status(400).json({ message: "Contact Id is required!" });
     }
-    
+
     try {
         const contacts = await deleteContactService(id);
-        return res.status(200).json({ message: "Contact deleted!", contacts, });
+        return res.status(200).json({ message: "Contact deleted!", contacts });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const getContactToSend = async (req, res) => {
+    try {
+        const contact = await getContactToSendService();
+        return res.status(200).json({ message: "Contact to send fetched!", contact });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const updateContactToSend = async (req, res) => {
+    const { email, phone } = req.body;
+    const id = req.params.id
+
+    try {
+        const updated = await updateContactToSendService(id, email, phone);
+        return res.status(200).json({ message: "Contact updated!" });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

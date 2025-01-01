@@ -1,78 +1,97 @@
-import { createProductService, getProductByIdService, getProductsService } from "../services/product.service.js";
+import {
+  createProductService,
+  getProductByIdService,
+  getProductsService,
+} from "../services/product.service.js";
 import { createProductVariantService } from "../services/productVariantService.js";
-import { applyVoucherService, createVouchersService, deleteVoucherByCodeService, getAllVouchersService, getVoucherByCodeService, updateVouchersService } from "../services/voucher.service.js";
+import { checkTransactionWithVoucher } from "../services/transaction.service.js";
+import {
+  applyVoucherService,
+  createVouchersService,
+  deleteVoucherByCodeService,
+  getAllVouchersService,
+  getVoucherByCodeService,
+  updateVouchersService,
+} from "../services/voucher.service.js";
 import { BASE_URL, UPLOAD_FOLDER } from "../utils/uploader.js";
 
 // #region GET
 
-export const getAllVouchers = async (req,res) => {
-    const vouchers = await getAllVouchersService();
-    return res.status(200).json(vouchers)
-}
+export const getAllVouchers = async (req, res) => {
+  const vouchers = await getAllVouchersService();
+  return res.status(200).json(vouchers);
+};
 
-export const getVoucherByCode = async (req,res) => {
-    console.log(req)
-    res.set('Cache-Control', 'no-store');
-    const {code} = req.query
-    const vouchers = await getVoucherByCodeService(code);
-    return res.status(200).json(vouchers)
-}
+export const getVoucherByCode = async (req, res) => {
+  // console.log(req);
+  res.set("Cache-Control", "no-store");
+  const { code } = req.query;
+  const userId = req.user.userId;
+
+  const voucherHasUsed = await checkTransactionWithVoucher(code, userId);
+  if (!voucherHasUsed) {
+      const vouchers = await getVoucherByCodeService(code);
+      if(vouchers){
+        return res.status(200).json(vouchers);
+      }
+      return res.status(400).json({ message: "Voucher not found!" });
+    }
+    return res.status(400).json({ message: "Voucher has used!" });
+};
 // #endregion
 
 // #region CREATE
 
-export const createVouchers = async (req,res) => {
-    const {vouchers} = req.body
-    try {
-        await createVouchersService(vouchers);
-        return res.status(200).json({ message: 'Vouchers created successfully' });
-    } catch (error) {
-        return res.status(400).json({ message: error.message });
-    }
-}
-  
+export const createVouchers = async (req, res) => {
+  const { vouchers } = req.body;
+  try {
+    await createVouchersService(vouchers);
+    return res.status(200).json({ message: "Vouchers created successfully" });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+};
+
 // #endregion
 
 // #region UPDATE
 
-export const updateVouchers = async (req,res) => {
-    try {
-        console.log("dasd")
-      await updateVouchersService(req.body);
-      return res.status(200).json({ message: "Voucher updated successfully"});
-    } catch (error) {
-      return res.status(500).json({ message: error.message })
-    }
+export const updateVouchers = async (req, res) => {
+  try {
+    // console.log("dasd");
+    await updateVouchersService(req.body);
+    return res.status(200).json({ message: "Voucher updated successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
+};
 
 // #endregion
-
 
 // #region DELETE
 
-export const deleteVoucherByCode = async (req,res) => {
-    const {code} = req.body
-    try {
-        const response = await deleteVoucherByCodeService(code);
-        return res.status(200).json('Voucher has been deleted successfully');
-    } catch (error) {
-        return res.status(404).json(error.message)
-    }
-}
+export const deleteVoucherByCode = async (req, res) => {
+  const { code } = req.body;
+  try {
+    const response = await deleteVoucherByCodeService(code);
+    return res.status(200).json("Voucher has been deleted successfully");
+  } catch (error) {
+    return res.status(404).json(error.message);
+  }
+};
 
 // #endregion
-
 
 // #region TRANSACTIONS
 
 export const applyVoucher = async (req, res) => {
-    const { voucherCode, totalAmount } = req.body
-    try {
-        const totalDiscount = await applyVoucherService(voucherCode, totalAmount)
-        return totalDiscount
-    } catch (error) {
-        return res.status(404).json(error.message)
-    }
-}
+  const { voucherCode, totalAmount } = req.body;
+  try {
+    const totalDiscount = await applyVoucherService(voucherCode, totalAmount);
+    return totalDiscount;
+  } catch (error) {
+    return res.status(404).json(error.message);
+  }
+};
 
 // #endregion

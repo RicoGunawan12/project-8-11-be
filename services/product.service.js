@@ -5,21 +5,33 @@ import {
   ProductVariantModel,
   PromoDetailModel,
   PromoModel,
+  RatingModel,
 } from "../association/association.js";
 import { deleteDirectory, deletePostImage } from "../utils/uploader.js";
 import { getCategoryByName } from "./productCategory.service.js";
+import sequelize from "../config/database.js";
 
-export const getProductsService = async (search, category, limit) => {
+export const getProductsService = async (search, category, limit, status = "active") => {
+  const whereCondition = {};
+  whereCondition.productName = { [Op.like]: `%${search}%` };
+  
+  if (status !== "all") whereCondition.productActivityStatus = status; 
+
   const products = ProductModel.findAll({
     attributes: [
       "productId",
       "productName",
+      "productSize",
+      "productCode",
       "productDescription",
       "defaultImage",
-      "isPromo",
-      "productPromo",
-      "startDate",
-      "endDate",
+      "productWeight",
+      "productLength",
+      "productWidth",
+      "productHeight",
+      "isBestSeller",
+      "productActivityStatus",
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
     ],
     include: [
       {
@@ -31,24 +43,21 @@ export const getProductsService = async (search, category, limit) => {
         model: ProductVariantModel,
         attributes: [
           "productVariantId",
-          "productSize",
           "productColor",
           "sku",
           "productPrice",
           "productStock",
           "productImage",
-          "productWeight",
-          "productLength",
-          "productWidth",
-          "productHeight",
         ],
       },
       {
         model: PromoDetailModel,
         attributes: ['promoDetailId'],
+        required: false,
         include: [
             {
                 model: PromoModel,
+                required: false,
                 where: {
                     startDate: {
                         [Op.lte]: new Date(), 
@@ -59,32 +68,36 @@ export const getProductsService = async (search, category, limit) => {
                 },
             },
         ]
-      }
-      
+      },
+      // {
+      //   model: RatingModel,
+      //   required: false,
+      //   attributes: [],
+      // }
     ],
-    where: {
-      productName: { [Op.like]: `%${search}%` },
-    },
+    where: whereCondition,
+    // group: ["products.product_id"],
     limit: parseInt(limit) || null,
   });
   return products;
 };
 
-export const getProductPaginationService = async (limit, offset, search) => {
-  const whereCondition = {};
-  whereCondition.productName = {
-    [Op.like]: `%${search}%`,
-  };
-  const products = ProductModel.findAll({
+export const getNewestProductsService = async () => {
+  const products = await ProductModel.findAll({
     attributes: [
       "productId",
       "productName",
+      "productSize",
+      "productCode",
       "productDescription",
       "defaultImage",
-      "isPromo",
-      "productPromo",
-      "startDate",
-      "endDate",
+      "productWeight",
+      "productLength",
+      "productWidth",
+      "productHeight",
+      "createdAt",
+      "isBestSeller",
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
     ],
     include: [
       {
@@ -95,24 +108,21 @@ export const getProductPaginationService = async (limit, offset, search) => {
         model: ProductVariantModel,
         attributes: [
           "productVariantId",
-          "productSize",
           "productColor",
           "sku",
           "productPrice",
           "productStock",
           "productImage",
-          "productWeight",
-          "productLength",
-          "productWidth",
-          "productHeight",
         ],
       },
       {
         model: PromoDetailModel,
         attributes: ['promoDetailId'],
+        required: false,
         include: [
             {
                 model: PromoModel,
+                required: false,
                 where: {
                     startDate: {
                         [Op.lte]: new Date(), 
@@ -123,31 +133,122 @@ export const getProductPaginationService = async (limit, offset, search) => {
                 },
             },
         ]
-      }
+      },
+      // {
+      //   model: RatingModel,
+      //   required: false,
+      //   attributes: [],
+      // }
     ],
-    where: whereCondition,
-    limit: parseInt(limit) || 0,
-    offset: parseInt(offset) || 0,
+    // group: ["products.product_id"],
+    where: {
+      productActivityStatus: "active"
+    },
+    limit: 3,
+    order: [['createdAt', 'DESC']],
   });
-  console.log("asd")
-  if (!products || products.length === 0) {
-    throw new Error("No products match the query parameters");
-  }
-
   return products;
 };
 
-export const getProductCountService = async (search) => {
+
+export const getProductPaginationService = async (limit, offset, search, category) => {
   const whereCondition = {};
   whereCondition.productName = {
     [Op.like]: `%${search}%`,
   };
-  console.log(search);
+  whereCondition.productActivityStatus = "active";
+
+  // console.log(search)
+
+  const products = ProductModel.findAll({
+    attributes: [
+      "productId",
+      "productName",
+      "productSize",
+      "productCode",
+      "productDescription",
+      "defaultImage",
+      "productWeight",
+      "productLength",
+      "productWidth",
+      "productHeight",
+      "isBestSeller",
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
+    ],
+    include: [
+      {
+        model: ProductCategoryModel,
+        attributes: ["productCategoryName"],
+        where: category ? { productCategoryName: category } : undefined,
+      },
+      {
+        model: ProductVariantModel,
+        attributes: [
+          "productVariantId",
+          "productColor",
+          "sku",
+          "productPrice",
+          "productStock",
+          "productImage",
+        ],
+      },
+      {
+        model: PromoDetailModel,
+        attributes: ['promoDetailId'],
+        required: false,
+        include: [
+            {
+                model: PromoModel,
+                required: false,
+                where: {
+                    startDate: {
+                        [Op.lte]: new Date(), 
+                    },
+                    endDate: {
+                        [Op.gte]: new Date(),
+                    },
+                },
+            },
+        ]
+      },
+      // {
+      //   model: RatingModel,
+      //   required: false,
+      //   attributes: [],
+      // }
+    ],
+    where: whereCondition,
+    // group: ["products.product_id"],
+    limit: parseInt(limit) || 0,
+    offset: parseInt(offset) || 0,
+  });
+  // console.log("asd")
+  // if (!products || products.length === 0) {
+  //   throw new Error("No products match the query parameters");
+  // }
+  // console.log(products)
+  return products;
+};
+
+export const getProductCountService = async (search, category) => {
+  const whereCondition = {};
+  whereCondition.productName = {
+    [Op.like]: `%${search}%`,
+  };
+  whereCondition.productActivityStatus = "active";
+  // console.log(search);
 
   const count = await ProductModel.count({
     where: whereCondition,
+    include: [
+      {
+        model: ProductCategoryModel,
+        attributes: ["productCategoryName"],
+        where: category ? { productCategoryName: category } : undefined,
+      },
+    ]
   });
-  console.log(count);
+  // console.log(count);
 
   return count;
 };
@@ -157,8 +258,16 @@ export const getProductByIdService = async (productId) => {
     attributes: [
       "productId",
       "productName",
+      "productSize",
+      "productCode",
       "productDescription",
       "defaultImage",
+      "productWeight",
+      "productLength",
+      "productWidth",
+      "productHeight",
+      "isBestSeller",
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
     ],
     include: [
       {
@@ -169,24 +278,44 @@ export const getProductByIdService = async (productId) => {
         model: ProductVariantModel,
         attributes: [
           "productVariantId",
-          "productSize",
           "productColor",
           "sku",
           "productPrice",
           "productStock",
           "productImage",
-          "productWeight",
-          "productLength",
-          "productWidth",
-          "productHeight",
         ],
       },
+      {
+        model: PromoDetailModel,
+        attributes: ['promoDetailId'],
+        required: false,
+        include: [
+            {
+                model: PromoModel,
+                required: false,
+                where: {
+                    startDate: {
+                        [Op.lte]: new Date(), 
+                    },
+                    endDate: {
+                        [Op.gte]: new Date(),
+                    },
+                },
+            },
+        ]
+      },
+      // {
+      //   model: RatingModel,
+      //   required: false,
+      //   // attributes: ['rating', 'comment'],
+      // }
     ],
-    where: { productId },
+    where: { productId, productActivityStatus: "active" },
+    // group: ["products.product_id"],
   });
 
   if (!product) {
-    throw new Error("Product not found!sdsdwds");
+    throw new Error("Product not found!");
   }
   return product;
 };
@@ -195,7 +324,13 @@ export const createProductService = async (
   productName,
   productDescription,
   productCategoryName,
-  defaultImage
+  defaultImage,
+  productSize,
+  productCode,
+  productWeight, 
+  productLength, 
+  productWidth, 
+  productHeight
 ) => {
   const category = await getCategoryByName(productCategoryName);
   if (!category) {
@@ -216,6 +351,12 @@ export const createProductService = async (
     productDescription,
     productCategoryId,
     defaultImage,
+    productSize,
+    productCode,
+    productWeight, 
+    productLength, 
+    productWidth, 
+    productHeight
   });
   return product;
 };
@@ -226,37 +367,103 @@ export const updateProductService = async (
   productName,
   productDescription,
   productCategoryName,
-  defaultImage
+  defaultImage,
+  productSize,
+  productCode,
+  productWeight,
+  productLength,
+  productWidth,
+  productHeight,
+  variants
 ) => {
-  const category = await getCategoryByName(productCategoryName);
-  if (!category) {
-    throw new Error("There is no " + productCategoryName + " category");
+  const transaction = await sequelize.transaction();
+
+  try {
+    // Fetch the product and ensure it exists
+    const product = await ProductModel.findByPk(productId, { transaction });
+    if (!product) throw new Error("Product not found");
+    const category = await getCategoryByName(productCategoryName);
+    if (!category) {
+      throw new Error("There is no " + productCategoryName + " category");
+    }
+    
+    const productCategoryId = category.productCategoryId;
+    // Update product details
+    await product.update(
+      {
+        productName,
+        productDescription,
+        productCategoryId,
+        defaultImage,
+        productSize,
+        productCode,
+        productWeight,
+        productLength,
+        productWidth,
+        productHeight,
+      },
+      { transaction }
+    );
+
+    // Fetch existing variants
+    const existingVariants = await ProductVariantModel.findAll({
+      where: { productId },
+      transaction,
+    });
+
+    // Identify variants to add, update, or delete
+    const existingVariantIds = existingVariants.map((v) => v.productVariantId);
+    const updatedVariantIds = variants.map((v) => v.productVariantId).filter(Boolean);
+
+    const variantsToDelete = existingVariantIds.filter((id) => !updatedVariantIds.includes(id));
+    const variantsToUpdate = variants.filter((v) => updatedVariantIds.includes(v.productVariantId));
+    const variantsToAdd = variants.filter((v) => !v.productVariantId);
+
+    // Delete removed variants
+    if (variantsToDelete.length > 0) {
+      await ProductVariantModel.destroy({
+        where: { productVariantId: variantsToDelete },
+        transaction,
+      });
+    }
+    console.log(variantsToUpdate);
+    
+    // Update existing variants
+    for (const variant of variantsToUpdate) {
+      const existingVariant = existingVariants.find((v) => v.productVariantId === variant.productVariantId);
+      await existingVariant.update(
+        {
+          productColor: variant.productColor,
+          productPrice: variant.productPrice,
+          productStock: variant.productStock,
+          productImage: variant.productImage,
+        },
+        { transaction }
+      );
+    }
+
+    // Add new variants
+    if (variantsToAdd.length > 0) {
+      const newVariants = variantsToAdd.map(({ productVariantId, ...variant }) => ({
+        ...variant,
+        productId,
+      }));
+      await ProductVariantModel.bulkCreate(newVariants, { transaction });
+    }
+
+    // Commit the transaction
+    await transaction.commit();
+
+    return product;
+  } catch (error) {
+    // Rollback the transaction on error
+    console.log(error);
+    
+    await transaction.rollback();
+    if (error.name === "SequelizeUniqueConstraintError") {
+      throw new Error("Duplicate color variant");
+    }
   }
-
-  const existingProduct = await ProductModel.findOne({
-    where: { productName },
-  });
-
-  if (existingProduct && existingProduct.productId !== productId) {
-    throw new Error("Product name already exists");
-  }
-
-  const product = await ProductModel.findByPk(productId);
-  if (!product) {
-    throw new Error("Product not found");
-  }
-  await deletePostImage(product.defaultImage);
- 
-  const productCategoryId = category.productCategoryId;
-
-  await product.update({
-    productName,
-    productDescription,
-    productCategoryId,
-    defaultImage,
-  });
-
-  return product;
 };
 
 
@@ -282,9 +489,77 @@ export const updateBestSellerService = async (productId, isBestSeller) => {
   return update;
 };
 
+export const updateActivityStatusService = async (productId, status) => {
+  const update = ProductModel.update(
+    { productActivityStatus: status },
+    {
+      where: {
+        productId: productId,
+      },
+    }
+  );
+  return update;
+};
+
 export const getBestSellerService = async () => {
   const bestSellerProduct = await ProductModel.findAll({
-    where: { isBestSeller: true },
+    where: { isBestSeller: true, productActivityStatus: 'active' },
+    attributes: [
+      "productId",
+      "productName",
+      "productSize",
+      "productCode",
+      "productDescription",
+      "defaultImage",
+      "productWeight",
+      "productLength",
+      "productWidth",
+      "productHeight",
+      "isBestSeller",
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
+    ],
+    include: [
+      {
+        model: ProductCategoryModel,
+        attributes: ["productCategoryName"],
+      },
+      {
+        model: ProductVariantModel,
+        attributes: [
+          "productVariantId",
+          "productColor",
+          "sku",
+          "productPrice",
+          "productStock",
+          "productImage",
+        ],
+      },
+      {
+        model: PromoDetailModel,
+        attributes: ['promoDetailId'],
+        required: false,
+        include: [
+            {
+                model: PromoModel,
+                required: false,
+                where: {
+                    startDate: {
+                        [Op.lte]: new Date(), 
+                    },
+                    endDate: {
+                        [Op.gte]: new Date(),
+                    },
+                },
+            },
+        ]
+      },
+      // {
+      //   model: RatingModel,
+      //   required: false,
+      //   attributes: [],
+      // }
+    ],
+    // group: ["products.product_id"],
   });
   console.log(bestSellerProduct);
 
@@ -307,10 +582,22 @@ export const updatePromoService = async (
     },
     { where: { productId: productId } }
   );
-  console.log(updatedProduct);
+  // console.log(updatedProduct);
 
   if (updatedProduct[0] == 0) {
     throw new Error("Product not found or no changes applied!");
   }
   return updatedProduct;
+};
+
+export const deleteProductsService = async (productId) => {
+  const products = await ProductModel.findAll({ where: { productId } });
+  products.forEach(product => {
+    deleteDirectory(product.productName);
+  });
+
+  const deletedProduct = await ProductModel.destroy({
+    where: { productId: productId },
+  });
+  return deletedProduct;
 };
