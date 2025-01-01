@@ -13,14 +13,27 @@ export const getAllTransactionsService = async (status, startDate, endDate, offs
             : { [Op.ne]: 'Unpaid' }
     };
 
-    if (startDate) {
-        whereConditions.transactionDate = { [Op.gte]: new Date(startDate) };
-    }
-
-    if (endDate) {
-        whereConditions.transactionDate = whereConditions.transactionDate
-            ? { ...whereConditions.transactionDate, [Op.lte]: new Date(endDate) }
-            : { [Op.lte]: new Date(endDate) };
+    if (startDate && endDate && startDate === endDate) {
+        const date = new Date(startDate);
+        const nextDay = new Date(date);
+        nextDay.setDate(date.getDate() + 1);
+    
+        whereConditions.transactionDate = {
+            [Op.gte]: date,
+            [Op.lt]: nextDay,
+        };
+    } else {
+        if (startDate) {
+            whereConditions.transactionDate = { [Op.gte]: new Date(startDate) };
+        }
+        
+        if (endDate) {
+            const endOfDay = new Date(endDate);
+            endOfDay.setHours(23, 59, 59, 999); 
+            whereConditions.transactionDate = whereConditions.transactionDate
+                ? { ...whereConditions.transactionDate, [Op.lte]: endOfDay }
+                : { [Op.lte]: endOfDay };
+        }
     }
 
     const transactions = await TransactionHeaderModel.findAll({
@@ -58,15 +71,29 @@ export const countTransactionsService = async (status, startDate, endDate) => {
             : { [Op.and]: [{ [Op.ne]: 'Unpaid' }, { [Op.ne]: 'Cancelled' }] }
     };
 
-    if (startDate) {
-        whereConditions.transactionDate = { [Op.gte]: new Date(startDate) };
+    if (startDate && endDate && startDate === endDate) {
+        const date = new Date(startDate);
+        const nextDay = new Date(date);
+        nextDay.setDate(date.getDate() + 1);
+    
+        whereConditions.transactionDate = {
+            [Op.gte]: date,
+            [Op.lt]: nextDay,
+        };
+    } else {
+        if (startDate) {
+            whereConditions.transactionDate = { [Op.gte]: new Date(startDate) };
+        }
+        
+        if (endDate) {
+            const endOfDay = new Date(endDate);
+            endOfDay.setHours(23, 59, 59, 999); 
+            whereConditions.transactionDate = whereConditions.transactionDate
+                ? { ...whereConditions.transactionDate, [Op.lte]: endOfDay }
+                : { [Op.lte]: endOfDay };
+        }
     }
 
-    if (endDate) {
-        whereConditions.transactionDate = whereConditions.transactionDate
-            ? { ...whereConditions.transactionDate, [Op.lte]: new Date(endDate) }
-            : { [Op.lte]: new Date(endDate) };
-    }
 
     const transactionCount = await TransactionHeaderModel.count({
         where: whereConditions,
