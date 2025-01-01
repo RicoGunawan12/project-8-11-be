@@ -1,4 +1,4 @@
-import { getAboutPageService, getPageService, updateEngAboutPageService, updateEngPageService, updateIndoAboutPageService, updateIndoPageService } from "../services/page.service.js";
+import { getAboutPageService, getPageService, getWhyContentService, updateEngAboutPageService, updateEngPageService, updateEngWhyContentService, updateIndoAboutPageService, updateIndoPageService, updateIndoWhyContentService } from "../services/page.service.js";
 import { UPLOAD_FOLDER } from "../utils/uploader.js";
 import { isValidNumber } from "../utils/utility.js";
 
@@ -74,6 +74,10 @@ export const updateBackgroundPage = async (req, res) => {
     // }
 }
 
+export const updateWhyPhoto = async (req, res) => {
+    return res.status(200).json({ message: "Photo updated!" });
+}
+
 export const getAboutPage = async (req, res) => {
     try {
         const response = await getAboutPageService();
@@ -83,9 +87,18 @@ export const getAboutPage = async (req, res) => {
     }
 }
 
+export const getWhyContent = async (req, res) => {
+    try {
+        const response = await getWhyContentService();
+        return res.status(200).json({ message: "Why content fetched!", response });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
 export const updateEngAboutPage = async (req, res) => {
 
-    const { contentEng, titleEng, whyEng } = req.body;
+    const { contentEng, titleEng, whyEng, whyContentJSONEng, whyContentId } = req.body;
     const id = req.params.id
     if (!id || typeof id !== 'string') {
         return res.status(400).json({ error: "Invalid or missing ID parameter." });
@@ -103,9 +116,16 @@ export const updateEngAboutPage = async (req, res) => {
         return res.status(400).json({ error: "Why Tyeso must be a non-empty string." });
     }
 
+    if (!whyContentJSONEng || !Array.isArray(whyContentJSONEng)) {
+        return res.status(400).json({ error: "Invalid or missing why content. It should be an array." });
+    }
+    if (!whyContentId || typeof whyContentId !== 'string') {
+        return res.status(400).json({ error: "Invalid or missing why content ID parameter." });
+    }
 
     try {
         const response = await updateEngAboutPageService(id, contentEng, titleEng, whyEng);
+        const whyResponse = await updateEngWhyContentService(whyContentJSONEng, whyContentId);
         return res.status(200).json({ message: "About Page updated!"});
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -114,7 +134,7 @@ export const updateEngAboutPage = async (req, res) => {
 
 export const updateIndoAboutPage = async (req, res) => {
 
-    const { contentIndo, titleIndo, whyIndo } = req.body;
+    const { contentIndo, titleIndo, whyIndo, whyContentJSONIndo, whyContentId } = req.body;
     const id = req.params.id
 
     if (!id || typeof id !== 'string') {
@@ -133,9 +153,17 @@ export const updateIndoAboutPage = async (req, res) => {
         return res.status(400).json({ error: "Why Tyeso must be a non-empty string." });
     }
 
+    if (!whyContentJSONIndo || !Array.isArray(whyContentJSONIndo)) {
+        return res.status(400).json({ error: "Invalid or missing why content. It should be an array." });
+    }
+    if (!whyContentId || typeof whyContentId !== 'string') {
+        return res.status(400).json({ error: "Invalid or missing why content ID parameter." });
+    }
+
 
     try {
         const response = await updateIndoAboutPageService(id, contentIndo, titleIndo, whyIndo);
+        const whyResponse = await updateIndoWhyContentService(whyContentJSONIndo, whyContentId);
         return res.status(200).json({ message: "About Page updated!"});
     } catch (error) {
         return res.status(500).json({ message: error.message });

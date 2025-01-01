@@ -1,5 +1,6 @@
 import AboutPage from "../models/aboutPage.model.js";
 import Page from "../models/page.model.js"
+import WhyContent from "../models/whyContent.model.js";
 
 export const getPageService = async () => {
     const pages = await Page.findAll();
@@ -22,6 +23,24 @@ export const getPageService = async () => {
 export const getAboutPageService = async () => {
     const pages = await AboutPage.findAll();
     return pages;
+}
+
+export const getWhyContentService = async () => {
+    const whyContents = await WhyContent.findAll();
+    const parsedPages = whyContents.map(whyContent => {
+        const whyContentJSONEng = whyContent.whyContentJSONEng ? JSON.parse(whyContent.whyContentJSONEng) : {};
+        const whyContentJSONIndo = whyContent.whyContentJSONIndo ? JSON.parse(whyContent.whyContentJSONIndo) : {};
+        
+        // console.log("Parsed contentJSONEng:", contentJSONEng);
+        // console.log("Parsed contentJSONIndo:", contentJSONIndo);
+        
+        return {
+            ...whyContent.toJSON(),
+            whyContentJSONEng,
+            whyContentJSONIndo,
+        };
+    });
+    return parsedPages;
 }
 
 export const migratePage = async () => {
@@ -126,6 +145,64 @@ export const migrateAboutPage = async () => {
     }
 }
 
+export const migrateWhyContent = async () => {
+    const whyContents = await getWhyContentService();
+    if (whyContents.length === 0) {
+        try {
+            const body = [
+                {
+                    contentId: 1,
+                    photo: "/assets/photo/About Page1.png",
+                    content: "test 123"
+                },
+                {
+                    contentId: 2,
+                    photo: "/assets/photo/About Page2.png",
+                    content: "test 123456"
+                },
+                {
+                    contentId: 3,
+                    photo: "/assets/photo/About Page3.png",
+                    content: "test 123456789"
+                },
+                {
+                    contentId: 4,
+                    photo: "/assets/photo/About Page4.png",
+                    content: "test 123456789101112"
+                },
+            ];
+            const body2 = [
+                {
+                    contentId: 1,
+                    photo: "/assets/photo/About Page1.png",
+                    content: "test 123"
+                },
+                {
+                    contentId: 2,
+                    photo: "/assets/photo/About Page2.png",
+                    content: "test 123456"
+                },
+                {
+                    contentId: 3,
+                    photo: "/assets/photo/About Page3.png",
+                    content: "test 123456789"
+                },
+                {
+                    contentId: 4,
+                    photo: "/assets/photo/About Page4.png",
+                    content: "test 123456789101112"
+                },
+            ];
+            const whyContentJSONEng = JSON.stringify(body)
+            const whyContentJSONIndo = JSON.stringify(body2)
+    
+            await WhyContent.create({ whyContentJSONEng, whyContentJSONIndo });    
+        } catch (error) {
+            throw new Error("Failed to migrate why content");
+        }
+    }
+}
+
 export const updateEngPageService = async (id, contentJSONEng) => {
     const updatedPage = await Page.update(
         { contentJSONEng: JSON.stringify(contentJSONEng) },
@@ -169,9 +246,7 @@ export const updateEngAboutPageService = async (id, contentEng, titleEng, whyEng
             }
         }
     )
-    if (updatedPage[0] === 0) {
-        throw new Error("There is no change or page")
-    }
+    
     return updatedPage;
 }
 
@@ -188,8 +263,32 @@ export const updateIndoAboutPageService = async (id, contentIndo, titleIndo, why
             }
         }
     )
-    if (updatedPage[0] === 0) {
-        throw new Error("There is no change or page")
-    }
+    
+    return updatedPage;
+}
+
+export const updateEngWhyContentService = async (whyContentJSONEng, whyContentId) => {
+    const updatedPage = await WhyContent.update(
+        { whyContentJSONEng: JSON.stringify(whyContentJSONEng) },
+        { 
+            where: {
+                whyId: whyContentId
+            }
+        }
+    )
+    
+    return updatedPage;
+}
+
+export const updateIndoWhyContentService = async (whyContentJSONIndo, whyContentId) => {
+    const updatedPage = await WhyContent.update(
+        { whyContentJSONIndo: JSON.stringify(whyContentJSONIndo) },
+        { 
+            where: {
+                whyId: whyContentId
+            }
+        }
+    )
+    
     return updatedPage;
 }
