@@ -132,6 +132,16 @@ export const deleteVoucherByCodeService = async (code) =>{
   return result
 }
 
+export const deleteVouchersByCodeService = async (code) =>{
+  const result = await VoucherModel.destroy({
+    where: {
+      voucherCode: code,
+    },
+  });
+
+  return result
+}
+
 // #endregion
 
 // #region TRANSACTIONS
