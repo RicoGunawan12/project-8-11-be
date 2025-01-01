@@ -5,7 +5,8 @@ import UserAddress from "../models/userAddress.model.js";
 import Voucher from "../models/voucher.model.js";
 import Wishlist from "../models/wishlist.model.js";
 import WishlistItem from "../models/wishlistItem.model.js";
-import { ProductVariant, User } from "./cart.association.js";
+import { ProductVariant } from "./cart.association.js";
+import { User } from "./product.association.js";
 
 
 // PaymentMethod.hasMany(TransactionHeader, { foreignKey: 'ref_payment_method_id' });

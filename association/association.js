@@ -2,7 +2,7 @@
 import UserAddress from "../models/userAddress.model.js";
 import { Cart, CartItem } from "./cart.association.js";
 import { ContentDetail, ContentHeader, Page } from "./content.association.js";
-import { ProductCategory, Rating, User } from "./product.association.js";
+import { ProductCategory, Rating } from "./product.association.js";
 import { PromoDetail, Product, Promo } from "./promo.association.js";
 import { PaymentMethod, ProductVariant, TransactionDetail, TransactionHeader, User, Voucher, Wishlist, WishlistItem } from "./transaction.association.js"
 
