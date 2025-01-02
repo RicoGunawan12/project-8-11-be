@@ -12,6 +12,7 @@ import {
   getNewestProductsService,
   deleteProductsService,
   updateActivityStatusService,
+  getProductByIdWithRelatedProductService,
 } from "../services/product.service.js";
 import { getCategoryWithProductService } from "../services/productCategory.service.js";
 import {
@@ -94,6 +95,21 @@ export const getProductById = async (req, res) => {
   try {
     const product = await getProductByIdService(id);
     return res.status(200).json(product);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const getProductByIdWithRelatedProduct = async (req, res) => {
+  const id = req.params.id;
+
+  if (!id) {
+    return res.status(400).json({ message: "Product id is required" });
+  }
+
+  try {
+    const { product, relatedProducts } = await getProductByIdWithRelatedProductService(id);
+    return res.status(200).json({ product, relatedProducts });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

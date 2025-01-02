@@ -296,18 +296,18 @@ export const createKomshipOrderService = async (transaction) => {
 
     // }
     const createdKomshipOrder = await createOrderKomship(transaction, adminAddress[0]);
-    const updatedTransaction = await TransactionHeaderModel.update(
-        {
-            komshipOrderNumber: createdKomshipOrder.komshipResponse.data.order_no,
-            komshipOrderId: createdKomshipOrder.komshipResponse.data.order_id,
-            status: 'Shipping'
-        },
-        {
-            where: {
-                transactionId: transaction.transactionId
-            },
-        }
-    )
+    // const updatedTransaction = await TransactionHeaderModel.update(
+    //     {
+    //         komshipOrderNumber: createdKomshipOrder.komshipResponse.data.order_no,
+    //         komshipOrderId: createdKomshipOrder.komshipResponse.data.order_id,
+    //         status: 'Shipping'
+    //     },
+    //     {
+    //         where: {
+    //             transactionId: transaction.transactionId
+    //         },
+    //     }
+    // )
 
     return createdKomshipOrder
 }
