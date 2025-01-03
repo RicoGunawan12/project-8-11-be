@@ -17,7 +17,7 @@ export const getAllTransactionsService = async (status, startDate, endDate, offs
         const date = new Date(startDate);
         const nextDay = new Date(date);
         nextDay.setDate(date.getDate() + 1);
-    
+
         whereConditions.transactionDate = {
             [Op.gte]: date,
             [Op.lt]: nextDay,
@@ -26,10 +26,10 @@ export const getAllTransactionsService = async (status, startDate, endDate, offs
         if (startDate) {
             whereConditions.transactionDate = { [Op.gte]: new Date(startDate) };
         }
-        
+
         if (endDate) {
             const endOfDay = new Date(endDate);
-            endOfDay.setHours(23, 59, 59, 999); 
+            endOfDay.setHours(23, 59, 59, 999);
             whereConditions.transactionDate = whereConditions.transactionDate
                 ? { ...whereConditions.transactionDate, [Op.lte]: endOfDay }
                 : { [Op.lte]: endOfDay };
@@ -75,7 +75,7 @@ export const countTransactionsService = async (status, startDate, endDate) => {
         const date = new Date(startDate);
         const nextDay = new Date(date);
         nextDay.setDate(date.getDate() + 1);
-    
+
         whereConditions.transactionDate = {
             [Op.gte]: date,
             [Op.lt]: nextDay,
@@ -84,10 +84,10 @@ export const countTransactionsService = async (status, startDate, endDate) => {
         if (startDate) {
             whereConditions.transactionDate = { [Op.gte]: new Date(startDate) };
         }
-        
+
         if (endDate) {
             const endOfDay = new Date(endDate);
-            endOfDay.setHours(23, 59, 59, 999); 
+            endOfDay.setHours(23, 59, 59, 999);
             whereConditions.transactionDate = whereConditions.transactionDate
                 ? { ...whereConditions.transactionDate, [Op.lte]: endOfDay }
                 : { [Op.lte]: endOfDay };
@@ -123,11 +123,11 @@ export const getTransactionsByUserService = async (userId, status) => {
                 }
             }
         ],
-        where: { 
-            userId: userId, 
+        where: {
+            userId: userId,
             status: {
                 [Op.like]: `%${status}%`
-            } 
+            }
         }
     })
     return transactions;
@@ -152,7 +152,7 @@ export const getTransactionsByIdService = async (transactionId) => {
                     model: UserAddressModel,
                 }
             },
-            
+
         ],
         where: { transactionId: transactionId }
     })
@@ -199,33 +199,33 @@ export const createTransactionService = async (
 
 export const createTransactionDetailService = async (products) => {
     for (const product of products) {
-      const { productVariantId, quantity } = product;
+        const { productVariantId, quantity } = product;
 
-      const productVariant = await ProductVariantModel.findOne({
-        where: { productVariantId },
-        attributes: ['productStock']
-      });
+        const productVariant = await ProductVariantModel.findOne({
+            where: { productVariantId },
+            attributes: ['productStock']
+        });
 
-      if (!productVariant) {
-        throw new Error(`Product variant not found.`);
-      }
+        if (!productVariant) {
+            throw new Error(`Product variant not found.`);
+        }
 
-      if (productVariant.productStock - quantity < 0) {
-        throw new Error(
-          `Insufficient stock. Available: ${productVariant.productStock}, Requested: ${quantity}.`
-        );
-      }
+        if (productVariant.productStock - quantity < 0) {
+            throw new Error(
+                `Insufficient stock. Available: ${productVariant.productStock}, Requested: ${quantity}.`
+            );
+        }
     }
 
     const transactionDetails = await TransactionDetailModel.bulkCreate(products);
 
     for (const product of products) {
-      const { productVariantId, quantity } = product;
+        const { productVariantId, quantity } = product;
 
-      await ProductVariantModel.update(
-        { productStock: sequelize.literal(`product_stock - ${quantity}`) },
-        { where: { productVariantId } }
-      );
+        await ProductVariantModel.update(
+            { productStock: sequelize.literal(`product_stock - ${quantity}`) },
+            { where: { productVariantId } }
+        );
     }
 
     return transactionDetails;
@@ -291,7 +291,7 @@ export const updateTransactionStatusService = async (transactionId, gatewayRespo
 
 export const createKomshipOrderService = async (transaction) => {
 
-    const adminAddress = await getPickUpPointService(); 
+    const adminAddress = await getPickUpPointService();
     // if (adminAddress.length === 0) {
 
     // }
@@ -344,7 +344,7 @@ export const printLabelService = async (orderNumber) => {
 }
 
 export const monthlySalesReportService = async (year, month) => {
-    
+
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0, 23, 59, 59);
 
@@ -353,23 +353,23 @@ export const monthlySalesReportService = async (year, month) => {
 
     const transactions1 = await TransactionHeaderModel.findAll({
         where: {
-          transactionDate: {
-            [Op.between]: [prevStartDate, prevEndDate],
-          },
-          status: {
-            [Op.notIn]: ["Unpaid", "Cancelled"],
-          },
+            transactionDate: {
+                [Op.between]: [prevStartDate, prevEndDate],
+            },
+            status: {
+                [Op.notIn]: ["Unpaid", "Cancelled"],
+            },
         },
     })
 
     const transactions2 = await TransactionHeaderModel.findAll({
         where: {
-          transactionDate: {
-            [Op.between]: [startDate, endDate],
-          },
-          status: {
-            [Op.notIn]: ["Unpaid", "Cancelled"],
-          },
+            transactionDate: {
+                [Op.between]: [startDate, endDate],
+            },
+            status: {
+                [Op.notIn]: ["Unpaid", "Cancelled"],
+            },
         },
     })
 
@@ -400,25 +400,25 @@ export const monthlySalesReportService = async (year, month) => {
 export const allMonthSalesAnalyticService = async (year) => {
     const monthlySales = await TransactionHeaderModel.findAll({
         attributes: [
-            [Sequelize.fn("MONTH", Sequelize.col("transaction_date")), "month"], 
+            [Sequelize.fn("MONTH", Sequelize.col("transaction_date")), "month"],
             [Sequelize.fn("SUM", Sequelize.literal("total_price - delivery_fee")), "totalSales"],
         ],
         where: {
             transactionDate: {
                 [Op.between]: [
-                    new Date(year, 0, 1), 
-                    new Date(year, 11, 31, 23, 59, 59), 
+                    new Date(year, 0, 1),
+                    new Date(year, 11, 31, 23, 59, 59),
                 ],
             },
             status: {
                 [Op.notIn]: ["Unpaid", "Cancelled"],
             },
         },
-        group: [Sequelize.fn("MONTH", Sequelize.col("transaction_date"))], 
-        order: [[Sequelize.fn("MONTH", Sequelize.col("transaction_date")), "ASC"]], 
+        group: [Sequelize.fn("MONTH", Sequelize.col("transaction_date"))],
+        order: [[Sequelize.fn("MONTH", Sequelize.col("transaction_date")), "ASC"]],
     });
 
-    
+
     const salesByMonth = Array.from({ length: 12 }, (_, index) => {
         const monthData = monthlySales.find(
             (data) => data.dataValues.month === index + 1
@@ -434,64 +434,64 @@ export const allMonthSalesAnalyticService = async (year) => {
 
 export const fetchSalesByCategoryService = async (year, month) => {
     try {
-      const startDate = new Date(year, month - 1, 1); 
-      const endDate = new Date(year, month, 0, 23, 59, 59);
-  
-      const salesData = await TransactionHeaderModel.findAll({
-        where: {
-          transactionDate: {
-            [Op.between]: [startDate, endDate], 
-          },
-          status: {
-            [Op.notIn]: ["Unpaid", "Cancelled"],
-          },
-        },
-        include: [
-          {
-            model: TransactionDetailModel,
-            attributes: [], 
+        const startDate = new Date(year, month - 1, 1);
+        const endDate = new Date(year, month, 0, 23, 59, 59);
+
+        const salesData = await TransactionHeaderModel.findAll({
+            where: {
+                transactionDate: {
+                    [Op.between]: [startDate, endDate],
+                },
+                status: {
+                    [Op.notIn]: ["Unpaid", "Cancelled"],
+                },
+            },
             include: [
-              {
-                model: ProductVariantModel,
-                attributes: [],
-                include: [
-                  {
-                    model: ProductModel,
-                    attributes: [], 
+                {
+                    model: TransactionDetailModel,
+                    attributes: [],
                     include: [
-                      {
-                        model: ProductCategoryModel,
-                        attributes: ["productCategoryName"], 
-                      },
+                        {
+                            model: ProductVariantModel,
+                            attributes: [],
+                            include: [
+                                {
+                                    model: ProductModel,
+                                    attributes: [],
+                                    include: [
+                                        {
+                                            model: ProductCategoryModel,
+                                            attributes: ["productCategoryName"],
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
                     ],
-                  },
-                ],
-              },
+                },
             ],
-          },
-        ],
-        attributes: [
-          [Sequelize.fn("SUM", Sequelize.col("transaction_details.paid_product_price")), "totalSales"],
-          [Sequelize.col("transaction_details->product_variant->product->product_category.product_category_name"), "categoryName"],
-        ],
-        group: [
-            "transaction_details->product_variant->product->product_category.product_category_name",
-            "transaction_details->product_variant->product->product_category.product_category_id",
-        ], // Group by category name
-        raw: true, // Return raw data
-      });
-      
-  
-      return salesData;
+            attributes: [
+                [Sequelize.fn("SUM", Sequelize.col("transaction_details.paid_product_price")), "totalSales"],
+                [Sequelize.col("transaction_details->product_variant->product->product_category.product_category_name"), "categoryName"],
+            ],
+            group: [
+                "transaction_details->product_variant->product->product_category.product_category_name",
+                "transaction_details->product_variant->product->product_category.product_category_id",
+            ], // Group by category name
+            raw: true, // Return raw data
+        });
+
+
+        return salesData;
     } catch (error) {
-      console.error("Error fetching sales by category:", error);
-      throw error;
+        console.error("Error fetching sales by category:", error);
+        throw error;
     }
-  };
+};
 
 
 export const updateTransactionDeliveryService = async (order_no, status) => {
-    const response = TransactionHeaderModel.update({ 
+    const response = TransactionHeaderModel.update({
         status: status,
         where: {
             komshipOrderNumber: order_no
@@ -517,8 +517,8 @@ export const cancelTransactionService = async (transactionId) => {
     return updatedTransaction;
 }
 
-export const payTransactionService = async (transaction, customerId) => {
-    const response = await createPlanXendit(transaction, customerId);
+export const payTransactionService = async (transaction, customerId, productsInCart) => {
+    const response = await createPlanXendit(transaction, customerId, productsInCart);
     // console.log(response);
     return response
 }
@@ -526,9 +526,9 @@ export const payTransactionService = async (transaction, customerId) => {
 export const checkTransactionWithVoucher = async (voucherCode, userId) => {
     try {
         const transaction = await TransactionHeaderModel.findOne({
-            where: { 
-                voucherCode, 
-                userId 
+            where: {
+                voucherCode,
+                userId
             }
         });
 
@@ -546,7 +546,7 @@ export const checkTransactionWithVoucher = async (voucherCode, userId) => {
 export const updatePaymentLinkService = async (transaction, paymentLink) => {
     console.log(paymentLink);
     console.log(transaction.transactionId);
-    
+
     const updatedTransaction = await TransactionHeaderModel.update(
         {
             paymentLink: paymentLink

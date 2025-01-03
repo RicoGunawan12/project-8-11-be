@@ -1,9 +1,9 @@
 import { Xendit, PaymentRequest as PaymentRequestClient } from "xendit-node"
 
-const xenditClient = new Xendit({secretKey: process.env.XENDIT_API})
+const xenditClient = new Xendit({ secretKey: process.env.XENDIT_API })
 const { PaymentRequest } = xenditClient
 
-const xenditPaymentRequestClient = new PaymentRequestClient({secretKey: process.env.XENDIT_API})
+const xenditPaymentRequestClient = new PaymentRequestClient({ secretKey: process.env.XENDIT_API })
 
 const credentials = btoa(`${process.env.XENDIT_API_TEST}:`);
 const headers = new Headers({
@@ -45,9 +45,9 @@ export const createCreditCardTransactionXendit = async (
     //     amount : 15000,
     //     paymentMethod : {
     //       ewallet : {
-            // channelProperties : {
-            //   successReturnUrl : "https://redirect.me/success"
-            // },
+    // channelProperties : {
+    //   successReturnUrl : "https://redirect.me/success"
+    // },
     //         channelCode : "SHOPEEPAY"
     //       },
     //       reusability : "ONE_TIME_USE",
@@ -56,7 +56,7 @@ export const createCreditCardTransactionXendit = async (
     //     currency : "IDR",
     //     referenceId : "example-ref-1234"
     //   }
-    
+
     // const tokenResponse = await xenditPaymentRequestClient.createPaymentRequest({data});
     const tokenResponse = await xenditPaymentRequestClient.createPaymentRequest({
         data: {
@@ -65,8 +65,8 @@ export const createCreditCardTransactionXendit = async (
             country: "ID",
             paymentMethod: {
                 card: {
-                    channelProperties : {
-                        successReturnUrl : "http://localhost:4650/transactions/" + transactionId,
+                    channelProperties: {
+                        successReturnUrl: "http://localhost:4650/transactions/" + transactionId,
                         failureReturnUrl: "https://redirect.me/failed"
                     },
                     cardInformation: {
@@ -83,7 +83,7 @@ export const createCreditCardTransactionXendit = async (
                 reusability: is_multiple_use ? "MULTIPLE_USE" : "ONE_TIME_USE",
                 type: "CARD"
             },
-            referenceId : transactionId,
+            referenceId: transactionId,
             // customer: {
             //     mobileNumber: card_holder_phone_number
             // }
@@ -96,18 +96,18 @@ export const createCreditCardTransactionXendit = async (
 
 export const createQrisTransactionXendit = async (transactionId, amount) => {
     const data = {
-        amount : amount,
-        paymentMethod : {
-            qrCode : {
-                channelCode : "QRIS"
+        amount: amount,
+        paymentMethod: {
+            qrCode: {
+                channelCode: "QRIS"
             },
-            reusability : "ONE_TIME_USE",
-            type : "QR_CODE"
+            reusability: "ONE_TIME_USE",
+            type: "QR_CODE"
         },
-        currency : "IDR",
-        referenceId : transactionId
+        currency: "IDR",
+        referenceId: transactionId
     }
-    
+
     const response = await xenditPaymentRequestClient.createPaymentRequest({
         data
     })
@@ -119,30 +119,30 @@ export const checkOutVATransactionXendit = async (transactionId, amount, bank, c
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
-    
+
     const data = {
-        country : "ID",
-        amount : amount,
-        metadata : {
-            sku : "example-sku-1234"
+        country: "ID",
+        amount: amount,
+        metadata: {
+            sku: "example-sku-1234"
         },
-        paymentMethod : {
-            reusability : "ONE_TIME_USE",
-            type : "VIRTUAL_ACCOUNT",
-            virtualAccount : {
-                channelProperties : {
-                    customerName : customerName,
+        paymentMethod: {
+            reusability: "ONE_TIME_USE",
+            type: "VIRTUAL_ACCOUNT",
+            virtualAccount: {
+                channelProperties: {
+                    customerName: customerName,
                     // expiresAt : expiredDate
-                    expiresAt : tomorrow
+                    expiresAt: tomorrow
                 },
-                channelCode : bank
+                channelCode: bank
             },
-            referenceId : transactionId
+            referenceId: transactionId
         },
-        currency : "IDR",
-        referenceId : transactionId
+        currency: "IDR",
+        referenceId: transactionId
     }
-      
+
     const response = await xenditPaymentRequestClient.createPaymentRequest({
         data
     })
@@ -154,8 +154,8 @@ export const createCustomerXendit = async (userId, fullName, email, phone) => {
         reference_id: userId,
         type: "INDIVIDUAL",
         individual_detail: {
-        given_names: fullName,
-        surname: fullName
+            given_names: fullName,
+            surname: fullName
         },
         email: email,
         mobile_number: phone
@@ -167,7 +167,7 @@ export const createCustomerXendit = async (userId, fullName, email, phone) => {
         redirect: 'follow',
         body: JSON.stringify(body)
     }
-    
+
     try {
         const xenditResponse = await fetch(`${process.env.XENDIT_URL}/customers`, requestOptions);
         if (!xenditResponse.ok) {
@@ -181,7 +181,16 @@ export const createCustomerXendit = async (userId, fullName, email, phone) => {
     }
 }
 
-export const createPlanXendit = async (transaction, customerId) => {
+export const createPlanXendit = async (transaction, customerId, productsInCart) => {
+    const items = productsInCart.map((product) => {
+        return {
+            type: "PHYSICAL_PRODUCT",
+            name: product.productName + " - " + product.product_variant.productColor,
+            net_unit_amount: product.product_variant.productPrice,
+            quantity: product.quantity,
+            url: process.env.BASE_URL + product.product_variant.productImage
+        };
+    })
     const body = {
         reference_id: transaction.transactionId,
         customer_id: customerId,
@@ -198,30 +207,20 @@ export const createPlanXendit = async (transaction, customerId) => {
             retry_interval: "DAY",
             retry_interval_count: 3,
             total_retry: 2,
-            failed_attempt_notifications: [1,2]
+            failed_attempt_notifications: [1, 2]
         },
         immediate_action_type: "FULL_AMOUNT",
         notification_config: {
-            recurring_created: ["WHATSAPP","EMAIL"],
-            recurring_succeeded: ["WHATSAPP","EMAIL"],
-            recurring_failed: ["WHATSAPP","EMAIL"],
+            recurring_created: ["WHATSAPP", "EMAIL"],
+            recurring_succeeded: ["WHATSAPP", "EMAIL"],
+            recurring_failed: ["WHATSAPP", "EMAIL"],
             locale: "en"
         },
         failed_cycle_action: "STOP",
-        payment_link_for_failed_attempt : true,
+        payment_link_for_failed_attempt: true,
         metadata: null,
         description: "Tyeso Payment",
-        // items: [
-        //         {
-        //             type: "DIGITAL_PRODUCT",
-        //             name: "Cine Mraft",
-        //             net_unit_amount: 11512,
-        //             quantity: 1,
-        //             url: "https://www.xendit.co/",
-        //             category: "Gaming",
-        //             subcategory: "Open World"
-        //         }
-        //     ],
+        items: items,
         success_return_url: process.env.PRODUCTION_WEB + "/transactions/" + transaction.transactionId,
         failure_return_url: process.env.PRODUCTION_WEB
     }
