@@ -1,6 +1,6 @@
 import express from 'express';
 import { adminMiddleware, userMiddleware } from '../middleware/auth.middleware.js';
-import { calculateDeliveryFee, createAddress, deleteAddress, getAddressByUserId, getAllCity, getAllProvince, getAllSubdistrict, getPickUpPoint, searchDestination, updateAddress, updatePickUpPoint } from '../controllers/address.controller.js';
+import { calculateDeliveryFee, createAddress, deleteAddress, getAddressById, getAddressByUserId, getAllCity, getAllProvince, getAllSubdistrict, getPickUpPoint, searchDestination, updateAddress, updatePickUpPoint } from '../controllers/address.controller.js';
 import { generalValidator } from '../validator/general/general.validator.js';
 import { addressSchema } from '../schema/model/address.schema.js';
 import { validateSchema } from '../validator/validate.js';
@@ -8,6 +8,7 @@ import { validateSchema } from '../validator/validate.js';
 const AddressRoute = express.Router();
 
 AddressRoute.get('/', userMiddleware, getAddressByUserId);
+AddressRoute.get('/:id', userMiddleware, getAddressById)
 AddressRoute.post('/',generalValidator(addressSchema),validateSchema, userMiddleware, createAddress);
 AddressRoute.delete('/:id', userMiddleware, deleteAddress);
 AddressRoute.put('/:id', userMiddleware, updateAddress);
