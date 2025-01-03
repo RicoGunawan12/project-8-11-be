@@ -8,7 +8,6 @@ import { validateSchema } from '../validator/validate.js';
 const AddressRoute = express.Router();
 
 AddressRoute.get('/', userMiddleware, getAddressByUserId);
-AddressRoute.get('/:id', userMiddleware, getAddressById)
 AddressRoute.post('/',generalValidator(addressSchema),validateSchema, userMiddleware, createAddress);
 AddressRoute.delete('/:id', userMiddleware, deleteAddress);
 AddressRoute.put('/:id', userMiddleware, updateAddress);
@@ -22,5 +21,7 @@ AddressRoute.get('/calculate', userMiddleware, calculateDeliveryFee);
 
 AddressRoute.post('/admin', adminMiddleware, updatePickUpPoint);
 AddressRoute.get('/admin', adminMiddleware, getPickUpPoint);
+
+AddressRoute.get('/:id', userMiddleware, getAddressById)
 
 export default AddressRoute;
