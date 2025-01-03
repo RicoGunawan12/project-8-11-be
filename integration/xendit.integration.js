@@ -183,14 +183,23 @@ export const createCustomerXendit = async (userId, fullName, email, phone) => {
 
 export const createPlanXendit = async (transaction, customerId, productsInCart) => {
     const items = productsInCart.map((product) => {
+        console.log(product.product_variant.product.productName + " - " + product.product_variant.productColor);
+        console.log(product.product_variant.productPrice);
+        console.log(product.quantity);
+        console.log(process.env.BASE_URL + product.product_variant.productImage);
+        
         return {
             type: "PHYSICAL_PRODUCT",
-            name: product.productName + " - " + product.product_variant.productColor,
+            name: product.product_variant.product.productName + " - " + product.product_variant.productColor,
             net_unit_amount: product.product_variant.productPrice,
             quantity: product.quantity,
             url: process.env.BASE_URL + product.product_variant.productImage
+            // url: "https://th.bing.com/th/id/OIP.ULq5QQnJfNFuhcLNBVqzAwHaE7?w=250&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+            // category: "Gaming",
+            // subcategory: "Open World"
         };
     })
+    
     const body = {
         reference_id: transaction.transactionId,
         customer_id: customerId,
@@ -220,9 +229,18 @@ export const createPlanXendit = async (transaction, customerId, productsInCart) 
         payment_link_for_failed_attempt: true,
         metadata: null,
         description: "Tyeso Payment",
-        items: items,
         success_return_url: process.env.PRODUCTION_WEB + "/transactions/" + transaction.transactionId,
         failure_return_url: process.env.PRODUCTION_WEB
+    }
+    if (process.env.BASE_URL !== "http://localhost:5000") {
+        body.items = items; 
+        items.push({
+            type: "DIGITAL_PRODUCT",
+            name: "Delivery Fee",
+            net_unit_amount: transaction.deliveryFee,
+            quantity: 1,
+            url: "https://th.bing.com/th/id/OIP.ULq5QQnJfNFuhcLNBVqzAwHaE7?w=250&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+        })
     }
     // console.log(body);
 
@@ -235,13 +253,15 @@ export const createPlanXendit = async (transaction, customerId, productsInCart) 
 
     try {
         const xenditResponse = await fetch(`${process.env.XENDIT_URL}/recurring/plans`, requestOptions);
+        console.log(xenditResponse);
+        
         if (!xenditResponse.ok) {
             throw new Error(`Error: ${xenditResponse.statusText}`);
         }
         const result = await xenditResponse.json();
         return result;
     } catch (error) {
-        // console.log(error);
+        console.log(error);
         throw new Error(error.message);
     }
 }
