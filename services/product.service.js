@@ -320,6 +320,140 @@ export const getProductByIdService = async (productId) => {
   return product;
 };
 
+export const getProductByIdWithRelatedProductService = async (productId) => {
+  const product = await ProductModel.findOne({
+    attributes: [
+      "productId",
+      "productName",
+      "productSize",
+      "productCode",
+      "productDescription",
+      "defaultImage",
+      "productWeight",
+      "productLength",
+      "productWidth",
+      "productHeight",
+      "isBestSeller",
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
+    ],
+    include: [
+      {
+        model: ProductCategoryModel,
+        attributes: ["productCategoryName"],
+      },
+      {
+        model: ProductVariantModel,
+        attributes: [
+          "productVariantId",
+          "productColor",
+          "sku",
+          "productPrice",
+          "productStock",
+          "productImage",
+        ],
+      },
+      {
+        model: PromoDetailModel,
+        attributes: ['promoDetailId'],
+        required: false,
+        include: [
+            {
+                model: PromoModel,
+                required: false,
+                where: {
+                    startDate: {
+                        [Op.lte]: new Date(), 
+                    },
+                    endDate: {
+                        [Op.gte]: new Date(),
+                    },
+                },
+            },
+        ]
+      },
+      // {
+      //   model: RatingModel,
+      //   required: false,
+      //   // attributes: ['rating', 'comment'],
+      // }
+    ],
+    where: { productId, productActivityStatus: "active" },
+    // group: ["products.product_id"],
+  });
+
+  if (!product) {
+    throw new Error("Product not found!");
+  }
+
+  const relatedProducts = await ProductModel.findAll({
+    attributes: [
+      "productId",
+      "productName",
+      "productSize",
+      "productCode",
+      "productDescription",
+      "defaultImage",
+      "productWeight",
+      "productLength",
+      "productWidth",
+      "productHeight",
+      "isBestSeller",
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
+    ],
+    include: [
+      {
+        model: ProductCategoryModel,
+        attributes: ["productCategoryName"],
+        where: {
+          productCategoryName: product.product_category.productCategoryName
+        }
+      },
+      {
+        model: ProductVariantModel,
+        attributes: [
+          "productVariantId",
+          "productColor",
+          "sku",
+          "productPrice",
+          "productStock",
+          "productImage",
+        ],
+      },
+      {
+        model: PromoDetailModel,
+        attributes: ['promoDetailId'],
+        required: false,
+        include: [
+            {
+                model: PromoModel,
+                required: false,
+                where: {
+                    startDate: {
+                        [Op.lte]: new Date(), 
+                    },
+                    endDate: {
+                        [Op.gte]: new Date(),
+                    },
+                },
+            },
+        ]
+      },
+      // {
+      //   model: RatingModel,
+      //   required: false,
+      //   // attributes: ['rating', 'comment'],
+      // }
+    ],
+    where: {
+      productId: { [Op.ne]: productId }, 
+      productActivityStatus: "active",
+    },
+    limit: 8,
+  });
+
+  return { product, relatedProducts };
+};
+
 export const createProductService = async (
   productName,
   productDescription,

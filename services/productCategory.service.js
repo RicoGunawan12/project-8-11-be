@@ -94,7 +94,8 @@ export const getCategoryWithProductService = async () => {
             
             const products = await ProductModel.findAll({
                 where: {
-                    productCategoryId: category.productCategoryId
+                    productCategoryId: category.productCategoryId,
+                    productActivityStatus: "active"
                 },
                 attributes: [
                     "productId",

@@ -60,13 +60,13 @@ export const getTransactionById = async (req, res) => {
 }
 
 export const createTransaction = async (req, res) => {
-    const { 
-        addressId, 
-        paymentMethod, 
-        voucherCode, 
+    const {
+        addressId,
+        paymentMethod,
+        voucherCode,
         expedition,
         shippingType,
-        deliveryFee, 
+        deliveryFee,
         deliveryCashback,
         notes
     } = req.body;
@@ -99,13 +99,13 @@ export const createTransaction = async (req, res) => {
                 const promoDetails = await checkPromoService(product.product_variant.ref_product_id);
                 // console.log(product.product_variant.productPrice);
                 if (promoDetails) {
-                    product.product_variant.productPrice = 
-                    product.product_variant.productPrice - promoDetails.promo.promoAmount <= 0 ? 0 :
-                    product.product_variant.productPrice - promoDetails.promo.promoAmount;
+                    product.product_variant.productPrice =
+                        product.product_variant.productPrice - promoDetails.promo.promoAmount <= 0 ? 0 :
+                            product.product_variant.productPrice - promoDetails.promo.promoAmount;
                     product.product_variant.realizedPromo = promoDetails.promo.promoAmount;
                 }
                 // console.log(product.product_variant.productPrice);
-                
+
                 const itemTotal = product.product_variant.productPrice * product.quantity;
                 totalPrice += itemTotal;
                 totalWeight += product.product_variant.productWeight;
@@ -124,26 +124,26 @@ export const createTransaction = async (req, res) => {
                 totalPrice -= discount
             }
         }
-        
+
         // set transaction date to now 
         // set gateway response to null
         // set status to Wait for payment
         // set payment deadline to now + 1 day 
         // insert transaction header and get the id
         const transaction = await createTransactionService(
-            userId, 
-            addressId, 
-            voucherCode.length === 0 ? null : voucherCode, 
+            userId,
+            addressId,
+            voucherCode.length === 0 ? null : voucherCode,
             // null, 
-            new Date(), 
-            paymentMethod, 
-            null, 
+            new Date(),
+            paymentMethod,
+            null,
             "Unpaid",
-            expedition, 
+            expedition,
             shippingType,
-            deliveryFee, 
+            deliveryFee,
             deliveryCashback,
-            new Date(Date.now() + 1 * 60 * 60 * 1000), 
+            new Date(Date.now() + 1 * 60 * 60 * 1000),
             notes,
             totalPrice,
             totalWeight
@@ -152,7 +152,7 @@ export const createTransaction = async (req, res) => {
         // insert transaction detail
         const transactionDetails = productsInCart.map(product => {
             const currentDate = new Date();
-    
+
             // const isPromoActive =
             //     product.isPromo &&
             //     new Date(product.startDate) <= currentDate &&
@@ -167,17 +167,17 @@ export const createTransaction = async (req, res) => {
         });
         const insertedTransactionDetails = await createTransactionDetailService(transactionDetails);
         const deletedCartItem = await removeAllCartItemInUserService(userId);
-        const payTransactionResponse = await payTransactionService(transaction, req.user.customerId)
+        const payTransactionResponse = await payTransactionService(transaction, req.user.customerId, productsInCart)
         console.log(payTransactionResponse);
-        
+
         const updatePaymentLink = await updatePaymentLinkService(transaction, payTransactionResponse.actions[0].url);
-        
+
         await seqTransaction.commit();
         return res.status(200).json({ message: "Transaction created!", payTransactionResponse, transaction, insertedTransactionDetails });
-        
+
     } catch (error) {
         console.log(error);
-        
+
         await seqTransaction.rollback();
         return res.status(500).json({ message: error.message });
     }
@@ -237,8 +237,8 @@ export const checkOutQrisTransaction = async (req, res) => {
 export const checkOutVATransaction = async (req, res) => {
 
     const {
-        transactionId, 
-        amount, 
+        transactionId,
+        amount,
         bank
     } = req.body
 
@@ -327,7 +327,7 @@ export const updateTransactionStatus = async (req, res) => {
     const {
         reference_id
     } = req.body.data;
-    
+
     try {
         const updatedTransaction = await updateTransactionStatusService(reference_id, req.body);
         const getTransactionById = await getTransactionsByIdService(reference_id);
@@ -379,11 +379,11 @@ export const monthlySalesReport = async (req, res) => {
     const { year, month } = req.body;
 
     if (year <= 0) {
-        return res.status(400).json({ message: "Invalid Year" });   
+        return res.status(400).json({ message: "Invalid Year" });
     }
     else if (month <= 0) {
-        return res.status(400).json({ message: "Invalid Month" });   
-    } 
+        return res.status(400).json({ message: "Invalid Month" });
+    }
 
     try {
         const response = await monthlySalesReportService(year, month);
@@ -396,7 +396,7 @@ export const monthlySalesReport = async (req, res) => {
 export const allMonthSalesAnalytic = async (req, res) => {
     const { year } = req.body;
     if (year <= 0) {
-        return res.status(400).json({ message: "Invalid Year" });   
+        return res.status(400).json({ message: "Invalid Year" });
     }
 
     try {
@@ -411,11 +411,11 @@ export const fetchSalesByCategory = async (req, res) => {
     const { year, month } = req.body;
 
     if (year <= 0) {
-        return res.status(400).json({ message: "Invalid Year" });   
+        return res.status(400).json({ message: "Invalid Year" });
     }
     else if (month <= 0) {
-        return res.status(400).json({ message: "Invalid Month" });   
-    } 
+        return res.status(400).json({ message: "Invalid Month" });
+    }
 
     try {
         const response = await fetchSalesByCategoryService(year, month);
@@ -426,9 +426,9 @@ export const fetchSalesByCategory = async (req, res) => {
 }
 
 export const updateTransactionDelivery = async (req, res) => {
-    const { order_no, cnote, status } = req.body; 
+    const { order_no, cnote, status } = req.body;
     if (!order_no || !cnote || !status) {
-        return res.status(400).json({ message: "Invalid input" }); 
+        return res.status(400).json({ message: "Invalid input" });
     }
 
     try {
