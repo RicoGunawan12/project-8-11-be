@@ -8,11 +8,12 @@ export const getContactService = async () => {
     return contacts;
 }
 
-export const updateContactService = async (id, contact, contactAccount) => {
+export const updateContactService = async (id, contact, contactAccount, contactImage) => {
     const updatedContact = await Contact.update(
         {
             contact: contact,
-            contactAccount: contactAccount
+            contactAccount: contactAccount,
+            contactImage: contactImage
         },
         {
             where: {

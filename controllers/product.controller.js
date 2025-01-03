@@ -113,7 +113,7 @@ export const validateProduct = (req, res, next) => {
     productName,
     productDescription,
     productCategoryName,
-    productVariants,
+    productVariants
   } = req.body;
 
   // Validate productName
@@ -143,6 +143,15 @@ export const validateProduct = (req, res, next) => {
       });
   }
 
+  if(
+    !productSize ||
+    typeof productSize !== "number" ||
+    productSize.trim() === ""
+  )
+  return res.status(400).json({
+    message: "Product size is required and must be greater than 0"
+  })
+
   // Validate productCategoryName
   if (
     !productCategoryName ||
@@ -168,15 +177,6 @@ export const validateProduct = (req, res, next) => {
 
     for (let i = 0; i < variants.length; i++) {
       const variant = variants[i];
-      if (
-        !variant.productSize ||
-        typeof variant.productSize !== "string" ||
-        variant.productSize.trim() === ""
-      ) {
-        return res
-          .status(400)
-          .json({ message: `Variant at index ${i} must have a valid size.` });
-      }
       if (
         !variant.productColor ||
         typeof variant.productColor !== "string" ||
@@ -206,50 +206,6 @@ export const validateProduct = (req, res, next) => {
           .status(400)
           .json({
             message: `Variant stock at index ${i} must be a positive number.`,
-          });
-      }
-      if (
-        !variant.productWeight ||
-        typeof variant.productWeight !== "number" ||
-        variant.productWeight <= 0
-      ) {
-        return res
-          .status(400)
-          .json({
-            message: `Variant weight at index ${i} must be a positive number.`,
-          });
-      }
-      if (
-        !variant.productLength ||
-        typeof variant.productLength !== "number" ||
-        variant.productLength <= 0
-      ) {
-        return res
-          .status(400)
-          .json({
-            message: `Variant length at index ${i} must be a positive number.`,
-          });
-      }
-      if (
-        !variant.productWidth ||
-        typeof variant.productWidth !== "number" ||
-        variant.productWidth <= 0
-      ) {
-        return res
-          .status(400)
-          .json({
-            message: `Variant width at index ${i} must be a positive number.`,
-          });
-      }
-      if (
-        !variant.productHeight ||
-        typeof variant.productHeight !== "number" ||
-        variant.productHeight <= 0
-      ) {
-        return res
-          .status(400)
-          .json({
-            message: `Variant height at index ${i} must be a positive number.`,
           });
       }
     }
@@ -350,22 +306,22 @@ export const createProduct = async (req, res) => {
             "Product weight, length, width, and height must be a valid number",
         });
     }
-    if (typeof productWeight !== "number" || productWeight < 0) {
+    if (typeof productWeight !== "number" || productWeight <= 0) {
       return res
         .status(400)
         .json({ message: `Product weight must be greater than 0` });
     }
-    if (typeof productLength !== "number" || productLength < 0) {
+    if (typeof productLength !== "number" || productLength <= 0) {
       return res
         .status(400)
         .json({ message: `Product length must be greater than 0` });
     }
-    if (typeof productWidth !== "number" || productWidth < 0) {
+    if (typeof productWidth !== "number" || productWidth <= 0) {
       return res
         .status(400)
         .json({ message: `Product width must be greater than 0` });
     }
-    if (typeof productHeight !== "number" || productHeight < 0) {
+    if (typeof productHeight !== "number" || productHeight <= 0) {
       return res
         .status(400)
         .json({ message: `Product height must be greater than 0` });
