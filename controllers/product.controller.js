@@ -398,7 +398,9 @@ export const createProduct = async (req, res) => {
     }
 
     const hash = new Map();
-    images.forEach(async (image) => {
+    for (let i = 0; i < images.length; i++) {
+      const image = images[i];
+
       // console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
 
       // converts image to WebP format
@@ -406,11 +408,10 @@ export const createProduct = async (req, res) => {
       const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
 
       hash.set(
-        image.originalname.substring(0, image.originalname.length - 4),
-        // `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`
-        `/${UPLOAD_FOLDER}product/${productName}/${convertedImageData.filename}`
+        image.originalname,
+        `/${UPLOAD_FOLDER}product/${productName}/${filename}`
       );
-    });
+    }
 
     if (productName.length < 1) {
       return res.status(400).json({ message: "Product name must be filled" });
@@ -428,16 +429,16 @@ export const createProduct = async (req, res) => {
     });
 
     // console.log(defaultImage);
-    
+
     // converts image to WebP format
     let defaultImageString = '';
-    defaultImage.forEach(async (image, idx) => {
-
+    for (let i = 0; i < defaultImage.length; i++) {
+      const image = defaultImage[i];
       const filename = `${Date.now()}-${req.body.productName}.webp`;
-      const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
+      const convertedImageData = convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
 
-      if (idx === 0) defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${convertedImageData.filename}`;
-    });
+      if (i === 0) defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${filename}`;
+    }
 
     const product = await createProductService(
       productName,
@@ -619,7 +620,9 @@ export const updateProduct = async (req, res) => {
     const hash = new Map();
     console.log(images);
 
-    images.forEach(async (image) => {
+    for (let i = 0; i < images.length; i++) {
+      const image = images[i];
+
       // console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
 
       // converts image to WebP format
@@ -628,9 +631,9 @@ export const updateProduct = async (req, res) => {
 
       hash.set(
         image.originalname,
-        `/${UPLOAD_FOLDER}product/${productName}/${convertedImageData.filename}`
+        `/${UPLOAD_FOLDER}product/${productName}/${filename}`
       );
-    });
+    }
 
     if (productName.length < 1) {
       return res.status(400).json({ message: "Product name must be filled" });
@@ -651,13 +654,13 @@ export const updateProduct = async (req, res) => {
 
     // converts image to WebP format
     let defaultImageString = '';
-    defaultImage.forEach(async (image, idx) => {
-
+    for (let i = 0; i < defaultImage.length; i++) {
+      const image = defaultImage[i];
       const filename = `${Date.now()}-${req.body.productName}.webp`;
-      const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
+      const convertedImageData = convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
 
-      if (idx === 0) defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${convertedImageData.filename}`;
-    });
+      if (i === 0) defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${filename}`;
+    }
     
     const updatedProduct = await updateProductService(
       productId,
