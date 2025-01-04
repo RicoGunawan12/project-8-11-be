@@ -520,7 +520,25 @@ export const cancelTransactionService = async (transactionId) => {
 export const onReviewTransactionService = async (transactionId, reason) => {
     const updatedTransaction = await TransactionHeaderModel.update(
         {
-            status: 'On Review',
+            status: 'On Review Cancel',
+            notes: reason
+        },
+        {
+            where: {
+                transactionId: transactionId
+            },
+        }
+    )
+    if (updatedTransaction[0] === 0) {
+        throw new Error("There is no change or no transaction");
+    }
+    return updatedTransaction;
+}
+
+export const onReviewReturnTransactionService = async (transactionId, reason) => {
+    const updatedTransaction = await TransactionHeaderModel.update(
+        {
+            status: 'On Review Return',
             notes: reason
         },
         {

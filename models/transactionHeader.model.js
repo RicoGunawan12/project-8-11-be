@@ -48,7 +48,7 @@ const TransactionHeader = sequelize.define('transaction_headers', {
   },
   status: {
     field: "status",
-    type: DataTypes.ENUM('Unpaid', 'Waiting for shipping', 'Shipping', 'Done', 'Cancelled', 'On Review', 'Return'),
+    type: DataTypes.ENUM('Unpaid', 'Waiting for shipping', 'Shipping', 'Done', 'Cancelled', 'On Review Cancel', 'On Review Return', 'Return'),
     allowNull: false,
     length: 100
   },
