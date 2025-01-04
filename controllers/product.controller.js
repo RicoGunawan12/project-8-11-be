@@ -21,6 +21,7 @@ import {
   updateProductVariantService,
   updateVariantService,
 } from "../services/productVariantService.js";
+import { convertImageToWebp } from "../utils/imageconverter.js";
 import { BASE_URL, UPLOAD_FOLDER } from "../utils/uploader.js";
 import { isValidDate, isValidNumber } from "../utils/utility.js";
 
@@ -397,12 +398,15 @@ export const createProduct = async (req, res) => {
     }
 
     const hash = new Map();
-    images.forEach((image) => {
+    images.forEach(async (image) => {
       // console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
 
+      const filename = `${Date.now()}-${req.body.productName}.webp`;
+      const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
       hash.set(
         image.originalname.substring(0, image.originalname.length - 4),
-        `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`
+        // `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`
+        `/${UPLOAD_FOLDER}product/${productName}/${convertedImageData.filename}`
       );
     });
 
@@ -422,7 +426,9 @@ export const createProduct = async (req, res) => {
     });
 
     // console.log(defaultImage);
-    const defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${defaultImage[0].filename}`;
+    const filename = `${Date.now()}-${req.body.productName}.webp`;
+    const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, defaultImage[0], filename);
+    const defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${convertedImageData.filename}`;
     const product = await createProductService(
       productName,
       productDescription,
