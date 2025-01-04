@@ -4,6 +4,7 @@ import {
   getCategoriesService,
   updateCategoryService,
 } from "../services/productCategory.service.js";
+import { convertImageToWebp } from "../utils/imageconverter.js";
 import { UPLOAD_FOLDER } from "../utils/uploader.js";
 
 export const getCategories = async (req, res) => {
@@ -23,12 +24,14 @@ export const createCategory = async (req, res) => {
 
   // converts image to WebP format
   let productCategoryPhotoString = '';
-  productCategoryPhoto.forEach(async (image, idx) => {
-    const filename = `${Date.now()}-${req.body.productName}.webp`;
-    const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "category/" + req.body.productName, image, filename);
+  for (let i = 0; i < productCategoryPhoto.length; i++) {
+    const image = productCategoryPhoto[i];
 
-    if (idx === 0) productCategoryPhotoString = `/${UPLOAD_FOLDER}category/${convertedImageData.filename}`;
-  });
+    const filename = `${Date.now()}-${req.body.productCategoryName}.webp`;
+    const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "category", image, filename);
+
+    if (i === 0) productCategoryPhotoString = `/${UPLOAD_FOLDER}category/${filename}`;
+  }
   
   try {
     const insertedCategory = await createCategoryService(
@@ -68,12 +71,15 @@ export const updateCategory = async (req, res) => {
 
   // converts image to WebP format
   let productCategoryPhotoString = '';
-  productCategoryPhoto.forEach(async (image, idx) => {
-    const filename = `${Date.now()}-${req.body.productName}.webp`;
-    const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "category/" + req.body.productName, image, filename);
+  for (let i = 0; i < productCategoryPhoto.length; i++) {
+    const image = productCategoryPhoto[i];
 
-    if (idx === 0) productCategoryPhotoString = `/${UPLOAD_FOLDER}category/${convertedImageData.filename}`;
-  });
+    const filename = `${Date.now()}-${req.body.productCategoryName}.webp`;
+    const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "category", image, filename);
+
+    if (i === 0) productCategoryPhotoString = `/${UPLOAD_FOLDER}category/${filename}`;
+  } 
+  
   try {
     const message = await updateCategoryService(
       categoryId,
