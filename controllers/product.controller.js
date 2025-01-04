@@ -401,8 +401,10 @@ export const createProduct = async (req, res) => {
     images.forEach(async (image) => {
       // console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
 
+      // converts image to WebP format
       const filename = `${Date.now()}-${req.body.productName}.webp`;
       const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
+
       hash.set(
         image.originalname.substring(0, image.originalname.length - 4),
         // `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`
@@ -426,9 +428,11 @@ export const createProduct = async (req, res) => {
     });
 
     // console.log(defaultImage);
+     // converts image to WebP format
     const filename = `${Date.now()}-${req.body.productName}.webp`;
     const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, defaultImage[0], filename);
     const defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${convertedImageData.filename}`;
+
     const product = await createProductService(
       productName,
       productDescription,
@@ -609,12 +613,16 @@ export const updateProduct = async (req, res) => {
     const hash = new Map();
     console.log(images);
 
-    images.forEach((image) => {
+    images.forEach(async (image) => {
       // console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
+
+      // converts image to WebP format
+      const filename = `${Date.now()}-${req.body.productName}.webp`;
+      const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
 
       hash.set(
         image.originalname,
-        `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`
+        `/${UPLOAD_FOLDER}product/${productName}/${convertedImageData.filename}`
       );
     });
 
@@ -634,7 +642,12 @@ export const updateProduct = async (req, res) => {
     });
 
     // console.log(defaultImage);
-    const defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${defaultImage[0].filename}`;
+    
+    // converts image to WebP format
+    const filename = `${Date.now()}-${req.body.productName}.webp`;
+    const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, defaultImage[0], filename);
+    const defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${convertedImageData.filename}`;
+
     const updatedProduct = await updateProductService(
       productId,
       productName,
