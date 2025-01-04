@@ -271,3 +271,28 @@ export const printLabelKomship = async (orderNumber) => {
         throw new Error(error.message);
     }
 }
+
+export const cancelOrderKomship = async (orderNumber) => {
+    const body = {
+        order_no: orderNumber
+    }
+    const requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        redirect: 'follow',
+        body: JSON.stringify(body)
+    }
+
+    try {
+        const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/cancel`, requestOptions);
+
+        if (!komshipResponse.ok) {
+            throw new Error(`Error: ${komshipResponse.statusText}`);
+        }
+
+        const result = await komshipResponse.json();
+        return result;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}

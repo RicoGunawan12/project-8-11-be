@@ -517,6 +517,24 @@ export const cancelTransactionService = async (transactionId) => {
     return updatedTransaction;
 }
 
+export const onReviewTransactionService = async (transactionId, reason) => {
+    const updatedTransaction = await TransactionHeaderModel.update(
+        {
+            status: 'On Review',
+            notes: reason
+        },
+        {
+            where: {
+                transactionId: transactionId
+            },
+        }
+    )
+    if (updatedTransaction[0] === 0) {
+        throw new Error("There is no change or no transaction");
+    }
+    return updatedTransaction;
+}
+
 export const payTransactionService = async (transaction, customerId, productsInCart) => {
     const response = await createPlanXendit(transaction, customerId, productsInCart);
     // console.log(response);

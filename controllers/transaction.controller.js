@@ -2,7 +2,7 @@ import sequelize from "../config/database.js";
 import { createQrisTransactionXendit } from "../integration/xendit.integration.js";
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
 import { checkPromoService } from "../services/promo.service.js";
-import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, payTransactionService, printLabelService, requestPickupTransactionService, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionStatusService } from "../services/transaction.service.js";
+import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionStatusService } from "../services/transaction.service.js";
 import { applyVoucherService } from "../services/voucher.service.js";
 
 
@@ -448,6 +448,30 @@ export const cancelTransaction = async (req, res) => {
     try {
         const cancelledTransaction = await cancelTransactionService(transactionId);
         return res.status(200).json({ message: "Transaction cancelled!" })
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const onReviewTransaction = async (req, res) => {
+    const transactionId = req.params.id;
+    const { reason } = req.body;
+
+    if (!transactionId) {
+        return res.status(400).json({ message: "Transaction is required!" });
+    }
+
+    if (
+        !reason ||
+        typeof reason !== "string" ||
+        reason.trim() === ""
+    ) {
+        return res.status(400).json({ message: "Reason is required!" });
+    }
+
+    try {
+        const onReviewTransaction = await onReviewTransactionService(transactionId, reason);
+        return res.status(200).json({ message: "Cancel reason on review!" })
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
