@@ -435,7 +435,7 @@ export const createProduct = async (req, res) => {
     for (let i = 0; i < defaultImage.length; i++) {
       const image = defaultImage[i];
       const filename = `${Date.now()}-${req.body.productName}.webp`;
-      const convertedImageData = convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
+      const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
 
       if (i === 0) defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${filename}`;
     }
@@ -657,7 +657,7 @@ export const updateProduct = async (req, res) => {
     for (let i = 0; i < defaultImage.length; i++) {
       const image = defaultImage[i];
       const filename = `${Date.now()}-${req.body.productName}.webp`;
-      const convertedImageData = convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
+      const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
 
       if (i === 0) defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${filename}`;
     }
