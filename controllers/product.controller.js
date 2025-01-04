@@ -428,10 +428,16 @@ export const createProduct = async (req, res) => {
     });
 
     // console.log(defaultImage);
-     // converts image to WebP format
-    const filename = `${Date.now()}-${req.body.productName}.webp`;
-    const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, defaultImage[0], filename);
-    const defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${convertedImageData.filename}`;
+    
+    // converts image to WebP format
+    let defaultImageString = '';
+    defaultImage.forEach(async (image, idx) => {
+
+      const filename = `${Date.now()}-${req.body.productName}.webp`;
+      const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
+
+      if (idx === 0) defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${convertedImageData.filename}`;
+    });
 
     const product = await createProductService(
       productName,
@@ -642,12 +648,17 @@ export const updateProduct = async (req, res) => {
     });
 
     // console.log(defaultImage);
-    
-    // converts image to WebP format
-    const filename = `${Date.now()}-${req.body.productName}.webp`;
-    const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, defaultImage[0], filename);
-    const defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${convertedImageData.filename}`;
 
+    // converts image to WebP format
+    let defaultImageString = '';
+    defaultImage.forEach(async (image, idx) => {
+
+      const filename = `${Date.now()}-${req.body.productName}.webp`;
+      const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
+
+      if (idx === 0) defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${convertedImageData.filename}`;
+    });
+    
     const updatedProduct = await updateProductService(
       productId,
       productName,
