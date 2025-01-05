@@ -62,12 +62,18 @@ export const updateBackgroundPage = async (req, res) => {
     const pages = await getPageService();
     const index = parseInt(req.body.index);
     const page = pages[0].contentJSONEng[index].page;
+    const oldBackgroundPath = pages[0].contentJSONEng[index].background;
+    const oldPhotoPath = pages[0].contentJSONEng[index].photo;
     let image = null;
     let filename = '';
     let convertedImageData = null;
+
+    if ((req.files['background'] === null || req.files['background'] === undefined) && (req.files['photo'] === null || req.files['photo'] === undefined)) {
+        return res.status(400).json({ message: 'You must upload background picture and photo!' })
+    }
     
     let backgroundPhotoString = '';
-    if (index === 0) {
+    if (index === 0 && req.files['background'] !== null && req.files['background'] !== undefined) {
         const backgroundPhoto = req.files['background'];
         image = backgroundPhoto[0];
         filename = `${page}${index + 1}.webp`;
@@ -77,17 +83,19 @@ export const updateBackgroundPage = async (req, res) => {
     
     // converts image to WebP format
     let photoPhotoString = '';
-    const photoPhoto = req.files['photo'];
-    image = photoPhoto[0];
-    filename = `${page}${index + 1}.webp`;
-    convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + 'photo', image, filename);
-    photoPhotoString = `/${UPLOAD_FOLDER}photo/${filename}`;
+    if (req.files['photo'] !== null && req.files['photo'] !== undefined) {
+        const photoPhoto = req.files['photo'];
+        image = photoPhoto[0];
+        filename = `${page}${index + 1}.webp`;
+        convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + 'photo', image, filename);
+        photoPhotoString = `/${UPLOAD_FOLDER}photo/${filename}`;
+    }
 
     await updatePageService(
         pageId,
         index,
-        backgroundPhotoString,
-        photoPhotoString
+        (backgroundPhotoString === '') ? oldBackgroundPath : backgroundPhotoString,
+        (photoPhotoString === '') ? oldPhotoPath : photoPhotoString
     );
     
     return res.status(200).json({ message: "Image updated!" });
