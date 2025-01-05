@@ -205,7 +205,10 @@ export const requestPickUpKomship = async (orderNumber) => {
         // Set pickup_date to tomorrow
         now.setDate(now.getDate() + 1);
     }
-    console.log("komship order number: " + orderNumber);
+
+    const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 10);
     
     const requestOptions = {
         method: 'POST',
@@ -213,7 +216,7 @@ export const requestPickUpKomship = async (orderNumber) => {
         redirect: 'follow',
         body: JSON.stringify(
             {
-                pickup_date: now.toISOString().slice(0, 10),
+                pickup_date: localDate,
                 pickup_time: "20:00",
                 pickup_vehicle: "Motor",
                 orders: [
@@ -224,6 +227,7 @@ export const requestPickUpKomship = async (orderNumber) => {
             }
         )
     }
+    
 
     try {
         const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/pickup/request`, requestOptions);
