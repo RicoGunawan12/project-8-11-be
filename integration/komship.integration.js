@@ -205,6 +205,8 @@ export const requestPickUpKomship = async (orderNumber) => {
         // Set pickup_date to tomorrow
         now.setDate(now.getDate() + 1);
     }
+    console.log(orderNumber);
+    
     const requestOptions = {
         method: 'POST',
         headers: myHeaders,
