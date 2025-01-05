@@ -1,5 +1,6 @@
 import { createPostService, deletePostService, getAllPostService, getPostByIdService, updatePostService } from "../services/post.service.js";
 import { UPLOAD_FOLDER } from "../utils/uploader.js";
+import { convertImageToWebp } from "../utils/imageconverter.js";
 
 
 export const getAllPost = async (req, res) => {
@@ -42,8 +43,28 @@ export const createPost = async (req, res) => {
         return res.status(400).json({ message: "Post banner must be filled" });
     }
     
-    const postImage = `/${UPLOAD_FOLDER}blog/${postTitle}/${postImageFile[0].filename}`
-    const postBanner = `/${UPLOAD_FOLDER}blog/${postTitle}/${postBannerFile[0].filename}`
+    // converts image to WebP format
+    let postImage = '';
+    for (let i = 0; i < postImageFile.length; i++) {
+        const image = postImageFile[i];
+
+        const filename = `${Date.now()}-${req.body.postTitle}.webp`;
+        const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "blog/" + postTitle, image, filename);
+
+        if (i === 0) postImage = `/${UPLOAD_FOLDER}blog/${postTitle}/${filename}`;
+    }
+
+    // converts image to WebP format
+    let postBanner = '';
+    for (let i = 0; i < postBannerFile.length; i++) {
+        const image = postBannerFile[i];
+
+        const filename = `${Date.now()}-${req.body.postTitle}.webp`;
+        const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "blog/" + postTitle, image, filename);
+
+        if (i === 0) postBanner = `/${UPLOAD_FOLDER}blog/${postTitle}/${filename}`;
+    }
+
     try {
         const post = await createPostService(postImage, postTitle, postContent, postBanner);
         return res.status(200).json({ message: "Post created successfully", post });
@@ -72,9 +93,28 @@ export const updatePost = async (req, res) => {
     }
     
     
+    // converts image to WebP format
+    let postImage = '';
+    for (let i = 0; i < postImageFile.length; i++) {
+        const image = postImageFile[i];
+
+        const filename = `${Date.now()}-${req.body.postTitle}.webp`;
+        const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "blog/" + postTitle, image, filename);
+
+        if (i === 0) postImage = `/${UPLOAD_FOLDER}blog/${postTitle}/${filename}`;
+    }
+
+    // converts image to WebP format
+    let postBanner = '';
+    for (let i = 0; i < postBannerFile.length; i++) {
+        const image = postBannerFile[i];
+
+        const filename = `${Date.now()}-${req.body.postTitle}.webp`;
+        const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "blog/" + postTitle, image, filename);
+
+        if (i === 0) postBanner = `/${UPLOAD_FOLDER}blog/${postTitle}/${filename}`;
+    }
     
-    const postImage = `/${UPLOAD_FOLDER}blog/${postTitle}/${postImageFile[0].filename}`
-    const postBanner = `/${UPLOAD_FOLDER}blog/${postTitle}/${postBannerFile[0].filename}`
     try {
         const updatedPost = await updatePostService(postId, postImage, postTitle, postContent, postBanner);
         return res.status(200).json({ message: "Post updated successfully", updatedPost });

@@ -4,6 +4,7 @@ import {
   getCategoriesService,
   updateCategoryService,
 } from "../services/productCategory.service.js";
+import { convertImageToWebp } from "../utils/imageconverter.js";
 import { UPLOAD_FOLDER } from "../utils/uploader.js";
 
 export const getCategories = async (req, res) => {
@@ -21,7 +22,17 @@ export const createCategory = async (req, res) => {
   const { productCategoryName } = req.body;
   const productCategoryPhoto = req.files["productCategoryPhoto"];
 
-  const productCategoryPhotoString = `/${UPLOAD_FOLDER}category/${productCategoryPhoto[0].filename}`;
+  // converts image to WebP format
+  let productCategoryPhotoString = '';
+  for (let i = 0; i < productCategoryPhoto.length; i++) {
+    const image = productCategoryPhoto[i];
+
+    const filename = `${Date.now()}-${req.body.productCategoryName}.webp`;
+    const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "category", image, filename);
+
+    if (i === 0) productCategoryPhotoString = `/${UPLOAD_FOLDER}category/${filename}`;
+  }
+  
   try {
     const insertedCategory = await createCategoryService(
       productCategoryName,
@@ -58,7 +69,17 @@ export const updateCategory = async (req, res) => {
     return res.status(400).json({ message: "Category name must be filled" });
   }
 
-  const productCategoryPhotoString = `/${UPLOAD_FOLDER}category/${productCategoryPhoto[0].filename}`;
+  // converts image to WebP format
+  let productCategoryPhotoString = '';
+  for (let i = 0; i < productCategoryPhoto.length; i++) {
+    const image = productCategoryPhoto[i];
+
+    const filename = `${Date.now()}-${req.body.productCategoryName}.webp`;
+    const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "category", image, filename);
+
+    if (i === 0) productCategoryPhotoString = `/${UPLOAD_FOLDER}category/${filename}`;
+  } 
+  
   try {
     const message = await updateCategoryService(
       categoryId,

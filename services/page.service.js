@@ -1,3 +1,4 @@
+import { json } from "sequelize";
 import AboutPage from "../models/aboutPage.model.js";
 import Page from "../models/page.model.js"
 import WhyContent from "../models/whyContent.model.js";
@@ -41,6 +42,55 @@ export const getWhyContentService = async () => {
         };
     });
     return parsedPages;
+}
+
+export const updatePageService = async (pageId, index, backgroundPhotoPath, photoPhotoPath) => {
+    const page = await Page.findOne({ where: { pageId } });
+    if (!page) {
+        throw new Error(`Page not found!`);
+    }
+    
+    let jsonContentIndo = JSON.parse(page.contentJSONIndo);
+    let jsonContentEng = JSON.parse(page.contentJSONEng);
+    if (!Array.isArray(jsonContentIndo)) {
+        throw new Error('Content Indo is different as intended to saved');
+    }
+
+    if (!Array.isArray(jsonContentIndo)) {
+        throw new Error('Content Indo is different as intended to saved');
+    }
+
+    const condition = element => element.pageId === (index + 1);
+
+    let foundItem = jsonContentIndo.find(condition);
+    let foundIndex = jsonContentIndo.findIndex(condition);
+
+    if (index === 0) {
+        foundItem.background = backgroundPhotoPath;
+        foundItem.photo = photoPhotoPath;
+    }
+
+    jsonContentIndo[foundIndex] = foundItem;
+
+    foundItem = jsonContentEng.find(condition);
+    foundIndex = jsonContentEng.findIndex(condition);
+
+    if (index === 0) {
+        foundItem.background = backgroundPhotoPath;
+        foundItem.photo = photoPhotoPath;
+    }
+
+    jsonContentEng[foundIndex] = foundItem;
+
+    await Page.update(
+        { 
+            contentJSONEng: JSON.stringify(jsonContentEng),
+            contentJSONIndo: JSON.stringify(jsonContentIndo)
+        },
+        { where: { pageId: pageId } }
+    );
+
+    return { message: 'Page updated successfully' };
 }
 
 export const migratePage = async () => {

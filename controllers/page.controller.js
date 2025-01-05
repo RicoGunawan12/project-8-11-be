@@ -1,4 +1,5 @@
-import { getAboutPageService, getPageService, getWhyContentService, updateEngAboutPageService, updateEngPageService, updateEngWhyContentService, updateIndoAboutPageService, updateIndoPageService, updateIndoWhyContentService } from "../services/page.service.js";
+import { getAboutPageService, getPageService, getWhyContentService, updateEngAboutPageService, updateEngPageService, updateEngWhyContentService, updateIndoAboutPageService, updateIndoPageService, updateIndoWhyContentService, updatePageService } from "../services/page.service.js";
+import { convertImageToWebp } from "../utils/imageconverter.js";
 import { UPLOAD_FOLDER } from "../utils/uploader.js";
 import { isValidNumber } from "../utils/utility.js";
 
@@ -55,6 +56,37 @@ export const updateIndoPage = async (req, res) => {
 }
 
 export const updateBackgroundPage = async (req, res) => {
+    const pageId = req.params.id;
+    
+    // converts image to WebP format
+    const pages = await getPageService();
+    const index = parseInt(req.body.index);
+    const page = pages[0].contentJSONEng[index].page;
+    let image = null;
+    let filename = '';
+    let convertedImageData = null;
+    
+    let backgroundPhotoString = '';
+    const backgroundPhoto = req.files['background'];
+    image = backgroundPhoto[0];
+    filename = `${page}${index + 1}.webp`;
+    convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + 'background', image, filename);
+    backgroundPhotoString = `/${UPLOAD_FOLDER}background/${filename}`;
+
+    // converts image to WebP format
+    let photoPhotoString = '';
+    const photoPhoto = req.files['photo'];
+    image = photoPhoto[0];
+    filename = `${page}${index + 1}.webp`;
+    convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + 'photo', image, filename);
+    photoPhotoString = `/${UPLOAD_FOLDER}photo/${filename}`;
+
+    await updatePageService(
+        pageId,
+        index,
+        backgroundPhotoString,
+        photoPhotoString
+    );
     
     return res.status(200).json({ message: "Image updated!" });
     // var { index } = req.body;
