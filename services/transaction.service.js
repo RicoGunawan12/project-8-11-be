@@ -296,18 +296,18 @@ export const createKomshipOrderService = async (transaction) => {
 
     // }
     const createdKomshipOrder = await createOrderKomship(transaction, adminAddress[0]);
-    // const updatedTransaction = await TransactionHeaderModel.update(
-    //     {
-    //         komshipOrderNumber: createdKomshipOrder.komshipResponse.data.order_no,
-    //         komshipOrderId: createdKomshipOrder.komshipResponse.data.order_id,
-    //         status: 'Shipping'
-    //     },
-    //     {
-    //         where: {
-    //             transactionId: transaction.transactionId
-    //         },
-    //     }
-    // )
+    const updatedTransaction = await TransactionHeaderModel.update(
+        {
+            komshipOrderNumber: createdKomshipOrder.komshipResponse.data.order_no,
+            komshipOrderId: createdKomshipOrder.komshipResponse.data.order_id,
+            // status: 'Shipping'
+        },
+        {
+            where: {
+                transactionId: transaction.transactionId
+            },
+        }
+    )
 
     return createdKomshipOrder
 }
@@ -540,6 +540,23 @@ export const onReviewReturnTransactionService = async (transactionId, reason) =>
         {
             status: 'On Review Return',
             notes: reason
+        },
+        {
+            where: {
+                transactionId: transactionId
+            },
+        }
+    )
+    if (updatedTransaction[0] === 0) {
+        throw new Error("There is no change or no transaction");
+    }
+    return updatedTransaction;
+}
+
+export const returnTransactionService = async (transactionId) => {
+    const updatedTransaction = await TransactionHeaderModel.update(
+        {
+            status: 'Waiting for Return',
         },
         {
             where: {

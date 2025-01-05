@@ -266,6 +266,32 @@ export const createPlanXendit = async (transaction, customerId, productsInCart) 
     }
 }
 
-export const refundXendit = async () => {
-    
+export const refundXendit = async (transactionId, paymentRequestId, amount) => {
+    try {
+        const body = {
+            amount: amount,
+            external_refund_id: transactionId,
+            reason: "REQUESTED_BY_CUSTOMER",
+            payment_request_id: paymentRequestId
+        }
+        
+        const requestOptions = {
+            method: 'POST',
+            headers: headers,
+            redirect: 'follow',
+            body: JSON.stringify(body)
+        }
+
+        const xenditResponse = await fetch(`${process.env.XENDIT_URL}/refunds`, requestOptions);
+        console.log(xenditResponse);
+        
+        if (!xenditResponse.ok) {
+            throw new Error(`Error: ${xenditResponse.statusText}`);
+        }
+        const result = await xenditResponse.json();
+        return result;
+
+    } catch (error) {
+        throw new Error(error.message);
+    }
 }

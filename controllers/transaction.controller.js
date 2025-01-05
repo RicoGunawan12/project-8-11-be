@@ -1,8 +1,9 @@
 import sequelize from "../config/database.js";
-import { createQrisTransactionXendit } from "../integration/xendit.integration.js";
+import { cancelOrderKomship } from "../integration/komship.integration.js";
+import { createQrisTransactionXendit, refundXendit } from "../integration/xendit.integration.js";
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
 import { checkPromoService } from "../services/promo.service.js";
-import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionStatusService } from "../services/transaction.service.js";
+import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionStatusService } from "../services/transaction.service.js";
 import { applyVoucherService } from "../services/voucher.service.js";
 
 
@@ -506,7 +507,7 @@ export const payTransaction = async (req, res) => {
     const { transactionId } = req.body;
 
     if (!transactionId) {
-        return res.status(400).json({ message: "Transaction is required!" });
+        return res.status(400).json({ message: "Transaction ID is required!" });
     }
 
     try {
@@ -516,4 +517,58 @@ export const payTransaction = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 
+}
+
+export const returnTransaction = async (req, res) => {
+    const { transactionId } = req.body;
+    
+    if (!transactionId) {
+        return res.status(400).json({ message: "Transaction ID is required!" });
+    }
+
+    try {
+        const transaction = await getTransactionsByIdService(transactionId);
+        if (transaction.status != "Done") {
+            return res.status(400).json({ message: "Cannot refund undone transaction!" });
+        }
+        const returnedTransaction = await returnTransactionService(transactionId);
+        
+        return res.status(200).json({ message: "Transaction updated to waiting for return. Ask customer to return the poduct" });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const refundTransaction = async (req, res) => {
+    const { transactionId } = req.body;
+    
+    if (!transactionId) {
+        return res.status(400).json({ message: "Transaction ID is required!" });
+    }
+
+    try {
+        const transaction = await getTransactionsByIdService(transactionId);
+        const gatewayResponse = JSON.parse(transaction.gatewayResponse);
+        const refundRequest = await refundXendit(transactionId, gatewayResponse.data.payment_request_id, transaction.totalPrice);
+        return res.status(200).json({ message: "Transaction refunded!" })
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const cancelPaidTransaction = async (req, res) => {
+    const transactionId = req.params.id;
+
+    if (!transactionId) {
+        return res.status(400).json({ message: "Transaction is required!" });
+    }
+
+    try {
+        const transaction = await getTransactionsByIdService(transactionId);
+        const cancelledTransaction = await cancelTransactionService(transactionId);
+        const cancelledKomshipOrder = await cancelOrderKomship(transaction.komshipOrderNumber);
+        return res.status(200).json({ message: "Transaction cancelled!" })
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
 }
