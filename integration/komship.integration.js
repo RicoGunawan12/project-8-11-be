@@ -205,7 +205,7 @@ export const requestPickUpKomship = async (orderNumber) => {
         // Set pickup_date to tomorrow
         now.setDate(now.getDate() + 1);
     }
-    console.log(orderNumber);
+    console.log("komship order number: " + orderNumber);
     
     const requestOptions = {
         method: 'POST',
@@ -227,13 +227,15 @@ export const requestPickUpKomship = async (orderNumber) => {
 
     try {
         const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/pickup/request`, requestOptions);
-        // console.log(komshipResponse);
+        console.log(komshipResponse);
         if (!komshipResponse.ok) {
             throw new Error(`Error: ${komshipResponse.statusText}`);
         }
         const result = await komshipResponse.json();
         return result;
     } catch (error) {
+        console.log(error);
+        
         throw new Error(error.message);
     }
 }

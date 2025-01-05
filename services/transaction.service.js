@@ -316,6 +316,8 @@ export const requestPickupTransactionService = async (transaction) => {
     try {
         const pickupResponse = await requestPickUpKomship(transaction.komshipOrderNumber);
     } catch (error) {
+        console.log(error);
+        
         throw new Error("Failed to request pickup");
     }
 
