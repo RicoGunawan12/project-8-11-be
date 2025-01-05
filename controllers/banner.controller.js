@@ -1,4 +1,5 @@
 import { getBannerService, updateBannerService } from "../services/banner.service.js";
+import { convertImageToWebp } from "../utils/imageconverter.js";
 import { UPLOAD_FOLDER } from "../utils/uploader.js";
 
 export const getBanner = async (req, res) => {
@@ -35,8 +36,17 @@ export const updateBanner = async (req, res) => {
     }
 
     try {
-        const bannerImage = `/${UPLOAD_FOLDER}banner/${image[0].filename}`
-        const banners = await updateBannerService(page, bannerImage);
+        // converts image to WebP format
+        let bannerImageString = '';
+        for (let i = 0; i < image.length; i++) {
+            const selectedImage = image[i];
+            const filename = `${Date.now()}.webp`;
+            const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "banner/", selectedImage, filename);
+
+            if (i === 0) bannerImageString = `/${UPLOAD_FOLDER}banner/${filename}`;
+        }
+
+        const banners = await updateBannerService(page, bannerImageString);
         return res.status(200).json({ message: "Banner fetched!", banners });
     } catch (error) {
         return res.status(500).json({ message: error.message });
