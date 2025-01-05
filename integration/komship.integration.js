@@ -199,16 +199,17 @@ export const createOrderKomship = async (transaction, adminAddress) => {
 
 export const requestPickUpKomship = async (orderNumber) => {
     const now = new Date();
-    const currentHour = now.getHours();
-    const currentMinute = now.getMinutes();
-    if (currentHour > 20 || (currentHour === 20 && currentMinute > 0)) {
-        // Set pickup_date to tomorrow
-        now.setDate(now.getDate() + 1);
+    const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+    const currentHour = localDate.getHours();
+    const currentMinute = localDate.getMinutes();
+    if (currentHour > 12 || (currentHour === 12 && currentMinute > 0)) {
+        localDate.setDate(localDate.getDate() + 1);
     }
 
-    const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-    .toISOString()
-    .slice(0, 10);
+    console.log(
+        localDate.toISOString().slice(0, 10)
+    );
+    
     
     const requestOptions = {
         method: 'POST',
@@ -216,7 +217,7 @@ export const requestPickUpKomship = async (orderNumber) => {
         redirect: 'follow',
         body: JSON.stringify(
             {
-                pickup_date: localDate,
+                pickup_date: localDate.toISOString().slice(0, 10),
                 pickup_time: "20:00",
                 pickup_vehicle: "Motor",
                 orders: [
