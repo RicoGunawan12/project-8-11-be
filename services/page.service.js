@@ -342,3 +342,4 @@ export const updateIndoWhyContentService = async (whyContentJSONIndo, whyContent
     
     return updatedPage;
 }
+
