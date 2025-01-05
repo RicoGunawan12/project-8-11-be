@@ -198,13 +198,20 @@ export const createOrderKomship = async (transaction, adminAddress) => {
 
 
 export const requestPickUpKomship = async (orderNumber) => {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    if (currentHour > 20 || (currentHour === 20 && currentMinute > 0)) {
+        // Set pickup_date to tomorrow
+        now.setDate(now.getDate() + 1);
+    }
     const requestOptions = {
         method: 'POST',
         headers: myHeaders,
         redirect: 'follow',
         body: JSON.stringify(
             {
-                pickup_date: new Date().toISOString().slice(0, 10),
+                pickup_date: now.toISOString().slice(0, 10),
                 pickup_time: "20:00:00",
                 pickup_vehicle: "Motor",
                 orders: [
