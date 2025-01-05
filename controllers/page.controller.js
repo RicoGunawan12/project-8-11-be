@@ -67,12 +67,14 @@ export const updateBackgroundPage = async (req, res) => {
     let convertedImageData = null;
     
     let backgroundPhotoString = '';
-    const backgroundPhoto = req.files['background'];
-    image = backgroundPhoto[0];
-    filename = `${page}${index + 1}.webp`;
-    convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + 'background', image, filename);
-    backgroundPhotoString = `/${UPLOAD_FOLDER}background/${filename}`;
-
+    if (index === 0) {
+        const backgroundPhoto = req.files['background'];
+        image = backgroundPhoto[0];
+        filename = `${page}${index + 1}.webp`;
+        convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + 'background', image, filename);
+        backgroundPhotoString = `/${UPLOAD_FOLDER}background/${filename}`;
+    }
+    
     // converts image to WebP format
     let photoPhotoString = '';
     const photoPhoto = req.files['photo'];
