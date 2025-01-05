@@ -214,7 +214,7 @@ export const requestPickUpKomship = async (orderNumber) => {
         body: JSON.stringify(
             {
                 pickup_date: now.toISOString().slice(0, 10),
-                pickup_time: "20:00:00",
+                pickup_time: "20:00",
                 pickup_vehicle: "Motor",
                 orders: [
                     {
