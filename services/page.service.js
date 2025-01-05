@@ -67,8 +67,9 @@ export const updatePageService = async (pageId, index, backgroundPhotoPath, phot
 
     if (index === 0) {
         foundItem.background = backgroundPhotoPath;
-        foundItem.photo = photoPhotoPath;
     }
+
+    foundItem.photo = photoPhotoPath;
 
     jsonContentIndo[foundIndex] = foundItem;
 
@@ -77,8 +78,9 @@ export const updatePageService = async (pageId, index, backgroundPhotoPath, phot
 
     if (index === 0) {
         foundItem.background = backgroundPhotoPath;
-        foundItem.photo = photoPhotoPath;
     }
+
+    foundItem.photo = photoPhotoPath;
 
     jsonContentEng[foundIndex] = foundItem;
 
