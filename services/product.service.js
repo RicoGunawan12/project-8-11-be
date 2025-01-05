@@ -31,8 +31,8 @@ export const getProductsService = async (search, category, limit, status = "acti
       "productHeight",
       "isBestSeller",
       "productActivityStatus",
-      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
-      [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
+       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
     ],
     include: [
       {
@@ -98,8 +98,8 @@ export const getNewestProductsService = async () => {
       "productHeight",
       "createdAt",
       "isBestSeller",
-      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
-      [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
+       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
     ],
     include: [
       {
@@ -175,8 +175,8 @@ export const getProductPaginationService = async (limit, offset, search, categor
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
-      [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
+       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
     ],
     include: [
       {
@@ -270,8 +270,8 @@ export const getProductByIdService = async (productId) => {
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
-      [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
+       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
     ],
     include: [
       {
@@ -338,8 +338,8 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
-      [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
+       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
     ],
     include: [
       {
@@ -403,8 +403,8 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
-      [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
+       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
     ],
     include: [
       {
@@ -656,8 +656,8 @@ export const getBestSellerService = async () => {
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
-      [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
+       [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
+       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
     ],
     include: [
       {
