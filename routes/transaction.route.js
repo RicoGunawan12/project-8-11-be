@@ -7,7 +7,7 @@ import { checkoutQrisSchema } from '../schema/transaction/checkout/checkoutQris.
 import { checkoutVASchema } from './../schema/transaction/checkout/checkoutVA.schema.js';
 import { updateStatusValidator } from './../validator/transaction/updateStatus.validator.js';
 import { transactionIdSchema } from '../schema/general/transactionId.schema.js';
-import { allMonthSalesAnalytic, cancelTransaction, checkOutCreditTransaction, checkOutQrisTransaction, checkOutVATransaction, createTransaction, deliveryDetail, fetchSalesByCategory, getAllTransactions, getTransactionById, getTransactionCount, getTransactionsByUser, monthlySalesReport, onReviewReturnTransaction, onReviewTransaction, payTransaction, printLabel, refundTransaction, requestPickupTransaction, returnTransaction, updateTransactionDelivery, updateTransactionStatus } from '../controllers/transaction.controller.js';
+import { allMonthSalesAnalytic, cancelPaidTransaction, cancelTransaction, checkOutCreditTransaction, checkOutQrisTransaction, checkOutVATransaction, createTransaction, deliveryDetail, fetchSalesByCategory, getAllTransactions, getTransactionById, getTransactionCount, getTransactionsByUser, monthlySalesReport, onReviewReturnTransaction, onReviewTransaction, payTransaction, printLabel, refundTransaction, requestPickupTransaction, returnTransaction, updateTransactionDelivery, updateTransactionStatus } from '../controllers/transaction.controller.js';
 import { adminMiddleware, generalMiddleware, userMiddleware } from '../middleware/auth.middleware.js';
 
 const TransactionRoute = express.Router();
@@ -46,7 +46,7 @@ TransactionRoute.post('/update/delivery', updateTransactionDelivery);
 
 TransactionRoute.put('/cancel/:id', userMiddleware, cancelTransaction);
 
-TransactionRoute.put('/paid/cancel/:id', userMiddleware, cancelTransaction);
+TransactionRoute.put('/paid/cancel/:id', userMiddleware, cancelPaidTransaction);
 
 TransactionRoute.put('/on-review-cancel/:id', userMiddleware, onReviewTransaction);
 

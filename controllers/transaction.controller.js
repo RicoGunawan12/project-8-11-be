@@ -448,6 +448,7 @@ export const cancelTransaction = async (req, res) => {
 
     try {
         const cancelledTransaction = await cancelTransactionService(transactionId);
+
         return res.status(200).json({ message: "Transaction cancelled!" })
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -567,6 +568,10 @@ export const cancelPaidTransaction = async (req, res) => {
         const transaction = await getTransactionsByIdService(transactionId);
         const cancelledTransaction = await cancelTransactionService(transactionId);
         const cancelledKomshipOrder = await cancelOrderKomship(transaction.komshipOrderNumber);
+
+        const gatewayResponse = JSON.parse(transaction.gatewayResponse);
+        const refundRequest = await refundXendit(transactionId, gatewayResponse.data.payment_request_id, transaction.totalPrice);
+        
         return res.status(200).json({ message: "Transaction cancelled!" })
     } catch (error) {
         return res.status(500).json({ message: error.message });
