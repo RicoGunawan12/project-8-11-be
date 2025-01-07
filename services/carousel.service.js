@@ -1,20 +1,55 @@
-import Carousel from "../models/carousel.model";
+import Carousel from "../models/carousel.model.js";
 
 export const getCarouselService = async () => {
     const carousels = await Carousel.findAll();
     return carousels;
 }
 
-export const createCarouselService = async (carouselImage, title) => {
-    const carousel = await Carousel.create({ carouselImage, title });
+export const createCarouselService = async (
+    carouselImage,
+    titleEng,
+    titleIndo,
+    contentEng,
+    contentIndo,
+    buttonEng,
+    buttonIndo,
+    link
+) => {
+    const carousel = await Carousel.create({ 
+        carouselImage,
+        titleEng,
+        titleIndo,
+        contentEng,
+        contentIndo,
+        buttonEng,
+        buttonIndo,
+        link 
+    });
     return carousel;
 }
 
-export const updateCarouselService = async (carouselId, carouselImage, title) => {
+export const updateCarouselService = async (
+    carouselId, 
+    carouselImage,
+    titleEng,
+    titleIndo,
+    contentEng,
+    contentIndo,
+    buttonEng,
+    buttonIndo,
+    link 
+) => {
     const updatedCarousel = await Carousel.update(
         {
             carouselImage: carouselImage,
-            title: title
+            title: title,
+            titleEng: titleEng,
+            titleIndo: titleIndo,
+            contentEng: contentEng,
+            contentIndo: contentIndo,
+            buttonEng: buttonEng,
+            buttonIndo: buttonIndo,
+            link: link 
         },
         { where: carouselId }
     )
@@ -27,7 +62,9 @@ export const updateCarouselService = async (carouselId, carouselImage, title) =>
 }
 
 export const deleteCarouselService = async (carouselId) => {
-    const deletedCarousel = await Carousel.destroy({ carouselId });
+    const deletedCarousel = await Carousel.destroy({ 
+        where: { carouselId }
+     });
     if (deletedCarousel == 0) {
         throw new Error("Carousel not found!");
     }

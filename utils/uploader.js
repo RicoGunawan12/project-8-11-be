@@ -209,6 +209,21 @@ const storageWhyPhoto = multer.diskStorage({
   }
 })
 
+
+const storageCarousel = multer.diskStorage({
+  destination: async function (req, file, cb) {
+      const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'carousel');
+
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath, { recursive: true });
+      }
+      cb(null, uploadPath);
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${Date.now()}-${req.body.titleEng}.png`);
+  }
+});
+
 export const upload = multer({ storage: storage });
 export const uploadBlog = multer({ storage: storageBlog });
 export const uploadContact = multer({ storage: storageContact });
@@ -216,6 +231,7 @@ export const uploadBanner = multer({ storage: storageBanner });
 export const uploadCategory = multer({ storage: storageCategory });
 export const uploadBackground = multer({ storage: storageBackground });
 export const uploadWhyPhoto = multer({ storage: storageWhyPhoto });
+export const uploadCarousel = multer({ storage: storageCarousel });
 
 
 export const deleteDirectory = (productName) => {
