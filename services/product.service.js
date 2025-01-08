@@ -410,9 +410,13 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       {
         model: ProductCategoryModel,
         attributes: ["productCategoryName"],
-        where: {
-          productCategoryName: product.product_category.productCategoryName
-        }
+        ...(product?.product_category?.productCategoryName != null
+          ? {
+              where: {
+                productCategoryName: product.product_category.productCategoryName,
+              },
+            }
+          : {}),
       },
       {
         model: ProductVariantModel,
