@@ -374,7 +374,7 @@ export const printLabel = async (req, res) => {
 
     try {
         const getTransactionById = await getTransactionsByIdService(transactionId);
-        const label = await printLabelService(getTransactionById.orderNumber);
+        const label = await printLabelService(getTransactionById.komshipOrderNumber);
         console.log(label);
         
         return res.status(200).json({ message: "Success!", label });
