@@ -397,18 +397,17 @@ export const createProduct = async (req, res) => {
       return res.status(400).json({ message: "Default image is required" });
     }
 
+    const variants = JSON.parse(productVariants);
     const hash = new Map();
     for (let i = 0; i < images.length; i++) {
       const image = images[i];
-
-      // console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
 
       // converts image to WebP format
       const filename = `${Date.now()}-${req.body.productName}.webp`;
       const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
 
       hash.set(
-        image.originalname,
+        productName + " - " + variants[i].productColor,
         `/${UPLOAD_FOLDER}product/${productName}/${filename}`
       );
     }
@@ -417,12 +416,8 @@ export const createProduct = async (req, res) => {
       return res.status(400).json({ message: "Product name must be filled" });
     }
 
-    const variants = JSON.parse(productVariants);
+   
     variants.forEach((variant) => {
-      // console.log(productName + " - " + variant.productSize + " - " + variant.productColor);
-
-      // console.log("hash: " + hash.get(productName + " - " + variant.productSize + " - " + variant.productColor));
-
       variant.productImage = hash.get(
         productName + " - " + variant.productColor
       );
