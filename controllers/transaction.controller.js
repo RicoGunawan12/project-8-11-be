@@ -555,7 +555,7 @@ export const refundTransaction = async (req, res) => {
         console.log(gatewayResponse);
         
         const refundRequest = await refundXendit(transactionId, gatewayResponse.data.attempt_details[0].action_id, transaction.totalPrice);
-        console.log(refundRequest);
+        await updateTransactionService(transactionId, "Return");
         
         return res.status(200).json({ message: "Transaction refunded!" })
     } catch (error) {
