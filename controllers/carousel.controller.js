@@ -48,10 +48,10 @@ export const createCarousel = async (req, res) => {
     if (typeof link !== 'string' || link.trim() === '') {
         return res.status(400).json({ message: 'Link is required' });
     }
-    // const urlPattern = /^(https?:\/\/)?([\w\d\-]+\.)+\w{2,}(\/[\w\d\-._~:\/?#[\]@!$&'()*+,;%=]*)?$/;
-    // if (!urlPattern.test(link)) {
-    //     return res.status(400).json({ message: 'Invalid link format' });
-    // }
+    const urlPattern = /^(https?:\/\/)?([\w\d\-]+\.)+\w{2,}(\/[\w\d\-._~:\/?#[\]@!$&'()*+,;%=]*)?$/;
+    if (!urlPattern.test(link)) {
+        return res.status(400).json({ message: 'Invalid link format' });
+    }
 
     // Validate image
     if (!image) {
