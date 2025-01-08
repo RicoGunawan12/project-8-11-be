@@ -274,6 +274,7 @@ export const refundXendit = async (transactionId, paymentRequestId, amount) => {
             reason: "REQUESTED_BY_CUSTOMER",
             payment_request_id: paymentRequestId
         }
+        console.log(body);
         
         const requestOptions = {
             method: 'POST',

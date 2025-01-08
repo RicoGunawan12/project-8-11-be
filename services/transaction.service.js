@@ -513,9 +513,11 @@ export const cancelTransactionService = async (transactionId) => {
             },
         }
     )
-    if (updatedTransaction[0] === 0) {
-        throw new Error("There is no change or no transaction");
-    }
+    console.log(updatedTransaction);
+    
+    // if (updatedTransaction[0] === 0) {
+    //     throw new Error("There is no change or no transaction");
+    // }
     return updatedTransaction;
 }
 
@@ -612,4 +614,18 @@ export const updatePaymentLinkService = async (transaction, paymentLink) => {
             },
         }
     )
+}
+
+export const updateTransactionService = async (transactionId, status) => {
+    const updatedTransaction = await TransactionHeaderModel.update(
+        {
+            status: status
+        },
+        {
+            where: {
+                transactionId: transactionId
+            },
+        }
+    )
+    return updatedTransaction;
 }
