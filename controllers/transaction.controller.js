@@ -576,12 +576,13 @@ export const cancelPaidTransaction = async (req, res) => {
         const cancelledTransaction = await cancelTransactionService(transactionId);
         console.log(transaction.komshipOrderNumber);
         
-        const cancelledKomshipOrder = await cancelOrderKomship(transaction.komshipOrderNumber);
-        console.log(cancelledKomshipOrder);
-
         const gatewayResponse = JSON.parse(transaction.gatewayResponse);
         const refundRequest = await refundXendit(transactionId, gatewayResponse.data.payment_request_id, transaction.totalPrice);
         console.log(refundRequest);
+        
+        const cancelledKomshipOrder = await cancelOrderKomship(transaction.komshipOrderNumber);
+        console.log(cancelledKomshipOrder);
+
         return res.status(200).json({ message: "Transaction cancelled!" })
     } catch (error) {
         console.log(error);
