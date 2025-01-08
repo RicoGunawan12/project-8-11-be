@@ -338,7 +338,7 @@ export const updateTransactionStatus = async (req, res) => {
         const updatedTransaction = await updateTransactionStatusService(reference_id, req.body);
         const getTransactionById = await getTransactionsByIdService(reference_id);
 
-        // const response = await createKomshipOrderService(getTransactionById);
+        const response = await createKomshipOrderService(getTransactionById);
         return res.status(200).json({ message: "Transaction updated!", response });
         // return res.redirect('/');
     } catch (error) {
@@ -351,7 +351,7 @@ export const requestPickupTransaction = async (req, res) => {
     const { transactionId } = req.body;
     try {
         const getTransactionById = await getTransactionsByIdService(transactionId);
-        const createKomshipOrder = await createKomshipOrderService(getTransactionById);
+        // const createKomshipOrder = await createKomshipOrderService(getTransactionById);
         const response = await requestPickupTransactionService(getTransactionById);
         return res.status(200).json({ message: "Success!", response });
     } catch (error) {
