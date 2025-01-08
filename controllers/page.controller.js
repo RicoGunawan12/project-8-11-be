@@ -14,42 +14,42 @@ export const getPage = async (req, res) => {
 }
 
 export const updateEngPage = async (req, res) => {
-    
+
     const { contentJSONEng } = req.body;
     const id = req.params.id
-    
+
     if (!contentJSONEng || !Array.isArray(contentJSONEng)) {
         return res.status(400).json({ error: "Invalid or missing content. It should be an array." });
     }
-    
+
     if (!id || typeof id !== "string" || !/^[a-f0-9-]{36}$/i.test(id)) {
         return res.status(400).json({ error: "Invalid or missing ID. It should be a valid UUID." });
     }
 
     try {
         const response = await updateEngPageService(id, contentJSONEng);
-        return res.status(200).json({ message: "Page updated!"});
+        return res.status(200).json({ message: "Page updated!" });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
 }
 
 export const updateIndoPage = async (req, res) => {
-    
+
     const { contentJSONIndo } = req.body;
     const id = req.params.id
-    
+
     if (!contentJSONIndo || !Array.isArray(contentJSONIndo)) {
         return res.status(400).json({ error: "Invalid or missing content. It should be an array." });
     }
-    
+
     if (!id || typeof id !== "string" || !/^[a-f0-9-]{36}$/i.test(id)) {
         return res.status(400).json({ error: "Invalid or missing ID. It should be a valid UUID." });
     }
 
     try {
         const response = await updateIndoPageService(id, contentJSONIndo);
-        return res.status(200).json({ message: "Page updated!"});
+        return res.status(200).json({ message: "Page updated!" });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
@@ -57,7 +57,7 @@ export const updateIndoPage = async (req, res) => {
 
 export const updateBackgroundPage = async (req, res) => {
     const pageId = req.params.id;
-    
+
     // converts image to WebP format
     const pages = await getPageService();
     const index = parseInt(req.body.index);
@@ -71,7 +71,7 @@ export const updateBackgroundPage = async (req, res) => {
     if ((req.files['background'] === null || req.files['background'] === undefined) && (req.files['photo'] === null || req.files['photo'] === undefined)) {
         return res.status(400).json({ message: 'You must upload background picture and photo!' })
     }
-    
+
     let backgroundPhotoString = '';
     if (index === 0 && req.files['background'] !== null && req.files['background'] !== undefined) {
         const backgroundPhoto = req.files['background'];
@@ -80,7 +80,7 @@ export const updateBackgroundPage = async (req, res) => {
         convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + 'background', image, filename);
         backgroundPhotoString = `/${UPLOAD_FOLDER}background/${filename}`;
     }
-    
+
     // converts image to WebP format
     let photoPhotoString = '';
     if (req.files['photo'] !== null && req.files['photo'] !== undefined) {
@@ -97,7 +97,7 @@ export const updateBackgroundPage = async (req, res) => {
         (backgroundPhotoString === '') ? oldBackgroundPath : backgroundPhotoString,
         (photoPhotoString === '') ? oldPhotoPath : photoPhotoString
     );
-    
+
     return res.status(200).json({ message: "Image updated!" });
     // var { index } = req.body;
     // const images = req.files['background'];
@@ -122,7 +122,7 @@ export const updateWhyPhoto = async (req, res) => {
     let image = null;
     let filename = '';
     let convertedImageData = null;
-    
+
     let photoPhotoString = '';
     const photoPhoto = req.files['photo'];
     image = photoPhoto[0];
@@ -148,10 +148,15 @@ export const updateWhyPhoto = async (req, res) => {
     foundItem.photo = photoPhotoString;
     jsonContentIndo[foundIndex] = foundItem;
 
-    await updateEngWhyContentService(jsonContentEng, whyId);
-    await updateIndoWhyContentService(jsonContentIndo, whyId);
+    try {
+        await updateEngWhyContentService(jsonContentEng, whyId);
+        await updateIndoWhyContentService(jsonContentIndo, whyId);
 
-    return res.status(200).json({ message: "Photo updated!" });
+        return res.status(200).json({ message: "Photo updated!" });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+
 }
 
 export const getAboutPage = async (req, res) => {
@@ -202,7 +207,7 @@ export const updateEngAboutPage = async (req, res) => {
     try {
         const response = await updateEngAboutPageService(id, contentEng, titleEng, whyEng);
         const whyResponse = await updateEngWhyContentService(whyContentJSONEng, whyContentId);
-        return res.status(200).json({ message: "About Page updated!"});
+        return res.status(200).json({ message: "About Page updated!" });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
@@ -240,7 +245,7 @@ export const updateIndoAboutPage = async (req, res) => {
     try {
         const response = await updateIndoAboutPageService(id, contentIndo, titleIndo, whyIndo);
         const whyResponse = await updateIndoWhyContentService(whyContentJSONIndo, whyContentId);
-        return res.status(200).json({ message: "About Page updated!"});
+        return res.status(200).json({ message: "About Page updated!" });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

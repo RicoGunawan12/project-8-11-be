@@ -12,199 +12,199 @@ export const BASE_URL = process.env.BASE_URL || 'http://localhost:5000';
 export const UPLOAD_FOLDER = process.env.FOLDER_PATH || 'assets/';
 
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        try {
-          const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + "product/" + req.body.productName);
+  destination: function (req, file, cb) {
+    try {
+      const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + "product/" + req.body.productName);
 
-          if (!fs.existsSync(uploadPath)) {
-            fs.mkdirSync(uploadPath, { recursive: true });
-          }
-          cb(null, uploadPath);
-        } catch (error) {
-          cb(error)
-        }
-    },
-    filename: function (req, file, cb) {
-      try {
-        cb(null, `${Date.now()}-${req.body.productName}.png`);
-      } catch (error) {
-        cb(error);
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath, { recursive: true });
       }
+      cb(null, uploadPath);
+    } catch (error) {
+      cb(error)
     }
+  },
+  filename: function (req, file, cb) {
+    try {
+      cb(null, `${Date.now()}-${req.body.productName}.png`);
+    } catch (error) {
+      cb(error);
+    }
+  }
 });
 
 const storageBlog = multer.diskStorage({
-    destination: async function (req, file, cb) {
-        try {
-          const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'blog/' + req.body.postTitle);
+  destination: async function (req, file, cb) {
+    try {
+      const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'blog/' + req.body.postTitle);
 
-          if (!fs.existsSync(uploadPath)) {
-            fs.mkdirSync(uploadPath, { recursive: true });
-          }
-          cb(null, uploadPath);
-        } catch (error) {
-          cb(error)
-        }
-    },
-    filename: function (req, file, cb) {
-      try {
-        cb(null, `${Date.now()}-${req.body.postTitle}.png`);
-      } catch (error) {
-        cb(error)
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath, { recursive: true });
       }
+      cb(null, uploadPath);
+    } catch (error) {
+      cb(error)
     }
+  },
+  filename: function (req, file, cb) {
+    try {
+      cb(null, `${Date.now()}-${req.body.postTitle}.png`);
+    } catch (error) {
+      cb(error)
+    }
+  }
 });
 
 const storageContact = multer.diskStorage({
-    destination: async function (req, file, cb) {
-        const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'contact');
+  destination: async function (req, file, cb) {
+    const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'contact');
 
-        if (!fs.existsSync(uploadPath)) {
-          fs.mkdirSync(uploadPath, { recursive: true });
-        }
-        cb(null, uploadPath);
-    },
-    filename: function (req, file, cb) {
-      try {
-        const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'contact/' + req.body.contact);
-        if (fs.existsSync(uploadPath)) {
-          fs.unlinkSync(uploadPath); // Deletes the file
-        }
-        cb(null, `${req.body.contact}.png`);
-      } catch (error) {
-        cb(error);
-      }
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
     }
+    cb(null, uploadPath);
+  },
+  filename: function (req, file, cb) {
+    try {
+      const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'contact/' + req.body.contact);
+      if (fs.existsSync(uploadPath)) {
+        fs.unlinkSync(uploadPath); // Deletes the file
+      }
+      cb(null, `${req.body.contact}.png`);
+    } catch (error) {
+      cb(error);
+    }
+  }
 });
 
 const storageBanner = multer.diskStorage({
-    destination: async function (req, file, cb) {
-        const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'banner');
+  destination: async function (req, file, cb) {
+    const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'banner');
 
-        if (!fs.existsSync(uploadPath)) {
-          fs.mkdirSync(uploadPath, { recursive: true });
-        }
-        cb(null, uploadPath);
-    },
-    filename: function (req, file, cb) {
-      cb(null, `${Date.now()}-${req.body.page}.png`);
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
     }
+    cb(null, uploadPath);
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${Date.now()}-${req.body.page}.png`);
+  }
 });
 
 const storageCategory = multer.diskStorage({
-    destination: async function (req, file, cb) {
-        const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'category');
+  destination: async function (req, file, cb) {
+    const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'category');
 
-        if (!fs.existsSync(uploadPath)) {
-          fs.mkdirSync(uploadPath, { recursive: true });
-        }
-        
-        cb(null, uploadPath);
-    },
-    filename: function (req, file, cb) {
-      try {
-        const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'category/' + req.body.productCategoryName);
-        if (fs.existsSync(uploadPath)) {
-          fs.unlinkSync(uploadPath); // Deletes the file
-        }
-        cb(null, `${req.body.productCategoryName}.png`);
-      } catch (error) {
-        cb(error)
-      }
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
     }
+
+    cb(null, uploadPath);
+  },
+  filename: function (req, file, cb) {
+    try {
+      const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'category/' + req.body.productCategoryName);
+      if (fs.existsSync(uploadPath)) {
+        fs.unlinkSync(uploadPath); // Deletes the file
+      }
+      cb(null, `${req.body.productCategoryName}.png`);
+    } catch (error) {
+      cb(error)
+    }
+  }
 });
 
 const storageBackground = multer.diskStorage({
-    destination: async function (req, file, cb) {
+  destination: async function (req, file, cb) {
+    let uploadPath = '';
+    if (file.fieldname === 'background') {
+      uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'background');
+    }
+    else if (file.fieldname === 'photo') {
+      uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'photo');
+    }
+
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: async function (req, file, cb) {
+    console.log("asdasdasd");
+    try {
+      // Validate index from the request body
+      // var { index } = req.body;
+      console.log(req.body);
+      if (!isValidNumber(req.body.index)) {
+        return cb(new Error("Invalid index"));
+      }
+
+
       let uploadPath = '';
       if (file.fieldname === 'background') {
-          uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'background');
-        } 
+        uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'background');
+      }
       else if (file.fieldname === 'photo') {
         uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'photo');
       }
+      const pages = await getPageService();
+      const index = parseInt(req.body.index);
+      const page = pages[0].contentJSONEng[index].page;
+      const newFilename = `${page}${index + 1}.png`;
+      console.log(newFilename);
 
-      if (!fs.existsSync(uploadPath)) {
-          fs.mkdirSync(uploadPath, { recursive: true });
+      // Check if a previous file exists and delete it
+      const previousFilePath = path.join(uploadPath, newFilename);
+      if (fs.existsSync(previousFilePath)) {
+        fs.unlinkSync(previousFilePath); // Deletes the file
       }
-      cb(null, uploadPath);
-    },
-    filename: async function (req, file, cb) {
-      console.log("asdasdasd");
-      try {
-          // Validate index from the request body
-          // var { index } = req.body;
-          console.log(req.body);
-          if (!isValidNumber(req.body.index)) {
-              return cb(new Error("Invalid index"));
-          }
-          
-          
-          let uploadPath = '';
-          if (file.fieldname === 'background') {
-            uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'background');
-          } 
-          else if (file.fieldname === 'photo') {
-            uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'photo');
-          }
-          const pages = await getPageService();
-          const index = parseInt(req.body.index);
-          const page = pages[0].contentJSONEng[index].page;
-          const newFilename = `${page}${index + 1}.png`;
-          console.log(newFilename);
-          
-          // Check if a previous file exists and delete it
-          const previousFilePath = path.join(uploadPath, newFilename);
-          if (fs.existsSync(previousFilePath)) {
-              fs.unlinkSync(previousFilePath); // Deletes the file
-          }
 
-          // Set the new filename
-          cb(null, newFilename);
-      } catch (error) {
-        console.log("asdasdas");
-        
-          console.error("Error in filename function:", error);
-          cb(error); // Handle any errors gracefully
-      }
+      // Set the new filename
+      cb(null, newFilename);
+    } catch (error) {
+      console.log("asdasdas");
+
+      console.error("Error in filename function:", error);
+      cb(error); // Handle any errors gracefully
     }
+  }
 });
 
-const storageWhyPhoto = multer.diskStorage({ 
+const storageWhyPhoto = multer.diskStorage({
   destination: async function (req, file, cb) {
     let uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'photo');
 
     if (!fs.existsSync(uploadPath)) {
-        fs.mkdirSync(uploadPath, { recursive: true });
+      fs.mkdirSync(uploadPath, { recursive: true });
     }
     cb(null, uploadPath);
   },
   filename: async function (req, file, cb) {
     try {
-        // Validate index from the request body
-        // var { index } = req.body;
-        console.log(req.body);
-        if (!isValidNumber(req.body.index)) {
-            return cb(new Error("Invalid index"));
-        }
-        
-        
-        let uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'photo');
-        const index = parseInt(req.body.index);
-        const newFilename = `About Page${index + 1}.png`;
-        // Check if a previous file exists and delete it
-        const previousFilePath = path.join(uploadPath, newFilename);
-        if (fs.existsSync(previousFilePath)) {
-            fs.unlinkSync(previousFilePath); // Deletes the file
-        }
+      // Validate index from the request body
+      // var { index } = req.body;
+      console.log(req.body);
+      if (!isValidNumber(req.body.index)) {
+        return cb(new Error("Invalid index"));
+      }
 
-        // Set the new filename
-        cb(null, newFilename);
+
+      let uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'photo');
+      const index = parseInt(req.body.index);
+      const newFilename = `About Page${index + 1}.png`;
+      // Check if a previous file exists and delete it
+      const previousFilePath = path.join(uploadPath, newFilename);
+      if (fs.existsSync(previousFilePath)) {
+        fs.unlinkSync(previousFilePath); // Deletes the file
+      }
+
+      // Set the new filename
+      cb(null, newFilename);
     } catch (error) {
       console.log("asdasdas");
-      
-        console.error("Error in filename function:", error);
-        cb(error); // Handle any errors gracefully
+
+      console.error("Error in filename function:", error);
+      cb(error); // Handle any errors gracefully
     }
   }
 })
@@ -212,15 +212,16 @@ const storageWhyPhoto = multer.diskStorage({
 
 const storageCarousel = multer.diskStorage({
   destination: async function (req, file, cb) {
-      const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'carousel');
+    const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'carousel');
 
-      if (!fs.existsSync(uploadPath)) {
-        fs.mkdirSync(uploadPath, { recursive: true });
-      }
-      cb(null, uploadPath);
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
-    cb(null, `${Date.now()}-${req.body.titleEng}.png`);
+    console.log(req);
+    cb(null, `${Date.now()}.png`);
   }
 });
 
@@ -238,15 +239,15 @@ export const deleteDirectory = (productName) => {
   const dirPath = path.join(__dirname, "../", UPLOAD_FOLDER + productName);
 
   // console.log(dirPath);
-  
+
 
   fs.rm(dirPath, { recursive: true, force: true }, (err) => {
-      if (err) {
-          console.error("Error deleting directory:", err);
-          return { success: false, message: "Directory not found or error deleting directory" };
-      }
-      // console.log("Directory deleted successfully");
-      return { success: true, message: "Directory deleted successfully" };
+    if (err) {
+      console.error("Error deleting directory:", err);
+      return { success: false, message: "Directory not found or error deleting directory" };
+    }
+    // console.log("Directory deleted successfully");
+    return { success: true, message: "Directory deleted successfully" };
   });
 };
 

@@ -15,7 +15,7 @@ export const createCarouselService = async (
     buttonIndo,
     link
 ) => {
-    const carousel = await Carousel.create({ 
+    const carousel = await Carousel.create({
         carouselImage,
         titleEng,
         titleIndo,
@@ -23,13 +23,13 @@ export const createCarouselService = async (
         contentIndo,
         buttonEng,
         buttonIndo,
-        link 
+        link
     });
     return carousel;
 }
 
 export const updateCarouselService = async (
-    carouselId, 
+    carouselId,
     carouselImage,
     titleEng,
     titleIndo,
@@ -37,21 +37,20 @@ export const updateCarouselService = async (
     contentIndo,
     buttonEng,
     buttonIndo,
-    link 
+    link
 ) => {
     const updatedCarousel = await Carousel.update(
         {
             carouselImage: carouselImage,
-            title: title,
             titleEng: titleEng,
             titleIndo: titleIndo,
             contentEng: contentEng,
             contentIndo: contentIndo,
             buttonEng: buttonEng,
             buttonIndo: buttonIndo,
-            link: link 
+            link: link
         },
-        { where: carouselId }
+        { where: { carouselId } }
     )
 
     if (updatedCarousel[0] == 0) {
@@ -62,9 +61,9 @@ export const updateCarouselService = async (
 }
 
 export const deleteCarouselService = async (carouselId) => {
-    const deletedCarousel = await Carousel.destroy({ 
+    const deletedCarousel = await Carousel.destroy({
         where: { carouselId }
-     });
+    });
     if (deletedCarousel == 0) {
         throw new Error("Carousel not found!");
     }

@@ -22,9 +22,9 @@ export const createCarousel = async (req, res) => {
         buttonIndo,
         link
     } = req.body;
-    
-    const image = req.files['carouselImage'];
 
+    const image = req.files['carouselImage'];
+    // console.log(image);
     if (typeof titleEng !== 'string' || titleEng.trim() === '') {
         return res.status(400).json({ message: 'English title is required' });
     }
@@ -59,11 +59,11 @@ export const createCarousel = async (req, res) => {
     }
 
     try {
-        const filename = `${Date.now()}-${req.body.titleEng}.webp`;
-        const imagePath = "../" + UPLOAD_FOLDER + "carousel/" + filename
+        // const filename = `${Date.now()}-${req.body.titleEng}.webp`;
+        // const imagePath = "../" + UPLOAD_FOLDER + "carousel/" + filename
         // const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "carousel/", image, filename);
         const carousel = await createCarouselService(
-            "/" + UPLOAD_FOLDER + "carousel/" + filename,
+            "/" + UPLOAD_FOLDER + "carousel/" + image[0].filename,
             titleEng,
             titleIndo,
             contentEng,
@@ -75,7 +75,7 @@ export const createCarousel = async (req, res) => {
         return res.status(200).json({ message: "Carousel created!", carousel })
     } catch (error) {
         console.log(error);
-        
+
         return res.status(500).json({ message: error.message });
     }
 }
@@ -91,12 +91,12 @@ export const updateCarousel = async (req, res) => {
         buttonIndo,
         link
     } = req.body;
-    
+
     const image = req.files['carouselImage'];
 
     if (!carouselId) {
         return res.status(400).json({ message: "Carousel ID is required" });
-    } 
+    }
 
     if (typeof titleEng !== 'string' || titleEng.trim() === '') {
         return res.status(400).json({ message: 'English title is required' });
@@ -132,12 +132,12 @@ export const updateCarousel = async (req, res) => {
     }
 
     try {
-        const filename = `${Date.now()}-${req.body.titleEng}.webp`;
-        const imagePath = "../" + UPLOAD_FOLDER + "carousel/" + req.body.titleEng
-        const convertedImageData = await convertImageToWebp(imagePath, image, filename);
+        // const filename = `${Date.now()}-${req.body.titleEng}.webp`;
+        // const imagePath = "../" + UPLOAD_FOLDER + "carousel/" + req.body.titleEng
+        // const convertedImageData = await convertImageToWebp(imagePath, image, filename);
         const carousel = await updateCarouselService(
             carouselId,
-            imagePath,
+            "/" + UPLOAD_FOLDER + "carousel/" + image[0].filename,
             titleEng,
             titleIndo,
             contentEng,
@@ -148,6 +148,7 @@ export const updateCarousel = async (req, res) => {
         );
         return res.status(200).json({ message: "Carousel updated!", carousel })
     } catch (error) {
+        console.log(error);
         return res.status(500).json({ message: error.message });
     }
 }
@@ -157,7 +158,7 @@ export const deleteCarousel = async (req, res) => {
 
     if (!carouselId) {
         return res.status(400).json({ message: "Carousel ID is required" });
-    } 
+    }
 
     try {
         const deleted = await deleteCarouselService(carouselId);
