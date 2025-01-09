@@ -6,10 +6,7 @@ export const registerUser = async (req, res) => {
   const { fullName, email, password, confirmPassword, phoneNumber } = req.body;
   const phoneRegex = /^\+62\d+$/;
 
-  if (fullName.length < 5) {
-    return res.status(400).json({ path: 'fullName', message: 'Full Name length must be more than 4' });
-  }
-  else if (email.length < 1) {
+  if (email.length < 1) {
     return res.status(400).json({ path: 'email', message: 'Email must be filled' })
   }
   else if (password.length < 1) {
