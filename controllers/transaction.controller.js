@@ -351,8 +351,9 @@ export const requestPickupTransaction = async (req, res) => {
     const { transactionId } = req.body;
     try {
         const getTransactionById = await getTransactionsByIdService(transactionId);
-        // const createKomshipOrder = await createKomshipOrderService(getTransactionById);
-        const response = await requestPickupTransactionService(getTransactionById);
+        const createKomshipOrder = await createKomshipOrderService(getTransactionById);
+        const getTransactionByIdAfter = await getTransactionsByIdService(transactionId);
+        const response = await requestPickupTransactionService(getTransactionByIdAfter);
         return res.status(200).json({ message: "Success!", response });
     } catch (error) {
         return res.status(500).json({ message: error.message });

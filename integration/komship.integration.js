@@ -95,7 +95,7 @@ export const calculateDeliveryFeeKomship = async (shipperDestinationId, receiver
 //     "subtotal": 500000
 // }
 // ]
-export const createOrderKomship = async (transaction, adminAddress) => {
+export const createOrderKomship = async (transaction, adminAddress, contact) => {
     const transactionDetails = transaction.transaction_details.map((det) => {
         return {
             product_name: det.product_variant.product.productName,
@@ -125,7 +125,7 @@ export const createOrderKomship = async (transaction, adminAddress) => {
             shipper_phone: adminAddress.senderPhoneNumber,
             shipper_destination_id: parseInt(adminAddress.komshipAddressId),
             shipper_address: adminAddress.addressDetail,
-            shipper_email: "test@gmail.com",
+            shipper_email: contact.email,
             receiver_name: transaction.user.user_addresses[0].receiverName, //ambil dari transaction
             receiver_phone: transaction.user.user_addresses[0].receiverPhoneNumber, //ambil dari transaction
             receiver_destination_id: parseInt(transaction.user.user_addresses[0].komshipAddressId), //ambil dari transaction,

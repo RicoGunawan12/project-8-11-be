@@ -5,6 +5,7 @@ import { Op, Sequelize } from "sequelize";
 import { generateReadableId } from "../utils/utility.js";
 import { getPickUpPointService } from "./address.service.js";
 import sequelize from "../config/database.js";
+import { getContactToSendService } from "./contact.service.js";
 
 export const getAllTransactionsService = async (status, startDate, endDate, offset, limit) => {
     const whereConditions = {
@@ -292,10 +293,12 @@ export const updateTransactionStatusService = async (transactionId, gatewayRespo
 export const createKomshipOrderService = async (transaction) => {
 
     const adminAddress = await getPickUpPointService();
+    
+    const contact = await getContactToSendService();
     // if (adminAddress.length === 0) {
 
     // }
-    const createdKomshipOrder = await createOrderKomship(transaction, adminAddress[0]);
+    const createdKomshipOrder = await createOrderKomship(transaction, adminAddress[0], contact);
     const updatedTransaction = await TransactionHeaderModel.update(
         {
             komshipOrderNumber: createdKomshipOrder.komshipResponse.data.order_no,
