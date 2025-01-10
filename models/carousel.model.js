@@ -14,6 +14,11 @@ const Carousel = sequelize.define('carousels', {
         type: DataTypes.STRING,
         length: 255
     },
+    carouselImageMobile: {
+        field: "carousel_image_mobile",
+        type: DataTypes.STRING,
+        length: 255
+    },
     titleEng: {
         field: "title_eng",
         type: DataTypes.STRING,

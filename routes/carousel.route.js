@@ -7,19 +7,21 @@ const CarouselRoute = express.Router();
 
 CarouselRoute.get('/', getCarousel);
 CarouselRoute.post(
-    '/', 
-    adminMiddleware, 
+    '/',
+    adminMiddleware,
     uploadCarousel.fields([
-        { name: 'carouselImage', maxCount: 20}
+        { name: 'carouselImage', maxCount: 20 },
+        { name: 'carouselImageMobile', maxCount: 20 },
     ]),
     createCarousel
 )
 CarouselRoute.delete('/:id', adminMiddleware, deleteCarousel);
-CarouselRoute.put('/:id', 
-    adminMiddleware, 
+CarouselRoute.put('/:id',
+    adminMiddleware,
     uploadCarousel.fields([
-        { name: 'carouselImage', maxCount: 20 }
-    ]), 
+        { name: 'carouselImage', maxCount: 20 },
+        { name: 'carouselImageMobile', maxCount: 20 }
+    ]),
     updateCarousel
 );
 

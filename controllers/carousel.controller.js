@@ -24,6 +24,7 @@ export const createCarousel = async (req, res) => {
     } = req.body;
 
     const image = req.files['carouselImage'];
+    const imageMobile = req.files['carouselImageMobile'];
     // console.log(image);
     if (typeof titleEng !== 'string' || titleEng.trim() === '') {
         return res.status(400).json({ message: 'English title is required' });
@@ -57,6 +58,9 @@ export const createCarousel = async (req, res) => {
     if (!image) {
         return res.status(400).json({ message: 'Carousel photo is required' });
     }
+    if (!imageMobile) {
+        return res.status(400).json({ message: 'Mobile carousel photo is required' });
+    }
 
     try {
         // const filename = `${Date.now()}-${req.body.titleEng}.webp`;
@@ -64,6 +68,7 @@ export const createCarousel = async (req, res) => {
         // const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "carousel/", image, filename);
         const carousel = await createCarouselService(
             "/" + UPLOAD_FOLDER + "carousel/" + image[0].filename,
+            "/" + UPLOAD_FOLDER + "carousel/mobile/" + imageMobile[0].filename,
             titleEng,
             titleIndo,
             contentEng,
@@ -93,6 +98,7 @@ export const updateCarousel = async (req, res) => {
     } = req.body;
 
     const image = req.files['carouselImage'];
+    const imageMobile = req.files['carouselImageMobile'];
 
     if (!carouselId) {
         return res.status(400).json({ message: "Carousel ID is required" });
@@ -130,6 +136,9 @@ export const updateCarousel = async (req, res) => {
     if (!image) {
         return res.status(400).json({ message: 'Carousel photo is required' });
     }
+    if (!imageMobile) {
+        return res.status(400).json({ message: 'Mobile carousel photo is required' });
+    }
 
     try {
         // const filename = `${Date.now()}-${req.body.titleEng}.webp`;
@@ -138,6 +147,7 @@ export const updateCarousel = async (req, res) => {
         const carousel = await updateCarouselService(
             carouselId,
             "/" + UPLOAD_FOLDER + "carousel/" + image[0].filename,
+            "/" + UPLOAD_FOLDER + "carousel/mobile/" + imageMobile[0].filename,
             titleEng,
             titleIndo,
             contentEng,

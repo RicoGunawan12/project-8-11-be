@@ -331,14 +331,14 @@ export const updateTransactionStatus = async (req, res) => {
     } = req.body.data;
 
     if (status != "SUCCEEDED") {
-        return res.status(400).json({ message: "Transaction not succeeded"});
+        return res.status(400).json({ message: "Transaction not succeeded" });
     }
 
     try {
         const updatedTransaction = await updateTransactionStatusService(reference_id, req.body);
         const getTransactionById = await getTransactionsByIdService(reference_id);
 
-        const response = await createKomshipOrderService(getTransactionById);
+        // const response = await createKomshipOrderService(getTransactionById);
         return res.status(200).json({ message: "Transaction updated!", response });
         // return res.redirect('/');
     } catch (error) {
@@ -378,7 +378,7 @@ export const printLabel = async (req, res) => {
         const getTransactionById = await getTransactionsByIdService(transactionId);
         const label = await printLabelService(getTransactionById.komshipOrderNumber);
         console.log(label);
-        
+
         return res.status(200).json({ message: "Success!", label });
     } catch (error) {
         console.log(error);
@@ -532,7 +532,7 @@ export const payTransaction = async (req, res) => {
 
 export const returnTransaction = async (req, res) => {
     const { transactionId } = req.body;
-    
+
     if (!transactionId) {
         return res.status(400).json({ message: "Transaction ID is required!" });
     }
@@ -540,7 +540,7 @@ export const returnTransaction = async (req, res) => {
     try {
         const transaction = await getTransactionsByIdService(transactionId);
         const returnedTransaction = await returnTransactionService(transactionId);
-        
+
         return res.status(200).json({ message: "Transaction updated to waiting for return. Ask customer to return the poduct" });
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -549,7 +549,7 @@ export const returnTransaction = async (req, res) => {
 
 export const refundTransaction = async (req, res) => {
     const { transactionId } = req.body;
-    
+
     if (!transactionId) {
         return res.status(400).json({ message: "Transaction ID is required!" });
     }
@@ -558,10 +558,10 @@ export const refundTransaction = async (req, res) => {
         const transaction = await getTransactionsByIdService(transactionId);
         const gatewayResponse = JSON.parse(transaction.gatewayResponse);
         console.log(gatewayResponse);
-        
+
         const refundRequest = await refundXendit(transactionId, gatewayResponse.data.attempt_details[0].action_id, transaction.totalPrice);
         await updateTransactionService(transactionId, "Return");
-        
+
         return res.status(200).json({ message: "Transaction refunded!" })
     } catch (error) {
         console.log(error);
@@ -578,10 +578,10 @@ export const cancelPaidTransaction = async (req, res) => {
 
     try {
         const transaction = await getTransactionsByIdService(transactionId);
-        
+
         const cancelledTransaction = await cancelTransactionService(transactionId);
         console.log(transaction.komshipOrderNumber);
-        
+
         const gatewayResponse = JSON.parse(transaction.gatewayResponse);
         const refundRequest = await refundXendit(transactionId, gatewayResponse.data.attempt_details[0].action_id, transaction.totalPrice);
         console.log(refundRequest);
@@ -592,7 +592,7 @@ export const cancelPaidTransaction = async (req, res) => {
         return res.status(200).json({ message: "Transaction cancelled!" })
     } catch (error) {
         console.log(error);
-        
+
         return res.status(500).json({ message: error.message });
     }
 }
@@ -605,7 +605,7 @@ export const rejectReviewTransaction = async (req, res) => {
         if (transaction.status === "On Review Cancel") {
             await updateTransactionService(transactionId, "Waiting for shipping");
             return res.status(200).json({ message: "Cancel rejected!" })
-        } 
+        }
         else if (transaction.status === "On Review Return") {
             await updateTransactionService(transactionId, "Done");
             return res.status(200).json({ message: "Return rejected!" });

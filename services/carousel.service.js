@@ -7,6 +7,7 @@ export const getCarouselService = async () => {
 
 export const createCarouselService = async (
     carouselImage,
+    carouselImageMobile,
     titleEng,
     titleIndo,
     contentEng,
@@ -17,6 +18,7 @@ export const createCarouselService = async (
 ) => {
     const carousel = await Carousel.create({
         carouselImage,
+        carouselImageMobile,
         titleEng,
         titleIndo,
         contentEng,
@@ -31,6 +33,7 @@ export const createCarouselService = async (
 export const updateCarouselService = async (
     carouselId,
     carouselImage,
+    carouselImageMobile,
     titleEng,
     titleIndo,
     contentEng,
@@ -42,6 +45,7 @@ export const updateCarouselService = async (
     const updatedCarousel = await Carousel.update(
         {
             carouselImage: carouselImage,
+            carouselImageMobile: carouselImageMobile,
             titleEng: titleEng,
             titleIndo: titleIndo,
             contentEng: contentEng,

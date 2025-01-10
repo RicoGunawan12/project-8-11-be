@@ -212,7 +212,13 @@ const storageWhyPhoto = multer.diskStorage({
 
 const storageCarousel = multer.diskStorage({
   destination: async function (req, file, cb) {
-    const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'carousel');
+    let uploadPath = '';
+    if (file.fieldname === 'carouselImage') {
+      uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'carousel');
+    }
+    else if (file.fieldname === 'carouselImageMobile') {
+      uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + '/carousel/mobile');
+    }
 
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true });
