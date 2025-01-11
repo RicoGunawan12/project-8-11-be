@@ -29,6 +29,14 @@ export const migrateBanner = async () => {
                 image: "/assets/banner/ProfilePage.png"
             },
             {
+                page: "Transaction Page",
+                image: "/assets/banner/TransactionPage.png"
+            },
+            {
+                page: "Location Page",
+                image: "/assets/banner/LocationPage.png"
+            },
+            {
                 page: "About Page Mobile",
                 image: "/assets/banner/AboutPageMobile.png"
             },
@@ -51,6 +59,14 @@ export const migrateBanner = async () => {
             {
                 page: "Profile Page Mobile",
                 image: "/assets/banner/ProfilePageMobile.png"
+            },
+            {
+                page: "Transaction Page Mobile",
+                image: "/assets/banner/TransactionPageMobile.png"
+            },
+            {
+                page: "Location Page Mobile",
+                image: "/assets/banner/LocationPageMobile.png"
             },
         ]
         await Banner.bulkCreate(body);

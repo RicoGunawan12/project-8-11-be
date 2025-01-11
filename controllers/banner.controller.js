@@ -22,12 +22,16 @@ export const updateBanner = async (req, res) => {
         page != "Blog Page" &&
         page != "FAQ Page" &&
         page != "Profile Page" &&
+        page != "Transaction Page" &&
+        page != "Location Page" &&
         page != "Contact Page Mobile" &&
         page != "About Page Mobile" &&
         page != "Product Page Mobile" &&
         page != "Blog Page Mobile" &&
         page != "FAQ Page Mobile" &&
-        page != "Profile Page Mobile"
+        page != "Profile Page Mobile" &&
+        page != "Transaction Page Mobile" &&
+        page != "Location Page Mobile"
     ) {
         return res.status(400).json({ message: "There is no such page" })
     }
