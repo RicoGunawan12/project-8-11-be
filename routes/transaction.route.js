@@ -44,7 +44,7 @@ TransactionRoute.post('/analytic/category', adminMiddleware, fetchSalesByCategor
 
 TransactionRoute.post('/update/delivery', updateTransactionDelivery);
 
-TransactionRoute.put('/cancel/:id', userMiddleware, cancelTransaction);
+TransactionRoute.put('/cancel/:id', cancelTransaction);
 
 TransactionRoute.put('/paid/cancel/:id', adminMiddleware, cancelPaidTransaction);
 

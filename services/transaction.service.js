@@ -15,13 +15,15 @@ export const getAllTransactionsService = async (status, startDate, endDate, offs
     };
 
     if (startDate && endDate && startDate === endDate) {
-        const date = new Date(startDate);
-        const nextDay = new Date(date);
-        nextDay.setDate(date.getDate() + 1);
+        // const date = new Date(startDate);
+        // const nextDay = new Date(date);
+        // nextDay.setDate(date.getDate() + 1);
+        const endOfDay = new Date(endDate);
+        endOfDay.setHours(23, 59, 59, 999);
 
         whereConditions.transactionDate = {
             [Op.gte]: date,
-            [Op.lt]: nextDay,
+            [Op.lt]: endOfDay,
         };
     } else {
         if (startDate) {
@@ -68,8 +70,8 @@ export const getAllTransactionsService = async (status, startDate, endDate, offs
 export const countTransactionsService = async (status, startDate, endDate) => {
     const whereConditions = {
         status: status
-            ? { [Op.and]: [{ [Op.eq]: status }, { [Op.ne]: 'Unpaid' }, { [Op.ne]: 'Cancelled' }] }
-            : { [Op.and]: [{ [Op.ne]: 'Unpaid' }, { [Op.ne]: 'Cancelled' }] }
+            ? { [Op.and]: [{ [Op.eq]: status }, { [Op.ne]: 'Unpaid' }] }
+            : { [Op.ne]: 'Unpaid' }
     };
 
     if (startDate && endDate && startDate === endDate) {
@@ -129,7 +131,8 @@ export const getTransactionsByUserService = async (userId, status) => {
             status: {
                 [Op.like]: `%${status}%`
             }
-        }
+        },
+        order: [['transactionDate', 'DESC']]
     })
     return transactions;
 }
@@ -577,8 +580,8 @@ export const returnTransactionService = async (transactionId) => {
     return updatedTransaction;
 }
 
-export const payTransactionService = async (transaction, customerId, productsInCart) => {
-    const response = await createPlanXendit(transaction, customerId, productsInCart);
+export const payTransactionService = async (transaction, customerId, productsInCart, disc) => {
+    const response = await createPlanXendit(transaction, customerId, productsInCart, disc);
     // console.log(response);
     return response
 }
@@ -588,7 +591,10 @@ export const checkTransactionWithVoucher = async (voucherCode, userId) => {
         const transaction = await TransactionHeaderModel.findOne({
             where: {
                 voucherCode,
-                userId
+                userId,
+                status: {
+                    [Op.not]: "Cancelled"
+                }
             }
         });
 
@@ -632,3 +638,41 @@ export const updateTransactionService = async (transactionId, status) => {
     )
     return updatedTransaction;
 }
+
+export const rollbackTransaction = async (transactionId) => {
+    const transaction = await sequelize.transaction();
+  
+    try {
+      const transactionDetails = await TransactionDetailModel.findAll({
+        where: { transactionId }
+      });
+  
+      if (!transactionDetails || transactionDetails.length === 0) {
+        throw new Error(`No transaction details found for transaction ID: ${transactionId}`);
+      }
+  
+      for (const detail of transactionDetails) {
+        const { productVariantId, quantity } = detail;
+  
+        const productVariant = await ProductVariantModel.findByPk(productVariantId, { transaction });
+  
+        if (!productVariant) {
+          throw new Error(`Product variant not found: ${productVariantId}`);
+        }
+  
+        productVariant.productStock = productVariant.productStock + quantity;
+        console.log(productVariant);
+        
+        await productVariant.save({ transaction });
+      }
+  
+      await transaction.commit();
+  
+      return { message: `Transaction ${transactionId} has been rolled back successfully.` };
+    } catch (error) {
+      // Rollback on error
+      await transaction.rollback();
+      console.error(error);
+      throw new Error(error.message);
+    }
+  };

@@ -39,6 +39,17 @@ export const getVoucherByCode = async (req, res) => {
     }
     return res.status(400).json({ message: "Voucher has used!" });
 };
+
+export const getByCodeNonUser = async (req, res) => {
+  // console.log(req);
+  res.set("Cache-Control", "no-store");
+  const { code } = req.query;
+  const vouchers = await getVoucherByCodeService(code);
+  if(vouchers){
+    return res.status(200).json(vouchers);
+  }
+  return res.status(400).json({ message: "Voucher not found!" });
+}
 // #endregion
 
 // #region CREATE
