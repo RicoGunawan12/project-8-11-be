@@ -120,7 +120,7 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
         redirect: 'follow',
         body: JSON.stringify({
             order_date: formatDateToString(new Date()),
-            brand_name: "Tyeso",
+            brand_name: "Tyeso Indonesia Official Store",
             shipper_name: adminAddress.senderName,
             shipper_phone: adminAddress.senderPhoneNumber,
             shipper_destination_id: parseInt(adminAddress.komshipAddressId),

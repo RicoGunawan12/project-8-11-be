@@ -147,10 +147,13 @@ export const deleteVouchersByCodeService = async (code) =>{
 // #region TRANSACTIONS
 
 export const calculateVoucherDiscount = async (voucherTypeCode, amount, discountAmount, maxDiscount) => {
+  voucherTypeCode = voucherTypeCode.toUpperCase();
+  console.log(voucherTypeCode, amount, discountAmount, maxDiscount);
+  
   switch(voucherTypeCode) {
-    case 'OFF':
-        if(discountAmount > amount) throw new Error("Payment amount cannot be less than discounted amount")
-        else return amount - discountAmount
+    case 'FIXED':
+        if(discountAmount > amount) amount
+        else return discountAmount
     case 'PERCENTAGE':
         const discountedAmt = amount * (discountAmount/100)
         if(maxDiscount && discountedAmt > maxDiscount){
@@ -174,7 +177,10 @@ export const applyVoucherService = async (voucherCode, totalAmount) => {
   if(voucher.voucherEndDate && (voucher.voucherEndDate && new Date(voucher.voucherEndDate) < new Date())){
     throw new Error("Voucher has expired")
   }
-  const totalDiscount = calculateVoucherDiscount(voucher.voucherTypeCode,totalAmount,voucher.discount, voucher.maxDiscount)
+  const totalDiscount = calculateVoucherDiscount(voucher.voucherType,totalAmount,voucher.discount, voucher.maxDiscount)
+
+  voucher.quota -= 1;
+  await voucher.save();
 
   return totalDiscount
 }

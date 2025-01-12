@@ -181,7 +181,9 @@ export const createCustomerXendit = async (userId, fullName, email, phone) => {
     }
 }
 
-export const createPlanXendit = async (transaction, customerId, productsInCart) => {
+export const createPlanXendit = async (transaction, customerId, productsInCart, disc) => {
+    console.log(disc);
+    
     const items = productsInCart.map((product) => {
         console.log(product.product_variant.product.productName + " - " + product.product_variant.productColor);
         console.log(product.product_variant.productPrice);
@@ -232,17 +234,26 @@ export const createPlanXendit = async (transaction, customerId, productsInCart) 
         success_return_url: process.env.PRODUCTION_WEB + "/transactions/" + transaction.transactionId,
         failure_return_url: process.env.PRODUCTION_WEB
     }
-    if (process.env.BASE_URL !== "http://localhost:5000") {
-        body.items = items; 
+    if (disc != 0) {
         items.push({
-            type: "DIGITAL_PRODUCT",
-            name: "Delivery Fee",
-            net_unit_amount: transaction.deliveryFee,
+            type: "DISCOUNT",
+            name: "Discount",
+            net_unit_amount: disc * -1,
             quantity: 1,
             url: "https://th.bing.com/th/id/OIP.ULq5QQnJfNFuhcLNBVqzAwHaE7?w=250&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
-        })
+        })    
     }
-    // console.log(body);
+    if (process.env.BASE_URL !== "http://localhost:5000") {
+    }
+    items.push({
+        type: "DIGITAL_PRODUCT",
+        name: "Delivery Fee",
+        net_unit_amount: transaction.deliveryFee,
+        quantity: 1,
+        url: "https://th.bing.com/th/id/OIP.ULq5QQnJfNFuhcLNBVqzAwHaE7?w=250&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+    })
+    body.items = items; 
+    console.log(body);
 
     const requestOptions = {
         method: 'POST',

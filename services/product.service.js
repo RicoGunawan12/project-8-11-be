@@ -67,6 +67,7 @@ export const getProductsService = async (search, category, limit, status = "acti
                         [Op.gte]: new Date(),
                     },
                 },
+                order: [['created_at', 'DESC']],
             },
         ]
       },

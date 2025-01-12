@@ -3,7 +3,7 @@ import { cancelOrderKomship } from "../integration/komship.integration.js";
 import { createQrisTransactionXendit, refundXendit } from "../integration/xendit.integration.js";
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
 import { checkPromoService } from "../services/promo.service.js";
-import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
+import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, rollbackTransaction, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
 import { applyVoucherService } from "../services/voucher.service.js";
 
 
@@ -113,7 +113,7 @@ export const createTransaction = async (req, res) => {
             })
         );
         // console.log(totalWeight);
-
+        var disc = 0;
         if (voucherCode) {
             // minus the totalprice
             const voucherHasUsed = await checkTransactionWithVoucher(voucherCode, userId);
@@ -122,7 +122,9 @@ export const createTransaction = async (req, res) => {
             }
             else {
                 const discount = await applyVoucherService(voucherCode, totalPrice - deliveryFee);
-                totalPrice -= discount
+                totalPrice -= discount;
+                disc = discount;
+                
             }
         }
 
@@ -137,7 +139,7 @@ export const createTransaction = async (req, res) => {
             voucherCode.length === 0 ? null : voucherCode,
             // null, 
             new Date(),
-            paymentMethod,
+            "Non COD",
             null,
             "Unpaid",
             expedition,
@@ -168,7 +170,7 @@ export const createTransaction = async (req, res) => {
         });
         const insertedTransactionDetails = await createTransactionDetailService(transactionDetails);
         const deletedCartItem = await removeAllCartItemInUserService(userId);
-        const payTransactionResponse = await payTransactionService(transaction, req.user.customerId, productsInCart)
+        const payTransactionResponse = await payTransactionService(transaction, req.user.customerId, productsInCart, disc)
         console.log(payTransactionResponse);
 
         const updatePaymentLink = await updatePaymentLinkService(transaction, payTransactionResponse.actions[0].url);
@@ -457,6 +459,7 @@ export const cancelTransaction = async (req, res) => {
     }
 
     try {
+        await rollbackTransaction(transactionId);
         const cancelledTransaction = await cancelTransactionService(transactionId);
 
         return res.status(200).json({ message: "Transaction cancelled!" })
@@ -579,6 +582,7 @@ export const cancelPaidTransaction = async (req, res) => {
     try {
         const transaction = await getTransactionsByIdService(transactionId);
 
+        await rollbackTransaction(transactionId);
         const cancelledTransaction = await cancelTransactionService(transactionId);
         console.log(transaction.komshipOrderNumber);
 
