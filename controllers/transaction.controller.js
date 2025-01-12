@@ -1,8 +1,9 @@
 import sequelize from "../config/database.js";
-import { createQrisTransactionXendit } from "../integration/xendit.integration.js";
+import { cancelOrderKomship } from "../integration/komship.integration.js";
+import { createQrisTransactionXendit, refundXendit } from "../integration/xendit.integration.js";
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
 import { checkPromoService } from "../services/promo.service.js";
-import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, payTransactionService, printLabelService, requestPickupTransactionService, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionStatusService } from "../services/transaction.service.js";
+import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
 import { applyVoucherService } from "../services/voucher.service.js";
 
 
@@ -60,13 +61,13 @@ export const getTransactionById = async (req, res) => {
 }
 
 export const createTransaction = async (req, res) => {
-    const { 
-        addressId, 
-        paymentMethod, 
-        voucherCode, 
+    const {
+        addressId,
+        paymentMethod,
+        voucherCode,
         expedition,
         shippingType,
-        deliveryFee, 
+        deliveryFee,
         deliveryCashback,
         notes
     } = req.body;
@@ -99,13 +100,13 @@ export const createTransaction = async (req, res) => {
                 const promoDetails = await checkPromoService(product.product_variant.ref_product_id);
                 // console.log(product.product_variant.productPrice);
                 if (promoDetails) {
-                    product.product_variant.productPrice = 
-                    product.product_variant.productPrice - promoDetails.promo.promoAmount <= 0 ? 0 :
-                    product.product_variant.productPrice - promoDetails.promo.promoAmount;
+                    product.product_variant.productPrice =
+                        product.product_variant.productPrice - promoDetails.promo.promoAmount <= 0 ? 0 :
+                            product.product_variant.productPrice - promoDetails.promo.promoAmount;
                     product.product_variant.realizedPromo = promoDetails.promo.promoAmount;
                 }
                 // console.log(product.product_variant.productPrice);
-                
+
                 const itemTotal = product.product_variant.productPrice * product.quantity;
                 totalPrice += itemTotal;
                 totalWeight += product.product_variant.productWeight;
@@ -124,26 +125,26 @@ export const createTransaction = async (req, res) => {
                 totalPrice -= discount
             }
         }
-        
+
         // set transaction date to now 
         // set gateway response to null
         // set status to Wait for payment
         // set payment deadline to now + 1 day 
         // insert transaction header and get the id
         const transaction = await createTransactionService(
-            userId, 
-            addressId, 
-            voucherCode.length === 0 ? null : voucherCode, 
+            userId,
+            addressId,
+            voucherCode.length === 0 ? null : voucherCode,
             // null, 
-            new Date(), 
-            paymentMethod, 
-            null, 
+            new Date(),
+            paymentMethod,
+            null,
             "Unpaid",
-            expedition, 
+            expedition,
             shippingType,
-            deliveryFee, 
+            deliveryFee,
             deliveryCashback,
-            new Date(Date.now() + 1 * 60 * 60 * 1000), 
+            new Date(Date.now() + 1 * 60 * 60 * 1000),
             notes,
             totalPrice,
             totalWeight
@@ -152,7 +153,7 @@ export const createTransaction = async (req, res) => {
         // insert transaction detail
         const transactionDetails = productsInCart.map(product => {
             const currentDate = new Date();
-    
+
             // const isPromoActive =
             //     product.isPromo &&
             //     new Date(product.startDate) <= currentDate &&
@@ -167,17 +168,17 @@ export const createTransaction = async (req, res) => {
         });
         const insertedTransactionDetails = await createTransactionDetailService(transactionDetails);
         const deletedCartItem = await removeAllCartItemInUserService(userId);
-        const payTransactionResponse = await payTransactionService(transaction, req.user.customerId)
+        const payTransactionResponse = await payTransactionService(transaction, req.user.customerId, productsInCart)
         console.log(payTransactionResponse);
-        
+
         const updatePaymentLink = await updatePaymentLinkService(transaction, payTransactionResponse.actions[0].url);
-        
+
         await seqTransaction.commit();
         return res.status(200).json({ message: "Transaction created!", payTransactionResponse, transaction, insertedTransactionDetails });
-        
+
     } catch (error) {
         console.log(error);
-        
+
         await seqTransaction.rollback();
         return res.status(500).json({ message: error.message });
     }
@@ -237,8 +238,8 @@ export const checkOutQrisTransaction = async (req, res) => {
 export const checkOutVATransaction = async (req, res) => {
 
     const {
-        transactionId, 
-        amount, 
+        transactionId,
+        amount,
         bank
     } = req.body
 
@@ -325,14 +326,19 @@ export const checkOutVATransaction = async (req, res) => {
 // }
 export const updateTransactionStatus = async (req, res) => {
     const {
-        reference_id
+        reference_id,
+        status
     } = req.body.data;
-    
+
+    if (status != "SUCCEEDED") {
+        return res.status(400).json({ message: "Transaction not succeeded" });
+    }
+
     try {
         const updatedTransaction = await updateTransactionStatusService(reference_id, req.body);
         const getTransactionById = await getTransactionsByIdService(reference_id);
 
-        const response = await createKomshipOrderService(getTransactionById);
+        // const response = await createKomshipOrderService(getTransactionById);
         return res.status(200).json({ message: "Transaction updated!", response });
         // return res.redirect('/');
     } catch (error) {
@@ -345,7 +351,9 @@ export const requestPickupTransaction = async (req, res) => {
     const { transactionId } = req.body;
     try {
         const getTransactionById = await getTransactionsByIdService(transactionId);
-        const response = await requestPickupTransactionService(getTransactionById);
+        const createKomshipOrder = await createKomshipOrderService(getTransactionById);
+        const getTransactionByIdAfter = await getTransactionsByIdService(transactionId);
+        const response = await requestPickupTransactionService(getTransactionByIdAfter);
         return res.status(200).json({ message: "Success!", response });
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -368,9 +376,12 @@ export const printLabel = async (req, res) => {
 
     try {
         const getTransactionById = await getTransactionsByIdService(transactionId);
-        const label = await printLabelService(getTransactionById.orderNumber);
+        const label = await printLabelService(getTransactionById.komshipOrderNumber);
+        console.log(label);
+
         return res.status(200).json({ message: "Success!", label });
     } catch (error) {
+        console.log(error);
         return res.status(500).json({ message: error.message });
     }
 }
@@ -379,11 +390,11 @@ export const monthlySalesReport = async (req, res) => {
     const { year, month } = req.body;
 
     if (year <= 0) {
-        return res.status(400).json({ message: "Invalid Year" });   
+        return res.status(400).json({ message: "Invalid Year" });
     }
     else if (month <= 0) {
-        return res.status(400).json({ message: "Invalid Month" });   
-    } 
+        return res.status(400).json({ message: "Invalid Month" });
+    }
 
     try {
         const response = await monthlySalesReportService(year, month);
@@ -396,7 +407,7 @@ export const monthlySalesReport = async (req, res) => {
 export const allMonthSalesAnalytic = async (req, res) => {
     const { year } = req.body;
     if (year <= 0) {
-        return res.status(400).json({ message: "Invalid Year" });   
+        return res.status(400).json({ message: "Invalid Year" });
     }
 
     try {
@@ -411,11 +422,11 @@ export const fetchSalesByCategory = async (req, res) => {
     const { year, month } = req.body;
 
     if (year <= 0) {
-        return res.status(400).json({ message: "Invalid Year" });   
+        return res.status(400).json({ message: "Invalid Year" });
     }
     else if (month <= 0) {
-        return res.status(400).json({ message: "Invalid Month" });   
-    } 
+        return res.status(400).json({ message: "Invalid Month" });
+    }
 
     try {
         const response = await fetchSalesByCategoryService(year, month);
@@ -426,9 +437,9 @@ export const fetchSalesByCategory = async (req, res) => {
 }
 
 export const updateTransactionDelivery = async (req, res) => {
-    const { order_no, cnote, status } = req.body; 
+    const { order_no, cnote, status } = req.body;
     if (!order_no || !cnote || !status) {
-        return res.status(400).json({ message: "Invalid input" }); 
+        return res.status(400).json({ message: "Invalid input" });
     }
 
     try {
@@ -447,7 +458,56 @@ export const cancelTransaction = async (req, res) => {
 
     try {
         const cancelledTransaction = await cancelTransactionService(transactionId);
+
         return res.status(200).json({ message: "Transaction cancelled!" })
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const onReviewTransaction = async (req, res) => {
+    const transactionId = req.params.id;
+    const { reason } = req.body;
+
+    if (!transactionId) {
+        return res.status(400).json({ message: "Transaction is required!" });
+    }
+
+    if (
+        !reason ||
+        typeof reason !== "string" ||
+        reason.trim() === ""
+    ) {
+        return res.status(400).json({ message: "Reason is required!" });
+    }
+
+    try {
+        const onReviewTransaction = await onReviewTransactionService(transactionId, reason);
+        return res.status(200).json({ message: "Cancel reason on review!" })
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const onReviewReturnTransaction = async (req, res) => {
+    const transactionId = req.params.id;
+    const { reason } = req.body;
+
+    if (!transactionId) {
+        return res.status(400).json({ message: "Transaction is required!" });
+    }
+
+    if (
+        !reason ||
+        typeof reason !== "string" ||
+        reason.trim() === ""
+    ) {
+        return res.status(400).json({ message: "Reason is required!" });
+    }
+
+    try {
+        const onReviewTransaction = await onReviewReturnTransactionService(transactionId, reason);
+        return res.status(200).json({ message: "Cancel reason on review!" })
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
@@ -458,7 +518,7 @@ export const payTransaction = async (req, res) => {
     const { transactionId } = req.body;
 
     if (!transactionId) {
-        return res.status(400).json({ message: "Transaction is required!" });
+        return res.status(400).json({ message: "Transaction ID is required!" });
     }
 
     try {
@@ -468,4 +528,92 @@ export const payTransaction = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 
+}
+
+export const returnTransaction = async (req, res) => {
+    const { transactionId } = req.body;
+
+    if (!transactionId) {
+        return res.status(400).json({ message: "Transaction ID is required!" });
+    }
+
+    try {
+        const transaction = await getTransactionsByIdService(transactionId);
+        const returnedTransaction = await returnTransactionService(transactionId);
+
+        return res.status(200).json({ message: "Transaction updated to waiting for return. Ask customer to return the poduct" });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const refundTransaction = async (req, res) => {
+    const { transactionId } = req.body;
+
+    if (!transactionId) {
+        return res.status(400).json({ message: "Transaction ID is required!" });
+    }
+
+    try {
+        const transaction = await getTransactionsByIdService(transactionId);
+        const gatewayResponse = JSON.parse(transaction.gatewayResponse);
+        console.log(gatewayResponse);
+
+        const refundRequest = await refundXendit(transactionId, gatewayResponse.data.attempt_details[0].action_id, transaction.totalPrice);
+        await updateTransactionService(transactionId, "Return");
+
+        return res.status(200).json({ message: "Transaction refunded!" })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const cancelPaidTransaction = async (req, res) => {
+    const transactionId = req.params.id;
+
+    if (!transactionId) {
+        return res.status(400).json({ message: "Transaction is required!" });
+    }
+
+    try {
+        const transaction = await getTransactionsByIdService(transactionId);
+
+        const cancelledTransaction = await cancelTransactionService(transactionId);
+        console.log(transaction.komshipOrderNumber);
+
+        const gatewayResponse = JSON.parse(transaction.gatewayResponse);
+        const refundRequest = await refundXendit(transactionId, gatewayResponse.data.attempt_details[0].action_id, transaction.totalPrice);
+        console.log(refundRequest);
+
+        // const cancelledKomshipOrder = await cancelOrderKomship(transaction.komshipOrderNumber);
+        // console.log(cancelledKomshipOrder);
+
+        return res.status(200).json({ message: "Transaction cancelled!" })
+    } catch (error) {
+        console.log(error);
+
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const rejectReviewTransaction = async (req, res) => {
+    const transactionId = req.params.id;
+
+    try {
+        const transaction = await getTransactionsByIdService(transactionId);
+        if (transaction.status === "On Review Cancel") {
+            await updateTransactionService(transactionId, "Waiting for shipping");
+            return res.status(200).json({ message: "Cancel rejected!" })
+        }
+        else if (transaction.status === "On Review Return") {
+            await updateTransactionService(transactionId, "Done");
+            return res.status(200).json({ message: "Return rejected!" });
+        }
+        else {
+            return res.status(400).json({ message: "Cannot reject transaction" });
+        }
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
 }

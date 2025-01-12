@@ -3,10 +3,10 @@ import TransactionDetail from "../models/transactionDetail.model.js";
 import TransactionHeader from "../models/transactionHeader.model.js";
 import UserAddress from "../models/userAddress.model.js";
 import Voucher from "../models/voucher.model.js";
-import VoucherType from "../models/voucherType.model.js";
 import Wishlist from "../models/wishlist.model.js";
 import WishlistItem from "../models/wishlistItem.model.js";
-import { ProductVariant, User } from "./cart.association.js";
+import { ProductVariant } from "./cart.association.js";
+import { User } from "./product.association.js";
 
 
 // PaymentMethod.hasMany(TransactionHeader, { foreignKey: 'ref_payment_method_id' });
@@ -48,7 +48,4 @@ Voucher.hasMany(TransactionHeader, {
 });
 
 
-VoucherType.hasMany(Voucher, { foreignKey: 'ref_voucher_type_id' });
-Voucher.belongsTo(VoucherType, { foreignKey: 'ref_voucher_type_id' });
-
-export { PaymentMethod, TransactionDetail, TransactionHeader, User, ProductVariant, Voucher, VoucherType, Wishlist, WishlistItem }
+export { PaymentMethod, TransactionDetail, TransactionHeader, User, ProductVariant, Voucher, Wishlist, WishlistItem }

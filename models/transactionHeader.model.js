@@ -43,13 +43,12 @@ const TransactionHeader = sequelize.define('transaction_headers', {
   },
   gatewayResponse: {
     field: "gateway_response",
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT("long"),
     allowNull: true,
-    length: 255
   },
   status: {
     field: "status",
-    type: DataTypes.ENUM('Unpaid', 'Waiting for shipping', 'Shipping', 'Done', 'Cancelled'),
+    type: DataTypes.ENUM('Unpaid', 'Waiting for shipping', 'Shipping', 'Done', 'Cancelled', 'On Review Cancel', 'On Review Return', 'Waiting for Return', 'Return'),
     allowNull: false,
     length: 100
   },

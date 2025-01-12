@@ -1,5 +1,4 @@
-import { VoucherModel, VoucherTypeModel } from "../association/association.js";
-import { getVoucherTypeByCodeService } from "./voucherType.service.js";
+import { VoucherModel } from "../association/association.js";
 
 
 // #region GET
@@ -124,6 +123,16 @@ export const deleteVoucherByCodeService = async (code) =>{
   const voucher = await getVoucherByCodeService(code)
   if (!voucher) throw new Error(`Voucher with Code ${code} not found`)
 
+  const result = await VoucherModel.destroy({
+    where: {
+      voucherCode: code,
+    },
+  });
+
+  return result
+}
+
+export const deleteVouchersByCodeService = async (code) =>{
   const result = await VoucherModel.destroy({
     where: {
       voucherCode: code,

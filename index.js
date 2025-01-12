@@ -11,13 +11,12 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url';
 import VoucherRoute from './routes/voucher.route.js';
-import VoucherTypeRoute from './routes/voucherType.route.js';
 import AddressRoute from './routes/address.route.js';
 import TransactionRoute from './routes/transaction.route.js';
 import FAQRoute from './routes/faq.route.js';
 import PostRoute from './routes/post.route.js';
 import { getPickUpPointService, storeAllCityService, storeAllProvinceService } from './services/address.service.js';
-import { migrateAboutPage, migratePage } from './services/page.service.js';
+import { migrateAboutPage, migratePage, migrateWhyContent } from './services/page.service.js';
 import PageRoute from './routes/page.route.js';
 import ContactRoute from './routes/contact.route.js';
 import { migrateContactService } from './services/contact.service.js';
@@ -28,6 +27,8 @@ import BannerRoute from './routes/banner.route.js';
 import { migrateBanner } from './services/banner.service.js';
 import { migrateAdminService } from './services/user.service.js';
 import RatingRoute from './routes/rating.route.js';
+import CarouselRoute from './routes/carousel.route.js';
+import LocationRoute from './routes/location.route.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -55,7 +56,7 @@ app.use('/api/categories', ProductCategoryRoute);
 app.use('/api/products', ProductRoute);
 app.use('/api/carts', CartRoute);
 app.use('/api/vouchers', VoucherRoute);
-app.use('/api/voucherTypes', VoucherTypeRoute);
+// app.use('/api/voucherTypes', VoucherTypeRoute);
 app.use('/api/addresses', AddressRoute);
 app.use('/api/transactions', TransactionRoute);
 app.use('/api/faqs', FAQRoute);
@@ -66,6 +67,8 @@ app.use('/api/promos', PromoRoute);
 app.use('/api/emails', EmailRoute);
 app.use('/api/banners', BannerRoute);
 app.use('/api/ratings', RatingRoute);
+app.use('/api/carousels', CarouselRoute);
+app.use('/api/locations', LocationRoute);
 
 (async () => {
   try {
@@ -79,6 +82,7 @@ app.use('/api/ratings', RatingRoute);
     await migrateAboutPage();
     await migrateContactService();
     await migrateBanner();
+    await migrateWhyContent();
 
     app.listen(5000, () => {
       console.log('Server running on port 5000');

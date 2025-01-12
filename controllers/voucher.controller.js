@@ -9,6 +9,7 @@ import {
   applyVoucherService,
   createVouchersService,
   deleteVoucherByCodeService,
+  deleteVouchersByCodeService,
   getAllVouchersService,
   getVoucherByCodeService,
   updateVouchersService,
@@ -86,6 +87,16 @@ export const deleteVoucherByCode = async (req, res) => {
   try {
     const response = await deleteVoucherByCodeService(code);
     return res.status(200).json("Voucher has been deleted successfully");
+  } catch (error) {
+    return res.status(404).json(error.message);
+  }
+};
+
+export const deleteVouchersByCode = async (req, res) => {
+  const { voucherCode } = req.body;
+  try {
+    const response = await deleteVouchersByCodeService(voucherCode);
+    return res.status(200).json("Voucher(s) has been deleted successfully");
   } catch (error) {
     return res.status(404).json(error.message);
   }

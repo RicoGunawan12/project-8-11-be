@@ -11,6 +11,8 @@ import {
   updateProductService,
   getNewestProductsService,
   deleteProductsService,
+  updateActivityStatusService,
+  getProductByIdWithRelatedProductService,
 } from "../services/product.service.js";
 import { getCategoryWithProductService } from "../services/productCategory.service.js";
 import {
@@ -19,6 +21,7 @@ import {
   updateProductVariantService,
   updateVariantService,
 } from "../services/productVariantService.js";
+import { convertImageToWebp } from "../utils/imageconverter.js";
 import { BASE_URL, UPLOAD_FOLDER } from "../utils/uploader.js";
 import { isValidDate, isValidNumber } from "../utils/utility.js";
 
@@ -98,6 +101,21 @@ export const getProductById = async (req, res) => {
   }
 };
 
+export const getProductByIdWithRelatedProduct = async (req, res) => {
+  const id = req.params.id;
+
+  if (!id) {
+    return res.status(400).json({ message: "Product id is required" });
+  }
+
+  try {
+    const { product, relatedProducts } = await getProductByIdWithRelatedProductService(id);
+    return res.status(200).json({ product, relatedProducts });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 export const getNewestProduct = async (req, res) => {
   try {
     const products = await getNewestProductsService();
@@ -112,7 +130,7 @@ export const validateProduct = (req, res, next) => {
     productName,
     productDescription,
     productCategoryName,
-    productVariants,
+    productVariants
   } = req.body;
 
   // Validate productName
@@ -142,6 +160,15 @@ export const validateProduct = (req, res, next) => {
       });
   }
 
+  if(
+    !productSize ||
+    typeof productSize !== "number" ||
+    productSize.trim() === ""
+  )
+  return res.status(400).json({
+    message: "Product size is required and must be greater than 0"
+  })
+
   // Validate productCategoryName
   if (
     !productCategoryName ||
@@ -167,15 +194,6 @@ export const validateProduct = (req, res, next) => {
 
     for (let i = 0; i < variants.length; i++) {
       const variant = variants[i];
-      if (
-        !variant.productSize ||
-        typeof variant.productSize !== "string" ||
-        variant.productSize.trim() === ""
-      ) {
-        return res
-          .status(400)
-          .json({ message: `Variant at index ${i} must have a valid size.` });
-      }
       if (
         !variant.productColor ||
         typeof variant.productColor !== "string" ||
@@ -205,50 +223,6 @@ export const validateProduct = (req, res, next) => {
           .status(400)
           .json({
             message: `Variant stock at index ${i} must be a positive number.`,
-          });
-      }
-      if (
-        !variant.productWeight ||
-        typeof variant.productWeight !== "number" ||
-        variant.productWeight <= 0
-      ) {
-        return res
-          .status(400)
-          .json({
-            message: `Variant weight at index ${i} must be a positive number.`,
-          });
-      }
-      if (
-        !variant.productLength ||
-        typeof variant.productLength !== "number" ||
-        variant.productLength <= 0
-      ) {
-        return res
-          .status(400)
-          .json({
-            message: `Variant length at index ${i} must be a positive number.`,
-          });
-      }
-      if (
-        !variant.productWidth ||
-        typeof variant.productWidth !== "number" ||
-        variant.productWidth <= 0
-      ) {
-        return res
-          .status(400)
-          .json({
-            message: `Variant width at index ${i} must be a positive number.`,
-          });
-      }
-      if (
-        !variant.productHeight ||
-        typeof variant.productHeight !== "number" ||
-        variant.productHeight <= 0
-      ) {
-        return res
-          .status(400)
-          .json({
-            message: `Variant height at index ${i} must be a positive number.`,
           });
       }
     }
@@ -349,22 +323,22 @@ export const createProduct = async (req, res) => {
             "Product weight, length, width, and height must be a valid number",
         });
     }
-    if (typeof productWeight !== "number" || productWeight < 0) {
+    if (typeof productWeight !== "number" || productWeight <= 0) {
       return res
         .status(400)
         .json({ message: `Product weight must be greater than 0` });
     }
-    if (typeof productLength !== "number" || productLength < 0) {
+    if (typeof productLength !== "number" || productLength <= 0) {
       return res
         .status(400)
         .json({ message: `Product length must be greater than 0` });
     }
-    if (typeof productWidth !== "number" || productWidth < 0) {
+    if (typeof productWidth !== "number" || productWidth <= 0) {
       return res
         .status(400)
         .json({ message: `Product width must be greater than 0` });
     }
-    if (typeof productHeight !== "number" || productHeight < 0) {
+    if (typeof productHeight !== "number" || productHeight <= 0) {
       return res
         .status(400)
         .json({ message: `Product height must be greater than 0` });
@@ -423,33 +397,44 @@ export const createProduct = async (req, res) => {
       return res.status(400).json({ message: "Default image is required" });
     }
 
+    const variants = JSON.parse(productVariants);
     const hash = new Map();
-    images.forEach((image) => {
-      // console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
+    for (let i = 0; i < images.length; i++) {
+      const image = images[i];
+
+      // converts image to WebP format
+      const filename = `${Date.now()}-${req.body.productName}.webp`;
+      const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
 
       hash.set(
-        image.originalname.substring(0, image.originalname.length - 4),
-        `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`
+        productName + " - " + variants[i].productColor,
+        `/${UPLOAD_FOLDER}product/${productName}/${filename}`
       );
-    });
+    }
 
     if (productName.length < 1) {
       return res.status(400).json({ message: "Product name must be filled" });
     }
 
-    const variants = JSON.parse(productVariants);
+   
     variants.forEach((variant) => {
-      // console.log(productName + " - " + variant.productSize + " - " + variant.productColor);
-
-      // console.log("hash: " + hash.get(productName + " - " + variant.productSize + " - " + variant.productColor));
-
       variant.productImage = hash.get(
         productName + " - " + variant.productColor
       );
     });
 
     // console.log(defaultImage);
-    const defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${defaultImage[0].filename}`;
+
+    // converts image to WebP format
+    let defaultImageString = '';
+    for (let i = 0; i < defaultImage.length; i++) {
+      const image = defaultImage[i];
+      const filename = `${Date.now()}-${req.body.productName}.webp`;
+      const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
+
+      if (i === 0) defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${filename}`;
+    }
+
     const product = await createProductService(
       productName,
       productDescription,
@@ -630,14 +615,20 @@ export const updateProduct = async (req, res) => {
     const hash = new Map();
     console.log(images);
 
-    images.forEach((image) => {
+    for (let i = 0; i < images.length; i++) {
+      const image = images[i];
+
       // console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
+
+      // converts image to WebP format
+      const filename = `${Date.now()}-${req.body.productName}.webp`;
+      const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
 
       hash.set(
         image.originalname,
-        `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`
+        `/${UPLOAD_FOLDER}product/${productName}/${filename}`
       );
-    });
+    }
 
     if (productName.length < 1) {
       return res.status(400).json({ message: "Product name must be filled" });
@@ -655,7 +646,17 @@ export const updateProduct = async (req, res) => {
     });
 
     // console.log(defaultImage);
-    const defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${defaultImage[0].filename}`;
+
+    // converts image to WebP format
+    let defaultImageString = '';
+    for (let i = 0; i < defaultImage.length; i++) {
+      const image = defaultImage[i];
+      const filename = `${Date.now()}-${req.body.productName}.webp`;
+      const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
+
+      if (i === 0) defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${filename}`;
+    }
+    
     const updatedProduct = await updateProductService(
       productId,
       productName,
@@ -854,6 +855,28 @@ export const updateInactiveBestSellers = async (req, res) => {
 
   try {
     const updatedProduct = await updateBestSellerService(productId, false);
+    return res.status(200).json({ message: "Product best seller updated!" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateActiveStatusProducts = async (req, res) => {
+  const { productId } = req.body;
+
+  try {
+    const updatedProduct = await updateActivityStatusService(productId, "active");
+    return res.status(200).json({ message: "Product best seller updated!" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateInactiveStatusProducts = async (req, res) => {
+  const { productId } = req.body;
+
+  try {
+    const updatedProduct = await updateActivityStatusService(productId, "inactive");
     return res.status(200).json({ message: "Product best seller updated!" });
   } catch (error) {
     return res.status(500).json({ message: error.message });

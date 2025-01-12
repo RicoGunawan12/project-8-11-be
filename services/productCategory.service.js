@@ -94,7 +94,8 @@ export const getCategoryWithProductService = async () => {
             
             const products = await ProductModel.findAll({
                 where: {
-                    productCategoryId: category.productCategoryId
+                    productCategoryId: category.productCategoryId,
+                    productActivityStatus: "active"
                 },
                 attributes: [
                     "productId",
@@ -108,7 +109,8 @@ export const getCategoryWithProductService = async () => {
                     "productWidth",
                     "productHeight",
                     "isBestSeller",
-                    [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
+                    [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
+       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
                 ],
                 include: [
                     {
@@ -172,7 +174,8 @@ export const getCategoryWithProductService = async () => {
             "productLength",
             "productWidth",
             "productHeight",
-            [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
+            [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
+       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
         ],
         include: [
             {

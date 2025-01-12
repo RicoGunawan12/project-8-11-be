@@ -12,6 +12,11 @@ import { getCategoryByName } from "./productCategory.service.js";
 import sequelize from "../config/database.js";
 
 export const getProductsService = async (search, category, limit, status = "active") => {
+  const whereCondition = {};
+  whereCondition.productName = { [Op.like]: `%${search}%` };
+  
+  if (status !== "all") whereCondition.productActivityStatus = status; 
+
   const products = ProductModel.findAll({
     attributes: [
       "productId",
@@ -25,7 +30,9 @@ export const getProductsService = async (search, category, limit, status = "acti
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
+      "productActivityStatus",
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
+       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
     ],
     include: [
       {
@@ -69,10 +76,7 @@ export const getProductsService = async (search, category, limit, status = "acti
       //   attributes: [],
       // }
     ],
-    where: {
-      productName: { [Op.like]: `%${search}%` },
-      productActivityStatus: status
-    },
+    where: whereCondition,
     // group: ["products.product_id"],
     limit: parseInt(limit) || null,
   });
@@ -94,7 +98,8 @@ export const getNewestProductsService = async () => {
       "productHeight",
       "createdAt",
       "isBestSeller",
-      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
+       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
     ],
     include: [
       {
@@ -170,7 +175,8 @@ export const getProductPaginationService = async (limit, offset, search, categor
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
+       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
     ],
     include: [
       {
@@ -264,7 +270,8 @@ export const getProductByIdService = async (productId) => {
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
+       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
     ],
     include: [
       {
@@ -315,6 +322,146 @@ export const getProductByIdService = async (productId) => {
     throw new Error("Product not found!");
   }
   return product;
+};
+
+export const getProductByIdWithRelatedProductService = async (productId) => {
+  const product = await ProductModel.findOne({
+    attributes: [
+      "productId",
+      "productName",
+      "productSize",
+      "productCode",
+      "productDescription",
+      "defaultImage",
+      "productWeight",
+      "productLength",
+      "productWidth",
+      "productHeight",
+      "isBestSeller",
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
+       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
+    ],
+    include: [
+      {
+        model: ProductCategoryModel,
+        attributes: ["productCategoryName"],
+      },
+      {
+        model: ProductVariantModel,
+        attributes: [
+          "productVariantId",
+          "productColor",
+          "sku",
+          "productPrice",
+          "productStock",
+          "productImage",
+        ],
+      },
+      {
+        model: PromoDetailModel,
+        attributes: ['promoDetailId'],
+        required: false,
+        include: [
+            {
+                model: PromoModel,
+                required: false,
+                where: {
+                    startDate: {
+                        [Op.lte]: new Date(), 
+                    },
+                    endDate: {
+                        [Op.gte]: new Date(),
+                    },
+                },
+            },
+        ]
+      },
+      // {
+      //   model: RatingModel,
+      //   required: false,
+      //   // attributes: ['rating', 'comment'],
+      // }
+    ],
+    where: { productId, productActivityStatus: "active" },
+    // group: ["products.product_id"],
+  });
+
+  if (!product) {
+    throw new Error("Product not found!");
+  }
+
+  const relatedProducts = await ProductModel.findAll({
+    attributes: [
+      "productId",
+      "productName",
+      "productSize",
+      "productCode",
+      "productDescription",
+      "defaultImage",
+      "productWeight",
+      "productLength",
+      "productWidth",
+      "productHeight",
+      "isBestSeller",
+      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
+       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
+    ],
+    include: [
+      {
+        model: ProductCategoryModel,
+        attributes: ["productCategoryName"],
+        ...(product?.product_category?.productCategoryName != null
+          ? {
+              where: {
+                productCategoryName: product.product_category.productCategoryName,
+              },
+            }
+          : {}),
+      },
+      {
+        model: ProductVariantModel,
+        attributes: [
+          "productVariantId",
+          "productColor",
+          "sku",
+          "productPrice",
+          "productStock",
+          "productImage",
+        ],
+      },
+      {
+        model: PromoDetailModel,
+        attributes: ['promoDetailId'],
+        required: false,
+        include: [
+            {
+                model: PromoModel,
+                required: false,
+                where: {
+                    startDate: {
+                        [Op.lte]: new Date(), 
+                    },
+                    endDate: {
+                        [Op.gte]: new Date(),
+                    },
+                },
+            },
+        ]
+      },
+      // {
+      //   model: RatingModel,
+      //   required: false,
+      //   // attributes: ['rating', 'comment'],
+      // }
+    ],
+    where: {
+      productId: { [Op.ne]: productId }, 
+      productActivityStatus: "active",
+    },
+    limit: 8,
+  });
+
+  return { product, relatedProducts };
 };
 
 export const createProductService = async (
@@ -486,6 +633,18 @@ export const updateBestSellerService = async (productId, isBestSeller) => {
   return update;
 };
 
+export const updateActivityStatusService = async (productId, status) => {
+  const update = ProductModel.update(
+    { productActivityStatus: status },
+    {
+      where: {
+        productId: productId,
+      },
+    }
+  );
+  return update;
+};
+
 export const getBestSellerService = async () => {
   const bestSellerProduct = await ProductModel.findAll({
     where: { isBestSeller: true, productActivityStatus: 'active' },
@@ -501,7 +660,8 @@ export const getBestSellerService = async () => {
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating']
+       [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
+       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
     ],
     include: [
       {

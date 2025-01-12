@@ -36,6 +36,7 @@ export const createContact = async (req, res) => {
 
 export const updateContact = async (req, res) => {
     const { contact, contactAccount } = req.body;
+    const images = req.files['contactImage'];
     const id = req.params.id;
 
     if (!id) {
@@ -49,8 +50,10 @@ export const updateContact = async (req, res) => {
         return res.status(400).json({ message: "Contact account is required!" });
     }
 
+    const contactImage = `/${UPLOAD_FOLDER}contact/${images[0].filename}`
+
     try {
-        const contacts = await updateContactService(id, contact, contactAccount);
+        const contacts = await updateContactService(id, contact, contactAccount, contactImage);
         return res.status(200).json({ message: "Contact updated!", contacts, });
     } catch (error) {
         return res.status(500).json({ message: error.message });

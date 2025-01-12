@@ -95,7 +95,7 @@ export const calculateDeliveryFeeKomship = async (shipperDestinationId, receiver
 //     "subtotal": 500000
 // }
 // ]
-export const createOrderKomship = async (transaction, adminAddress) => {
+export const createOrderKomship = async (transaction, adminAddress, contact) => {
     const transactionDetails = transaction.transaction_details.map((det) => {
         return {
             product_name: det.product_variant.product.productName,
@@ -125,7 +125,7 @@ export const createOrderKomship = async (transaction, adminAddress) => {
             shipper_phone: adminAddress.senderPhoneNumber,
             shipper_destination_id: parseInt(adminAddress.komshipAddressId),
             shipper_address: adminAddress.addressDetail,
-            shipper_email: "test@gmail.com",
+            shipper_email: contact.email,
             receiver_name: transaction.user.user_addresses[0].receiverName, //ambil dari transaction
             receiver_phone: transaction.user.user_addresses[0].receiverPhoneNumber, //ambil dari transaction
             receiver_destination_id: parseInt(transaction.user.user_addresses[0].komshipAddressId), //ambil dari transaction,
@@ -198,14 +198,27 @@ export const createOrderKomship = async (transaction, adminAddress) => {
 
 
 export const requestPickUpKomship = async (orderNumber) => {
+    const now = new Date();
+    const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+    const currentHour = localDate.getHours();
+    const currentMinute = localDate.getMinutes();
+    if (currentHour > 12 || (currentHour === 12 && currentMinute > 0)) {
+        localDate.setDate(localDate.getDate() + 1);
+    }
+
+    console.log(
+        localDate.toISOString().slice(0, 10)
+    );
+    
+    
     const requestOptions = {
         method: 'POST',
         headers: myHeaders,
         redirect: 'follow',
         body: JSON.stringify(
             {
-                pickup_date: new Date().toISOString().slice(0, 10),
-                pickup_time: "20:00:00",
+                pickup_date: localDate.toISOString().slice(0, 10),
+                pickup_time: "20:00",
                 pickup_vehicle: "Motor",
                 orders: [
                     {
@@ -215,16 +228,19 @@ export const requestPickUpKomship = async (orderNumber) => {
             }
         )
     }
+    
 
     try {
         const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/pickup/request`, requestOptions);
-        // console.log(komshipResponse);
+        console.log(komshipResponse);
         if (!komshipResponse.ok) {
             throw new Error(`Error: ${komshipResponse.statusText}`);
         }
         const result = await komshipResponse.json();
         return result;
     } catch (error) {
+        console.log(error);
+        
         throw new Error(error.message);
     }
 }
@@ -260,6 +276,31 @@ export const printLabelKomship = async (orderNumber) => {
 
     try {
         const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/print-label?order_no=${orderNumber}&page=page_1`, requestOptions);
+
+        if (!komshipResponse.ok) {
+            throw new Error(`Error: ${komshipResponse.statusText}`);
+        }
+
+        const result = await komshipResponse.json();
+        return result;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+export const cancelOrderKomship = async (orderNumber) => {
+    const body = {
+        order_no: orderNumber
+    }
+    const requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        redirect: 'follow',
+        body: JSON.stringify(body)
+    }
+
+    try {
+        const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/cancel`, requestOptions);
 
         if (!komshipResponse.ok) {
             throw new Error(`Error: ${komshipResponse.statusText}`);

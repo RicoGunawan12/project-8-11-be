@@ -1,4 +1,4 @@
-import { calculateDeliveryFeeService, createAddresService, deleteAddressService, getAddresByUserIdService, getAllCityService, getAllProvinceService, getAllSubdistrictService, getPickUpPointService, searchDestinationService, updateAddresService, updatePickUpPointService } from "../services/address.service.js";
+import { calculateDeliveryFeeService, createAddresService, deleteAddressService, getAddresByUserIdService, getAddressByAddressIdService, getAllCityService, getAllProvinceService, getAllSubdistrictService, getPickUpPointService, searchDestinationService, updateAddresService, updatePickUpPointService } from "../services/address.service.js";
 
 
 export const getAddressByUserId = async (req, res) => {
@@ -11,6 +11,18 @@ export const getAddressByUserId = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
+}
+
+export const getAddressById = async (req, res) => {
+    const addressId = req.params.id;
+
+    try {
+        const userAddress = await getAddressByAddressIdService(addressId)
+        return res.status(200).json(userAddress)
+    } catch (error) {
+        return res.status(500).json({message : error.messag})
+    }
+
 }
 
 export const createAddress = async (req, res) => {

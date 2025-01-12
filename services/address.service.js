@@ -16,6 +16,20 @@ export const getAddresByUserIdService = async (ref_user_id) => {
     return userAddresses;
 }
 
+export const getAddressByAddressIdService = async(ref_id) => {
+
+    const userAddress = await UserAddressModel.findOne(
+        {
+            where: {
+                addressId : ref_id
+            }
+        }
+    )
+
+    return userAddress
+
+}
+
 export const createAddresService = async (receiverName, receiverPhoneNumber, city, subdistrict, district, postalCode, userId, addressDetail, komshipAddressId, label) => {
     const insertedAddress = await UserAddressModel.create(
         { 
