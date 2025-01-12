@@ -1,5 +1,5 @@
 import express from 'express';
-import { applyVoucher, createVouchers, deleteVoucherByCode, deleteVouchersByCode, getAllVouchers, getVoucherByCode, updateVouchers } from '../controllers/voucher.controller.js';
+import { applyVoucher, createVouchers, deleteVoucherByCode, deleteVouchersByCode, getAllVouchers, getByCodeNonUser, getVoucherByCode, updateVouchers } from '../controllers/voucher.controller.js';
 import { validateSchema } from '../validator/validate.js';
 import { vouchersValidator } from '../validator/model/vouchers.validator.js';
 import { generalValidator } from '../validator/general/general.validator.js';
@@ -12,6 +12,7 @@ const VoucherRoute = express.Router();
 
 VoucherRoute.get('/', getAllVouchers)
 VoucherRoute.get('/getByCode',userMiddleware, generalValidator(getByCode),validateSchema, getVoucherByCode)
+VoucherRoute.get('/getByCodeV2', generalValidator(getByCode),validateSchema, getByCodeNonUser)
 VoucherRoute.post('/', vouchersValidator,validateSchema, createVouchers)
 VoucherRoute.put('/', vouchersValidator,validateSchema, updateVouchers)
 VoucherRoute.delete('/',generalValidator(getByCode),validateSchema,deleteVoucherByCode)
