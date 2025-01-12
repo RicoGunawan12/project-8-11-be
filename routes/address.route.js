@@ -1,5 +1,5 @@
 import express from 'express';
-import { adminMiddleware, userMiddleware } from '../middleware/auth.middleware.js';
+import { adminMiddleware, generalMiddleware, userMiddleware } from '../middleware/auth.middleware.js';
 import { calculateDeliveryFee, createAddress, deleteAddress, getAddressById, getAddressByUserId, getAllCity, getAllProvince, getAllSubdistrict, getPickUpPoint, searchDestination, updateAddress, updatePickUpPoint } from '../controllers/address.controller.js';
 import { generalValidator } from '../validator/general/general.validator.js';
 import { addressSchema } from '../schema/model/address.schema.js';
@@ -20,7 +20,7 @@ AddressRoute.get('/destination', searchDestination);
 AddressRoute.get('/calculate', userMiddleware, calculateDeliveryFee);
 
 AddressRoute.post('/admin', adminMiddleware, updatePickUpPoint);
-AddressRoute.get('/admin', getPickUpPoint);
+AddressRoute.get('/admin', generalMiddleware, getPickUpPoint);
 
 AddressRoute.get('/:id', userMiddleware, getAddressById)
 
