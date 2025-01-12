@@ -1,5 +1,5 @@
 import express from 'express';
-import { applyVoucher, createVouchers, deleteVoucherByCode, deleteVouchersByCode, getAllVouchers, getVoucherByCode, updateVouchers } from '../controllers/voucher.controller.js';
+import { applyVoucher, createVouchers, deleteVoucherByCode, deleteVouchersByCode, getAllVouchers, getByCodeNonUser, getVoucherByCode, updateVouchers } from '../controllers/voucher.controller.js';
 import { validateSchema } from '../validator/validate.js';
 import { vouchersValidator } from '../validator/model/vouchers.validator.js';
 import { generalValidator } from '../validator/general/general.validator.js';
