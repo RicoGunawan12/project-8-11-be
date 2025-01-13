@@ -437,15 +437,34 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
           },
         ],
       },
-      // {
-      //   model: RatingModel,
-      //   required: false,
-      //   // attributes: ['rating', 'comment'],
-      // }
+      {
+        model: RatingModel,
+        attributes: [
+          [sequelize.fn("AVG", sequelize.col("rating")), "averageRating"],
+          [sequelize.fn("COUNT", sequelize.col("rating")), "countRating"],
+        ],
+        required: false,
+      },
     ],
     where: { productId, productActivityStatus: "active" },
-    // group: ["products.product_id"],
   });
+
+  const ratingDistribution = await RatingModel.findAll({
+    attributes: [
+      "rating",
+      [sequelize.fn("COUNT", sequelize.col("rating")), "count"],
+    ],
+    where: {
+      product_id: productId,
+    },
+    group: ["rating"],
+    raw: true,
+  });
+
+  const ratingDistributionObject = ratingDistribution.reduce((acc, curr) => {
+    acc[curr.rating] = parseInt(curr.count);
+    return acc;
+  }, {});
 
   if (!product) {
     throw new Error("Product not found!");
@@ -532,8 +551,8 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
     },
     limit: 8,
   });
-
-  return { product, relatedProducts };
+  
+  return { product, relatedProducts, ratingDistributionObject };
 };
 
 export const createProductService = async (
