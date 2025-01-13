@@ -1,3 +1,4 @@
+import { readExcelFile } from "../services/excel.service.js";
 import {
   createProductService,
   deleteProductService,
@@ -13,6 +14,7 @@ import {
   deleteProductsService,
   updateActivityStatusService,
   getProductByIdWithRelatedProductService,
+  generateUpdateStockExcelService,
 } from "../services/product.service.js";
 import { getCategoryWithProductService } from "../services/productCategory.service.js";
 import {
@@ -895,3 +897,34 @@ export const deleteProducts = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 }
+
+export const generateUpdateStockExcel = async (req,res) => {
+  try {
+    const { excelBuffer, fileName } = await generateUpdateStockExcelService(  );
+
+        // Set response headers to prompt file download
+        res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+        // Send the Excel file buffer as the response
+        res.send(excelBuffer);
+  } catch (error) {
+    return res.status(500).json({message : error.message})
+  }
+}
+
+export const readUpdateStockExcel = async (req, res) => {
+  try {
+    console.log(req.file)  
+    if (!req.file) {
+          return res.status(400).json({ message: 'No file uploaded' });
+      }
+      
+      // Call the service to read and process the Excel file
+      const data = await readExcelFile(req.file.path);
+      res.status(200).json({ data });
+  } catch (error) {
+      console.error('Error in uploadAndReadExcel:', error);
+      res.status(500).json({ message: 'Failed to process file' });
+  }
+};

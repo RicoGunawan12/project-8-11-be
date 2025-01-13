@@ -10,12 +10,18 @@ import {
 import { deleteDirectory, deletePostImage } from "../utils/uploader.js";
 import { getCategoryByName } from "./productCategory.service.js";
 import sequelize from "../config/database.js";
+import { generateExcel} from "./excel.service.js";
 
-export const getProductsService = async (search, category, limit, status = "active") => {
+export const getProductsService = async (
+  search,
+  category,
+  limit,
+  status = "active"
+) => {
   const whereCondition = {};
   whereCondition.productName = { [Op.like]: `%${search}%` };
-  
-  if (status !== "all") whereCondition.productActivityStatus = status; 
+
+  if (status !== "all") whereCondition.productActivityStatus = status;
 
   const products = ProductModel.findAll({
     attributes: [
@@ -31,8 +37,18 @@ export const getProductsService = async (search, category, limit, status = "acti
       "productHeight",
       "isBestSeller",
       "productActivityStatus",
-      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
-       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
+      [
+        sequelize.literal(
+          "(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)"
+        ),
+        "averageRating",
+      ],
+      [
+        sequelize.literal(
+          "(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)"
+        ),
+        "countRating",
+      ],
     ],
     include: [
       {
@@ -53,23 +69,23 @@ export const getProductsService = async (search, category, limit, status = "acti
       },
       {
         model: PromoDetailModel,
-        attributes: ['promoDetailId'],
+        attributes: ["promoDetailId"],
         required: false,
         include: [
-            {
-                model: PromoModel,
-                required: false,
-                where: {
-                    startDate: {
-                        [Op.lte]: new Date(), 
-                    },
-                    endDate: {
-                        [Op.gte]: new Date(),
-                    },
-                },
-                order: [['created_at', 'DESC']],
+          {
+            model: PromoModel,
+            required: false,
+            where: {
+              startDate: {
+                [Op.lte]: new Date(),
+              },
+              endDate: {
+                [Op.gte]: new Date(),
+              },
             },
-        ]
+            order: [["created_at", "DESC"]],
+          },
+        ],
       },
       // {
       //   model: RatingModel,
@@ -99,8 +115,18 @@ export const getNewestProductsService = async () => {
       "productHeight",
       "createdAt",
       "isBestSeller",
-      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
-       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
+      [
+        sequelize.literal(
+          "(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)"
+        ),
+        "averageRating",
+      ],
+      [
+        sequelize.literal(
+          "(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)"
+        ),
+        "countRating",
+      ],
     ],
     include: [
       {
@@ -120,22 +146,22 @@ export const getNewestProductsService = async () => {
       },
       {
         model: PromoDetailModel,
-        attributes: ['promoDetailId'],
+        attributes: ["promoDetailId"],
         required: false,
         include: [
-            {
-                model: PromoModel,
-                required: false,
-                where: {
-                    startDate: {
-                        [Op.lte]: new Date(), 
-                    },
-                    endDate: {
-                        [Op.gte]: new Date(),
-                    },
-                },
+          {
+            model: PromoModel,
+            required: false,
+            where: {
+              startDate: {
+                [Op.lte]: new Date(),
+              },
+              endDate: {
+                [Op.gte]: new Date(),
+              },
             },
-        ]
+          },
+        ],
       },
       // {
       //   model: RatingModel,
@@ -145,16 +171,20 @@ export const getNewestProductsService = async () => {
     ],
     // group: ["products.product_id"],
     where: {
-      productActivityStatus: "active"
+      productActivityStatus: "active",
     },
     limit: 3,
-    order: [['createdAt', 'DESC']],
+    order: [["createdAt", "DESC"]],
   });
   return products;
 };
 
-
-export const getProductPaginationService = async (limit, offset, search, category) => {
+export const getProductPaginationService = async (
+  limit,
+  offset,
+  search,
+  category
+) => {
   const whereCondition = {};
   whereCondition.productName = {
     [Op.like]: `%${search}%`,
@@ -176,8 +206,18 @@ export const getProductPaginationService = async (limit, offset, search, categor
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
-       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
+      [
+        sequelize.literal(
+          "(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)"
+        ),
+        "averageRating",
+      ],
+      [
+        sequelize.literal(
+          "(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)"
+        ),
+        "countRating",
+      ],
     ],
     include: [
       {
@@ -198,22 +238,22 @@ export const getProductPaginationService = async (limit, offset, search, categor
       },
       {
         model: PromoDetailModel,
-        attributes: ['promoDetailId'],
+        attributes: ["promoDetailId"],
         required: false,
         include: [
-            {
-                model: PromoModel,
-                required: false,
-                where: {
-                    startDate: {
-                        [Op.lte]: new Date(), 
-                    },
-                    endDate: {
-                        [Op.gte]: new Date(),
-                    },
-                },
+          {
+            model: PromoModel,
+            required: false,
+            where: {
+              startDate: {
+                [Op.lte]: new Date(),
+              },
+              endDate: {
+                [Op.gte]: new Date(),
+              },
             },
-        ]
+          },
+        ],
       },
       // {
       //   model: RatingModel,
@@ -250,7 +290,7 @@ export const getProductCountService = async (search, category) => {
         attributes: ["productCategoryName"],
         where: category ? { productCategoryName: category } : undefined,
       },
-    ]
+    ],
   });
   // console.log(count);
 
@@ -271,8 +311,18 @@ export const getProductByIdService = async (productId) => {
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
-       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
+      [
+        sequelize.literal(
+          "(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)"
+        ),
+        "averageRating",
+      ],
+      [
+        sequelize.literal(
+          "(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)"
+        ),
+        "countRating",
+      ],
     ],
     include: [
       {
@@ -292,22 +342,22 @@ export const getProductByIdService = async (productId) => {
       },
       {
         model: PromoDetailModel,
-        attributes: ['promoDetailId'],
+        attributes: ["promoDetailId"],
         required: false,
         include: [
-            {
-                model: PromoModel,
-                required: false,
-                where: {
-                    startDate: {
-                        [Op.lte]: new Date(), 
-                    },
-                    endDate: {
-                        [Op.gte]: new Date(),
-                    },
-                },
+          {
+            model: PromoModel,
+            required: false,
+            where: {
+              startDate: {
+                [Op.lte]: new Date(),
+              },
+              endDate: {
+                [Op.gte]: new Date(),
+              },
             },
-        ]
+          },
+        ],
       },
       // {
       //   model: RatingModel,
@@ -339,8 +389,18 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
-       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
+      [
+        sequelize.literal(
+          "(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)"
+        ),
+        "averageRating",
+      ],
+      [
+        sequelize.literal(
+          "(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)"
+        ),
+        "countRating",
+      ],
     ],
     include: [
       {
@@ -360,22 +420,22 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       },
       {
         model: PromoDetailModel,
-        attributes: ['promoDetailId'],
+        attributes: ["promoDetailId"],
         required: false,
         include: [
-            {
-                model: PromoModel,
-                required: false,
-                where: {
-                    startDate: {
-                        [Op.lte]: new Date(), 
-                    },
-                    endDate: {
-                        [Op.gte]: new Date(),
-                    },
-                },
+          {
+            model: PromoModel,
+            required: false,
+            where: {
+              startDate: {
+                [Op.lte]: new Date(),
+              },
+              endDate: {
+                [Op.gte]: new Date(),
+              },
             },
-        ]
+          },
+        ],
       },
       // {
       //   model: RatingModel,
@@ -404,8 +464,18 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       "productWidth",
       "productHeight",
       "isBestSeller",
-      [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
-       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
+      [
+        sequelize.literal(
+          "(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)"
+        ),
+        "averageRating",
+      ],
+      [
+        sequelize.literal(
+          "(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)"
+        ),
+        "countRating",
+      ],
     ],
     include: [
       {
@@ -414,7 +484,8 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
         ...(product?.product_category?.productCategoryName != null
           ? {
               where: {
-                productCategoryName: product.product_category.productCategoryName,
+                productCategoryName:
+                  product.product_category.productCategoryName,
               },
             }
           : {}),
@@ -432,22 +503,22 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       },
       {
         model: PromoDetailModel,
-        attributes: ['promoDetailId'],
+        attributes: ["promoDetailId"],
         required: false,
         include: [
-            {
-                model: PromoModel,
-                required: false,
-                where: {
-                    startDate: {
-                        [Op.lte]: new Date(), 
-                    },
-                    endDate: {
-                        [Op.gte]: new Date(),
-                    },
-                },
+          {
+            model: PromoModel,
+            required: false,
+            where: {
+              startDate: {
+                [Op.lte]: new Date(),
+              },
+              endDate: {
+                [Op.gte]: new Date(),
+              },
             },
-        ]
+          },
+        ],
       },
       // {
       //   model: RatingModel,
@@ -456,7 +527,7 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       // }
     ],
     where: {
-      productId: { [Op.ne]: productId }, 
+      productId: { [Op.ne]: productId },
       productActivityStatus: "active",
     },
     limit: 8,
@@ -472,9 +543,9 @@ export const createProductService = async (
   defaultImage,
   productSize,
   productCode,
-  productWeight, 
-  productLength, 
-  productWidth, 
+  productWeight,
+  productLength,
+  productWidth,
   productHeight
 ) => {
   const category = await getCategoryByName(productCategoryName);
@@ -498,14 +569,13 @@ export const createProductService = async (
     defaultImage,
     productSize,
     productCode,
-    productWeight, 
-    productLength, 
-    productWidth, 
-    productHeight
+    productWeight,
+    productLength,
+    productWidth,
+    productHeight,
   });
   return product;
 };
-
 
 export const updateProductService = async (
   productId,
@@ -531,7 +601,7 @@ export const updateProductService = async (
     if (!category) {
       throw new Error("There is no " + productCategoryName + " category");
     }
-    
+
     const productCategoryId = category.productCategoryId;
     // Update product details
     await product.update(
@@ -558,10 +628,16 @@ export const updateProductService = async (
 
     // Identify variants to add, update, or delete
     const existingVariantIds = existingVariants.map((v) => v.productVariantId);
-    const updatedVariantIds = variants.map((v) => v.productVariantId).filter(Boolean);
+    const updatedVariantIds = variants
+      .map((v) => v.productVariantId)
+      .filter(Boolean);
 
-    const variantsToDelete = existingVariantIds.filter((id) => !updatedVariantIds.includes(id));
-    const variantsToUpdate = variants.filter((v) => updatedVariantIds.includes(v.productVariantId));
+    const variantsToDelete = existingVariantIds.filter(
+      (id) => !updatedVariantIds.includes(id)
+    );
+    const variantsToUpdate = variants.filter((v) =>
+      updatedVariantIds.includes(v.productVariantId)
+    );
     const variantsToAdd = variants.filter((v) => !v.productVariantId);
 
     // Delete removed variants
@@ -572,10 +648,12 @@ export const updateProductService = async (
       });
     }
     console.log(variantsToUpdate);
-    
+
     // Update existing variants
     for (const variant of variantsToUpdate) {
-      const existingVariant = existingVariants.find((v) => v.productVariantId === variant.productVariantId);
+      const existingVariant = existingVariants.find(
+        (v) => v.productVariantId === variant.productVariantId
+      );
       await existingVariant.update(
         {
           productColor: variant.productColor,
@@ -589,10 +667,12 @@ export const updateProductService = async (
 
     // Add new variants
     if (variantsToAdd.length > 0) {
-      const newVariants = variantsToAdd.map(({ productVariantId, ...variant }) => ({
-        ...variant,
-        productId,
-      }));
+      const newVariants = variantsToAdd.map(
+        ({ productVariantId, ...variant }) => ({
+          ...variant,
+          productId,
+        })
+      );
       await ProductVariantModel.bulkCreate(newVariants, { transaction });
     }
 
@@ -603,14 +683,13 @@ export const updateProductService = async (
   } catch (error) {
     // Rollback the transaction on error
     console.log(error);
-    
+
     await transaction.rollback();
     if (error.name === "SequelizeUniqueConstraintError") {
       throw new Error("Duplicate color variant");
     }
   }
 };
-
 
 export const deleteProductService = async (productId) => {
   const product = await ProductModel.findOne({ where: { productId } });
@@ -648,7 +727,7 @@ export const updateActivityStatusService = async (productId, status) => {
 
 export const getBestSellerService = async () => {
   const bestSellerProduct = await ProductModel.findAll({
-    where: { isBestSeller: true, productActivityStatus: 'active' },
+    where: { isBestSeller: true, productActivityStatus: "active" },
     attributes: [
       "productId",
       "productName",
@@ -661,8 +740,18 @@ export const getBestSellerService = async () => {
       "productWidth",
       "productHeight",
       "isBestSeller",
-       [sequelize.literal('(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'averageRating'],
-       [sequelize.literal('(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)'), 'countRating']
+      [
+        sequelize.literal(
+          "(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)"
+        ),
+        "averageRating",
+      ],
+      [
+        sequelize.literal(
+          "(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)"
+        ),
+        "countRating",
+      ],
     ],
     include: [
       {
@@ -682,22 +771,22 @@ export const getBestSellerService = async () => {
       },
       {
         model: PromoDetailModel,
-        attributes: ['promoDetailId'],
+        attributes: ["promoDetailId"],
         required: false,
         include: [
-            {
-                model: PromoModel,
-                required: false,
-                where: {
-                    startDate: {
-                        [Op.lte]: new Date(), 
-                    },
-                    endDate: {
-                        [Op.gte]: new Date(),
-                    },
-                },
+          {
+            model: PromoModel,
+            required: false,
+            where: {
+              startDate: {
+                [Op.lte]: new Date(),
+              },
+              endDate: {
+                [Op.gte]: new Date(),
+              },
             },
-        ]
+          },
+        ],
       },
       // {
       //   model: RatingModel,
@@ -738,7 +827,7 @@ export const updatePromoService = async (
 
 export const deleteProductsService = async (productId) => {
   const products = await ProductModel.findAll({ where: { productId } });
-  products.forEach(product => {
+  products.forEach((product) => {
     deleteDirectory(product.productName);
   });
 
@@ -747,3 +836,23 @@ export const deleteProductsService = async (productId) => {
   });
   return deletedProduct;
 };
+
+export const generateUpdateStockExcelService = async () => {
+  const columns = [
+    "Master Nama Produk",
+    "Nama Varian",
+    "Master SKU",
+    "ID varian utama",
+    "ID Varian Channel Telah Diikat",
+    "ID Kategori",
+    "SPU",
+    "Barcode",
+    "Merek",
+];
+
+// Generate the Excel file
+const { excelBuffer, fileName } = await generateExcel(columns);
+
+return {excelBuffer, fileName}
+};
+

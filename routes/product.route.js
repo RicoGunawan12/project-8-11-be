@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProduct, deleteProduct, getBestSeller, getCategoryWithProduct, getNewestProduct, getPaginateProduct, getProductById, getProductCount, getProducts, updateBestSeller, updateProduct, updateProductQuantity, updatePromo, updateVariant, validateProduct, updateActiveBestSellers, updateInactiveBestSellers, deleteProducts, updateActiveStatusProducts, updateInactiveStatusProducts, getProductByIdWithRelatedProduct } from '../controllers/product.controller.js';
+import { createProduct, deleteProduct, getBestSeller, getCategoryWithProduct, getNewestProduct, getPaginateProduct, getProductById, getProductCount, getProducts, updateBestSeller, updateProduct, updateProductQuantity, updatePromo, updateVariant, validateProduct, updateActiveBestSellers, updateInactiveBestSellers, deleteProducts, updateActiveStatusProducts, updateInactiveStatusProducts, getProductByIdWithRelatedProduct, generateUpdateStockExcel, readUpdateStockExcel } from '../controllers/product.controller.js';
 import { adminMiddleware } from '../middleware/auth.middleware.js';
 import { upload } from '../utils/uploader.js';
 import { generalValidator } from '../validator/general/general.validator.js';
@@ -60,6 +60,8 @@ ProductRoute.patch('/bestseller/inactive', adminMiddleware, generalValidator(upd
 ProductRoute.patch('/activitystatus/active', adminMiddleware, generalValidator(updateActiveStatusProductsSchema), validateSchema, updateActiveStatusProducts);
 ProductRoute.patch('/activitystatus/inactive', adminMiddleware, generalValidator(updateInactiveStatusProductsSchema), validateSchema, updateInactiveStatusProducts);
 ProductRoute.post('/delete/multiple', adminMiddleware, generalValidator(productMultipleDeleteSchema), validateSchema, deleteProducts);
-
+// ProductRoute.post('/upload/updateStock',adminMiddleware,)
+ProductRoute.post('/generate/updateStock',adminMiddleware,generateUpdateStockExcel)
+ProductRoute.post('/upload/readUpdateStock',upload.single('file'),readUpdateStockExcel)
 
 export default ProductRoute;
