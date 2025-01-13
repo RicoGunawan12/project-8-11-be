@@ -109,8 +109,8 @@ export const getProductByIdWithRelatedProduct = async (req, res) => {
   }
 
   try {
-    const { product, relatedProducts } = await getProductByIdWithRelatedProductService(id);
-    return res.status(200).json({ product, relatedProducts });
+    const { product, relatedProducts, ratingDistributionObject } = await getProductByIdWithRelatedProductService(id);
+    return res.status(200).json({ product, relatedProducts, ratingDistributionObject });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
