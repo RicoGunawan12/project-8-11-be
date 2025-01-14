@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import { UserModel } from '../association/association.js';
 import { createCart } from './cart.service.js';
 import { createCustomerXendit } from '../integration/xendit.integration.js';
+import { Op } from 'sequelize';
 
 
 export const getUsersService = async () => {
@@ -68,13 +69,18 @@ export const migrateAdminService = async () => {
 }
 
 export const loginUserService = async (email, password) => {
-  const existingUser = await UserModel.findOne({ where: { email, status: "active" } });
+  const existingUser = await UserModel.findOne({
+    where: {
+      [Op.or]: [{ email }, { phone: email }],
+      status: "active",
+    },
+  });
   if (!existingUser) {
     throw new Error('User not found!');
   }
   
   
-  if (existingUser.role !== "user") {
+  if (existingUser.role !== "user" ) {
     throw new Error('Invalid credential!');
   }
   

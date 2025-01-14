@@ -126,10 +126,10 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
             shipper_destination_id: parseInt(adminAddress.komshipAddressId),
             shipper_address: adminAddress.addressDetail,
             shipper_email: contact.email,
-            receiver_name: transaction.user.user_addresses[0].receiverName, //ambil dari transaction
-            receiver_phone: transaction.user.user_addresses[0].receiverPhoneNumber, //ambil dari transaction
-            receiver_destination_id: parseInt(transaction.user.user_addresses[0].komshipAddressId), //ambil dari transaction,
-            receiver_address: transaction.user.user_addresses[0].addressDetail, // ambil dari transaction
+            receiver_name: transaction.user_address.receiverName, //ambil dari transaction
+            receiver_phone: transaction.user_address.receiverPhoneNumber, //ambil dari transaction
+            receiver_destination_id: parseInt(transaction.user_address.komshipAddressId), //ambil dari transaction,
+            receiver_address: transaction.user_address.addressDetail, // ambil dari transaction
             shipping: transaction.expedition, // ambil dari transaction,
             shipping_type: transaction.shippingType, // ambil dari transaction
             payment_method: "BANK TRANSFER",

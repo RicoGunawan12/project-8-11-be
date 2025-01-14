@@ -139,7 +139,7 @@ export const createTransaction = async (req, res) => {
             voucherCode.length === 0 ? null : voucherCode,
             // null, 
             new Date(),
-            "Non COD",
+            "Unpaid",
             null,
             "Unpaid",
             expedition,
