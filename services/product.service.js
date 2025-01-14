@@ -89,7 +89,8 @@ export const getProductsService = async (
       },
       {
         model: ProductCoverModel,
-        attributes: ["productCover"]
+        attributes: ["productCover"],
+        order: [['productCover', "DESC"]]
       }
       // {
       //   model: RatingModel,
@@ -169,7 +170,8 @@ export const getNewestProductsService = async () => {
       },
       {
         model: ProductCoverModel,
-        attributes: ["productCover"]
+        attributes: ["productCover"],
+        order: [['productCover', "DESC"]]
       }
       // {
       //   model: RatingModel,
@@ -265,7 +267,8 @@ export const getProductPaginationService = async (
       },
       {
         model: ProductCoverModel,
-        attributes: ["productCover"]
+        attributes: ["productCover"],
+        order: [['productCover', "DESC"]]
       }
       // {
       //   model: RatingModel,
@@ -373,7 +376,8 @@ export const getProductByIdService = async (productId) => {
       },
       {
         model: ProductCoverModel,
-        attributes: ["productCover"]
+        attributes: ["productCover"],
+        order: [['productCover', "DESC"]]
       }
       // {
       //   model: RatingModel,
@@ -451,7 +455,8 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       },
       {
         model: ProductCoverModel,
-        attributes: ["productCover"]
+        attributes: ["productCover"],
+        order: [['productCover', "DESC"]]
       }
     ],
     where: { productId, productActivityStatus: "active" },
@@ -549,7 +554,8 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       },
       {
         model: ProductCoverModel,
-        attributes: ["productCover"]
+        attributes: ["productCover"],
+        order: [['productCover', "DESC"]]
       }
       // {
       //   model: RatingModel,
@@ -819,6 +825,11 @@ export const getBestSellerService = async () => {
           },
         ],
       },
+      {
+        model: ProductCoverModel,
+        attributes: ["productCover"],
+        order: [['productCover', "DESC"]]
+      }
       // {
       //   model: RatingModel,
       //   required: false,

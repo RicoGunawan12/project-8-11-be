@@ -12,6 +12,11 @@ import { adminMiddleware, generalMiddleware, userMiddleware } from '../middlewar
 
 const TransactionRoute = express.Router();
 
+
+/* Web hook */
+TransactionRoute.put('/update/delivery', updateTransactionDelivery);
+TransactionRoute.post('/update-status', updateTransactionStatus);
+
 TransactionRoute.get('/', adminMiddleware, getAllTransactions);
 
 TransactionRoute.get('/count', adminMiddleware, getTransactionCount);
@@ -28,7 +33,6 @@ TransactionRoute.post('/checkout-qris', userMiddleware, generalValidator(checkou
 
 TransactionRoute.post('/checkout-va', userMiddleware,generalValidator(checkoutVASchema), validateSchema, checkOutVATransaction);
 
-TransactionRoute.post('/update-status', updateTransactionStatus);
 
 TransactionRoute.post('/pickup', adminMiddleware,generalValidator(transactionIdSchema), validateSchema, requestPickupTransaction);
 
@@ -42,7 +46,6 @@ TransactionRoute.post('/analytic/all/month', adminMiddleware, allMonthSalesAnaly
 
 TransactionRoute.post('/analytic/category', adminMiddleware, fetchSalesByCategory);
 
-TransactionRoute.post('/update/delivery', updateTransactionDelivery);
 
 TransactionRoute.put('/cancel/:id', generalMiddleware, cancelTransaction);
 
@@ -59,5 +62,6 @@ TransactionRoute.post('/return', adminMiddleware, returnTransaction);
 TransactionRoute.post('/refund', adminMiddleware, refundTransaction);
 
 TransactionRoute.put('/reject/:id', adminMiddleware, rejectReviewTransaction);
+
 
 export default TransactionRoute;

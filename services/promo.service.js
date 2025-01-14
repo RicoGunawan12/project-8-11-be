@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { ProductCategoryModel, ProductModel, ProductVariantModel, PromoDetailModel, PromoModel } from "../association/association.js"
+import { ProductCategoryModel, ProductCoverModel, ProductModel, ProductVariantModel, PromoDetailModel, PromoModel } from "../association/association.js"
 
 
 export const getPromoService = async () => {
@@ -15,6 +15,10 @@ export const getPromoService = async () => {
                             {
                                 model: ProductVariantModel,
                                 attributes: ['productImage', 'productColor', 'productPrice'],
+                            },
+                            {
+                                model: ProductCoverModel,
+                                attributes: ["productCover"]
                             }
                         ]
                     },
