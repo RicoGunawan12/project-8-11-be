@@ -253,188 +253,131 @@ export const validateProduct = (req, res, next) => {
 
 export const createProduct = async (req, res) => {
   try {
-    const images = req.files["productImage"];
-    const defaultImage = req.files["defaultImage"];
+    console.log("create product")
+    const images = req.files?.["productImage"] || [];
+    const defaultImage = req.files?.["defaultImage"] || [];
+    
     var {
       productName,
       productDescription,
       productCategoryName,
       productVariants,
       productSize,
-      productCode,
       productWeight,
       productLength,
       productWidth,
       productHeight,
     } = req.body;
 
-    if (
-      !productName ||
-      typeof productName !== "string" ||
-      productName.trim().length < 1
-    ) {
+    console.log("validation")
+    // Input validation (keeping existing validation)
+    if (!productName || typeof productName !== "string" || productName.trim().length < 1) {
       return res.status(400).json({ message: "Product name must be filled" });
     }
 
-    // Manual validation for productDescription
-    // if (!productDescription || typeof productDescription !== "string" || productDescription.trim().length < 1) {
-    //     return res.status(400).json({ message: "Product description must be a non-empty string" });
-    // }
+    if (!productCategoryName || typeof productCategoryName !== "string" || productCategoryName.trim().length < 1) {
+      return res.status(400).json({ message: "Product category name must be filled" });
+    }
 
-    // Manual validation for productCategoryName
-    if (
-      !productCategoryName ||
-      typeof productCategoryName !== "string" ||
-      productCategoryName.trim().length < 1
-    ) {
-      return res
-        .status(400)
-        .json({ message: "Product category name must be filled" });
+    if (!productSize || typeof productSize !== "string" || productSize.trim().length < 1) {
+      throw new Error(`Product must have product size`);
     }
-    if (
-      !productSize ||
-      typeof productSize !== "string" ||
-      productSize.trim().length < 1
-    ) {
-      throw new Error(`Variant ${index + 1} must have product size`);
-    }
-    if (
-      !productCode ||
-      typeof productCode !== "string" ||
-      productCode.trim().length < 1
-    ) {
-      return res.status(400).json({ message: "Product code must be filled" });
-    }
-    if (
-      isValidNumber(productWeight) &&
-      isValidNumber(productLength) &&
-      isValidNumber(productWidth) &&
-      isValidNumber(productHeight)
-    ) {
-      // Proceed with handling the data
+
+    if (isValidNumber(productWeight) && isValidNumber(productLength) && isValidNumber(productWidth) && isValidNumber(productHeight)) {
       productWeight = parseInt(productWeight);
       productLength = parseInt(productLength);
       productWidth = parseInt(productWidth);
       productHeight = parseInt(productHeight);
     } else {
-      res
-        .status(400)
-        .json({
-          message:
-            "Product weight, length, width, and height must be a valid number",
-        });
+      return res.status(400).json({
+        message: "Product weight, length, width, and height must be a valid number",
+      });
     }
+
+    // Dimensional validation
     if (typeof productWeight !== "number" || productWeight <= 0) {
-      return res
-        .status(400)
-        .json({ message: `Product weight must be greater than 0` });
+      return res.status(400).json({ message: `Product weight must be greater than 0` });
     }
     if (typeof productLength !== "number" || productLength <= 0) {
-      return res
-        .status(400)
-        .json({ message: `Product length must be greater than 0` });
+      return res.status(400).json({ message: `Product length must be greater than 0` });
     }
     if (typeof productWidth !== "number" || productWidth <= 0) {
-      return res
-        .status(400)
-        .json({ message: `Product width must be greater than 0` });
+      return res.status(400).json({ message: `Product width must be greater than 0` });
     }
     if (typeof productHeight !== "number" || productHeight <= 0) {
-      return res
-        .status(400)
-        .json({ message: `Product height must be greater than 0` });
+      return res.status(400).json({ message: `Product height must be greater than 0` });
     }
 
-    let tempVariants;
-    try {
-      tempVariants = JSON.parse(productVariants);
-      if (!Array.isArray(tempVariants) || tempVariants.length < 1) {
-        return res
-          .status(400)
-          .json({ message: "Product must have at least one variants" });
+    console.log("variant")
+    let variants = [];
+    if (productVariants) {
+      let tempVariants;
+      try {
+        tempVariants = JSON.parse(productVariants);
+        if (!Array.isArray(tempVariants) || tempVariants.length < 1) {
+          return res.status(400).json({ message: "Product must have at least one variant" });
+        }
+
+        const tmpHash = new Map();
+        tempVariants.forEach((variant, index) => {
+          if (tmpHash.get(variant.productColor) === "found") {
+            throw new Error("Duplicate product color!");
+          }
+          tmpHash.set(variant.productColor, "found");
+          
+          if (!variant.productColor || typeof variant.productColor !== "string" || variant.productColor.trim().length < 1) {
+            throw new Error(`Variant ${index + 1} must have product color`);
+          }
+          if (typeof variant.productPrice !== "number" || variant.productPrice <= 0) {
+            throw new Error(`Variant ${index + 1} product price must be greater than 0`);
+          }
+          if (typeof variant.productStock !== "number" || variant.productStock < 0) {
+            throw new Error(`Variant ${index + 1} product stock must be greater than 0`);
+          }
+        });
+
+        variants = tempVariants;
+      } catch (error) {
+        return res.status(400).json({ message: `${error.message}` });
       }
-      const tmpHash = new Map();
-      tempVariants.forEach((variant, index) => {
-        if (tmpHash.get(variant.productColor) === "found") {
-          throw new Error("Duplicate product color!");
-        }
-        tmpHash.set(variant.productColor, "found");
-        if (
-          !variant.productColor ||
-          typeof variant.productColor !== "string" ||
-          variant.productColor.trim().length < 1
-        ) {
-          throw new Error(`Variant ${index + 1} must have product color`);
-        }
-        if (
-          typeof variant.productPrice !== "number" ||
-          variant.productPrice <= 0
-        ) {
-          throw new Error(
-            `Variant ${index + 1} product price must be greater than 0`
+
+      // Process images only if we have variants and images
+      if (images.length > 0) {
+        const hash = new Map();
+        for (let i = 0; i < images.length; i++) {
+          const image = images[i];
+          const filename = `${Date.now()}-${productName}.webp`;
+          const convertedImageData = await convertImageToWebp(
+            "../" + UPLOAD_FOLDER + "product/" + productName,
+            image,
+            filename
+          );
+
+          hash.set(
+            productName + " - " + variants[i].productColor,
+            `/${UPLOAD_FOLDER}product/${productName}/${filename}`
           );
         }
-        if (
-          typeof variant.productStock !== "number" ||
-          variant.productStock < 0
-        ) {
-          throw new Error(
-            `Variant ${index + 1} product stock must be greater than 0`
-          );
-        }
-      });
-    } catch (error) {
-      return res.status(400).json({ message: `${error.message}` });
+
+        variants.forEach((variant) => {
+          variant.productImage = hash.get(productName + " - " + variant.productColor);
+        });
+      }
     }
 
-    // if (!images || !Array.isArray(images) || images.length < 1) {
-    //   return res.status(400).json({ message: "Variant image is required" });
-    // }
-    // if (
-    //   !defaultImage ||
-    //   !Array.isArray(defaultImage) ||
-    //   defaultImage.length !== 1
-    // ) {
-    //   return res.status(400).json({ message: "Default image is required" });
-    // }
-
-    const variants = JSON.parse(productVariants);
-    const hash = new Map();
-    for (let i = 0; i < images.length; i++) {
-      const image = images[i];
-
-      // converts image to WebP format
-      const filename = `${Date.now()}-${req.body.productName}.webp`;
-      const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
-
-      hash.set(
-        productName + " - " + variants[i].productColor,
-        `/${UPLOAD_FOLDER}product/${productName}/${filename}`
-      );
-    }
-
-    if (productName.length < 1) {
-      return res.status(400).json({ message: "Product name must be filled" });
-    }
-
-   
-    variants.forEach((variant) => {
-      variant.productImage = hash.get(
-        productName + " - " + variant.productColor
-      );
-    });
-
-    // console.log(defaultImage);
-
-    // converts image to WebP format
-    // let defaultImageString = '';
-    // for (let i = 0; i < defaultImage.length; i++) {
-    //   const image = defaultImage[i];
-    //   const filename = `${Date.now()}-${req.body.productName}.webp`;
-    //   const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
-
-    //   if (i === 0) defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${filename}`;
-    // }
+    // Create the base product
+    console.log("create product")
+    console.log(
+      productName,
+      productDescription,
+      productCategoryName,
+      null,
+      productSize,
+      productWeight,
+      productLength,
+      productWidth,
+      productHeight
+    )
 
     const product = await createProductService(
       productName,
@@ -442,30 +385,33 @@ export const createProduct = async (req, res) => {
       productCategoryName,
       null,
       productSize,
-      productCode,
       productWeight,
       productLength,
       productWidth,
       productHeight
     );
 
-    const insertProductCover = defaultImage.map(async (image) => {
-      // const filename = `${Date.now()}-${req.body.productName}.webp`;
-      // const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
-      await createProductCoverService(product.productId, `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`);
-    })
-    await Promise.all(insertProductCover);
+    console.log("default image")
+    // Process default images if they exist
+    if (defaultImage.length > 0) {
+      const insertProductCover = defaultImage.map(async (image) => {
+        await createProductCoverService(
+          product.productId,
+          `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`
+        );
+      });
+      await Promise.all(insertProductCover);
+    }
 
-    const insertVariantPromise = variants.map(async (variant) => {
-      // console.log("product id: " + product.productId);
-
-      const insertedProduct = await createProductVariantService(
-        product.productId,
-        variant
-      );
-      console.log(insertedProduct);
-    });
-    await Promise.all(insertVariantPromise);
+    console.log("variant image")
+    // Process variants if they exist
+    if (variants.length > 0) {
+      const insertVariantPromise = variants.map(async (variant) => {
+        const insertedProduct = await createProductVariantService(product.productId, variant);
+        console.log(insertedProduct);
+      });
+      await Promise.all(insertVariantPromise);
+    }
 
     return res.status(200).json({ message: "New product added!", product });
   } catch (error) {
@@ -483,7 +429,6 @@ export const updateProduct = async (req, res) => {
       productCategoryName,
       productVariants,
       productSize,
-      productCode,
       productWeight,
       productLength,
       productWidth,
@@ -523,14 +468,7 @@ export const updateProduct = async (req, res) => {
       typeof productSize !== "string" ||
       productSize.trim().length < 1
     ) {
-      throw new Error(`Variant ${index + 1} must have product size`);
-    }
-    if (
-      !productCode ||
-      typeof productCode !== "string" ||
-      productCode.trim().length < 1
-    ) {
-      return res.status(400).json({ message: "Product code must be filled" });
+      throw new Error(`Product must have product size`);
     }
     if (
       isValidNumber(productWeight) &&
@@ -573,6 +511,9 @@ export const updateProduct = async (req, res) => {
     }
 
     let tempVariants;
+
+    console.log("variant")
+
     try {
       tempVariants = JSON.parse(productVariants);
       if (!Array.isArray(tempVariants) || tempVariants.length < 1) {
@@ -608,6 +549,8 @@ export const updateProduct = async (req, res) => {
     } catch (error) {
       return res.status(400).json({ message: `${error.message}` });
     }
+
+    console.log("past variant")
 
     // if (!images || !Array.isArray(images) || images.length < 1) {
     //   return res.status(400).json({ message: "Variant image is required" });
@@ -679,7 +622,6 @@ export const updateProduct = async (req, res) => {
       productCategoryName,
       null,
       productSize,
-      productCode,
       productWeight,
       productLength,
       productWidth,
@@ -734,6 +676,58 @@ export const updateProductQuantity = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+export const createVariant = async (req, res) => {
+
+  var {
+    color,
+    sku,
+    price,
+    stock
+  } = req.body;
+  const productId = req.params.id;
+
+  if (!productId) {
+    return res.status(400).json({ message: "Product id is required!" });
+  }
+
+  if (
+    !color ||
+    typeof color !== "string" ||
+    color.trim().length < 1
+  ) {
+    return res.status(400).json({ message: "Product color must be filled" });
+  }
+
+  if (
+    !sku ||
+    typeof sku !== "string" ||
+    sku.trim().length < 1
+  ) {
+    return res.status(400).json({ message: "Product sku must be filled" });
+  }
+
+  if (
+    !price ||
+    typeof price !== "number"
+  ) {
+    return res.status(400).json({ message: "Product price must be filled" });
+  }
+
+  if (
+    !stock ||
+    typeof stock !== "number"
+  ) {
+    return res.status(400).json({ message: "Product stock must be filled" });
+  }
+
+  const createdVariant = await createProductVariantService(productId,sku, color, price, stock);
+
+  return res
+    .status(200)
+    .json({ message: "Variant updated!", createdVariant });
+
+}
 
 export const updateVariant = async (req, res) => {
   const updates = req.body;

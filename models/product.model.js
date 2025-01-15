@@ -20,12 +20,6 @@ const Product = sequelize.define('products', {
     length: 255,
     allowNull: false
   },
-  productCode: {
-    field: "product_code",
-    type: DataTypes.STRING,
-    length: 255,
-    allowNull: false
-  },
   productDescription: {
     field: "product_description",
     type: DataTypes.STRING,
