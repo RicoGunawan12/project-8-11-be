@@ -33,13 +33,13 @@ const ProductVariant = sequelize.define('product_variants', {
     field: "spu",
     type: DataTypes.STRING,
     length: 200,
-    allowNull: false
+    allowNull: true
   },
   barcode: {
     field: "barcode",
     type: DataTypes.STRING,
     length: 50,
-    allowNull: false
+    allowNull: true
   },
   productImage: {
     field: "product_image",
