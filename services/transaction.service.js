@@ -53,10 +53,10 @@ export const getAllTransactionsService = async (status, startDate, endDate, offs
             {
                 model: UserModel,
                 attributes: ["userId", "fullName", "email"],
-                include: {
-                    model: UserAddressModel,
-                },
             },
+            {
+                model: UserAddressModel
+            }
         ],
         where: whereConditions,
         order: [["transactionDate", "DESC"]],
@@ -121,9 +121,9 @@ export const getTransactionsByUserService = async (userId, status) => {
             {
                 model: UserModel,
                 attributes: ['userId', 'fullName', 'email'],
-                include: {
-                    model: UserAddressModel,
-                }
+            },
+            {
+                model: UserAddressModel
             }
         ],
         where: {
@@ -152,11 +152,10 @@ export const getTransactionsByIdService = async (transactionId) => {
             {
                 model: UserModel,
                 attributes: ['userId', 'fullName', 'email'],
-                include: {
-                    model: UserAddressModel,
-                }
             },
-
+            {
+                model: UserAddressModel
+            }
         ],
         where: { transactionId: transactionId }
     })
@@ -500,7 +499,7 @@ export const fetchSalesByCategoryService = async (year, month) => {
 
 export const updateTransactionDeliveryService = async (order_no, status) => {
     const response = TransactionHeaderModel.update({
-        status: status,
+        status: "Done",
         where: {
             komshipOrderNumber: order_no
         }

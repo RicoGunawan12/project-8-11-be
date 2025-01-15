@@ -4,9 +4,9 @@ export const loginSchema = {
     notEmpty: {
       errorMessage: 'Email is required',
     },
-    isEmail: {
-      errorMessage: 'Email must be valid',
-    },
+    // isEmail: {
+    //   errorMessage: 'Email must be valid',
+    // },
   },
   password: {
     isString: true,

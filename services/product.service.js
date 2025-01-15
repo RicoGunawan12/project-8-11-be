@@ -6,6 +6,7 @@ import {
   PromoDetailModel,
   PromoModel,
   RatingModel,
+  ProductCoverModel,
 } from "../association/association.js";
 import { deleteDirectory, deletePostImage } from "../utils/uploader.js";
 import { getCategoryByName } from "./productCategory.service.js";
@@ -87,6 +88,11 @@ export const getProductsService = async (
           },
         ],
       },
+      {
+        model: ProductCoverModel,
+        attributes: ["productCover"],
+        order: [['productCover', "DESC"]]
+      }
       // {
       //   model: RatingModel,
       //   required: false,
@@ -163,6 +169,11 @@ export const getNewestProductsService = async () => {
           },
         ],
       },
+      {
+        model: ProductCoverModel,
+        attributes: ["productCover"],
+        order: [['productCover', "DESC"]]
+      }
       // {
       //   model: RatingModel,
       //   required: false,
@@ -255,6 +266,11 @@ export const getProductPaginationService = async (
           },
         ],
       },
+      {
+        model: ProductCoverModel,
+        attributes: ["productCover"],
+        order: [['productCover', "DESC"]]
+      }
       // {
       //   model: RatingModel,
       //   required: false,
@@ -359,6 +375,11 @@ export const getProductByIdService = async (productId) => {
           },
         ],
       },
+      {
+        model: ProductCoverModel,
+        attributes: ["productCover"],
+        order: [['productCover', "DESC"]]
+      }
       // {
       //   model: RatingModel,
       //   required: false,
@@ -445,6 +466,11 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
         ],
         required: false,
       },
+      {
+        model: ProductCoverModel,
+        attributes: ["productCover"],
+        order: [['productCover', "DESC"]]
+      }
     ],
     where: { productId, productActivityStatus: "active" },
   });
@@ -539,6 +565,11 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
           },
         ],
       },
+      {
+        model: ProductCoverModel,
+        attributes: ["productCover"],
+        order: [['productCover', "DESC"]]
+      }
       // {
       //   model: RatingModel,
       //   required: false,
@@ -712,7 +743,7 @@ export const updateProductService = async (
 
 export const deleteProductService = async (productId) => {
   const product = await ProductModel.findOne({ where: { productId } });
-  deleteDirectory(product.productName);
+  deleteDirectory(`assets/product/${product.productName}`);
 
   const deletedProduct = await ProductModel.destroy({
     where: { productId: productId },
@@ -807,6 +838,11 @@ export const getBestSellerService = async () => {
           },
         ],
       },
+      {
+        model: ProductCoverModel,
+        attributes: ["productCover"],
+        order: [['productCover', "DESC"]]
+      }
       // {
       //   model: RatingModel,
       //   required: false,

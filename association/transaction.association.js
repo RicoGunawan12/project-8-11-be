@@ -47,5 +47,7 @@ Voucher.hasMany(TransactionHeader, {
   onUpdate: 'CASCADE',
 });
 
+UserAddress.hasOne(TransactionHeader, { foreignKey: 'ref_address_id' });
+TransactionHeader.belongsTo(UserAddress, { foreignKey: 'ref_address_id' });
 
-export { PaymentMethod, TransactionDetail, TransactionHeader, User, ProductVariant, Voucher, Wishlist, WishlistItem }
+export { PaymentMethod, TransactionDetail, TransactionHeader, User, ProductVariant, Voucher, Wishlist, WishlistItem, UserAddress }

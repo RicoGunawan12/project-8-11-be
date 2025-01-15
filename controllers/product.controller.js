@@ -17,6 +17,7 @@ import {
   generateUpdateStockExcelService,
 } from "../services/product.service.js";
 import { getCategoryWithProductService } from "../services/productCategory.service.js";
+import { createProductCoverService } from "../services/productCover.service.js";
 import {
   createProductVariantService,
   updateProductQuantityService,
@@ -388,16 +389,16 @@ export const createProduct = async (req, res) => {
       return res.status(400).json({ message: `${error.message}` });
     }
 
-    if (!images || !Array.isArray(images) || images.length < 1) {
-      return res.status(400).json({ message: "Variant image is required" });
-    }
-    if (
-      !defaultImage ||
-      !Array.isArray(defaultImage) ||
-      defaultImage.length !== 1
-    ) {
-      return res.status(400).json({ message: "Default image is required" });
-    }
+    // if (!images || !Array.isArray(images) || images.length < 1) {
+    //   return res.status(400).json({ message: "Variant image is required" });
+    // }
+    // if (
+    //   !defaultImage ||
+    //   !Array.isArray(defaultImage) ||
+    //   defaultImage.length !== 1
+    // ) {
+    //   return res.status(400).json({ message: "Default image is required" });
+    // }
 
     const variants = JSON.parse(productVariants);
     const hash = new Map();
@@ -428,20 +429,20 @@ export const createProduct = async (req, res) => {
     // console.log(defaultImage);
 
     // converts image to WebP format
-    let defaultImageString = '';
-    for (let i = 0; i < defaultImage.length; i++) {
-      const image = defaultImage[i];
-      const filename = `${Date.now()}-${req.body.productName}.webp`;
-      const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
+    // let defaultImageString = '';
+    // for (let i = 0; i < defaultImage.length; i++) {
+    //   const image = defaultImage[i];
+    //   const filename = `${Date.now()}-${req.body.productName}.webp`;
+    //   const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
 
-      if (i === 0) defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${filename}`;
-    }
+    //   if (i === 0) defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${filename}`;
+    // }
 
     const product = await createProductService(
       productName,
       productDescription,
       productCategoryName,
-      defaultImageString,
+      null,
       productSize,
       productCode,
       productWeight,
@@ -449,6 +450,13 @@ export const createProduct = async (req, res) => {
       productWidth,
       productHeight
     );
+
+    const insertProductCover = defaultImage.map(async (image) => {
+      // const filename = `${Date.now()}-${req.body.productName}.webp`;
+      // const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
+      await createProductCoverService(product.productId, `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`);
+    })
+    await Promise.all(insertProductCover);
 
     const insertVariantPromise = variants.map(async (variant) => {
       // console.log("product id: " + product.productId);
@@ -603,16 +611,16 @@ export const updateProduct = async (req, res) => {
       return res.status(400).json({ message: `${error.message}` });
     }
 
-    if (!images || !Array.isArray(images) || images.length < 1) {
-      return res.status(400).json({ message: "Variant image is required" });
-    }
-    if (
-      !defaultImage ||
-      !Array.isArray(defaultImage) ||
-      defaultImage.length !== 1
-    ) {
-      return res.status(400).json({ message: "Default image is required" });
-    }
+    // if (!images || !Array.isArray(images) || images.length < 1) {
+    //   return res.status(400).json({ message: "Variant image is required" });
+    // }
+    // if (
+    //   !defaultImage ||
+    //   !Array.isArray(defaultImage) ||
+    //   defaultImage.length !== 1
+    // ) {
+    //   return res.status(400).json({ message: "Default image is required" });
+    // }
 
     const hash = new Map();
     console.log(images);
@@ -650,21 +658,28 @@ export const updateProduct = async (req, res) => {
     // console.log(defaultImage);
 
     // converts image to WebP format
-    let defaultImageString = '';
-    for (let i = 0; i < defaultImage.length; i++) {
-      const image = defaultImage[i];
-      const filename = `${Date.now()}-${req.body.productName}.webp`;
-      const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
+    // let defaultImageString = '';
+    // for (let i = 0; i < defaultImage.length; i++) {
+    //   const image = defaultImage[i];
+    //   const filename = `${Date.now()}-${req.body.productName}.webp`;
+    //   const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
 
-      if (i === 0) defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${filename}`;
-    }
+    //   if (i === 0) defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${filename}`;
+    // }
     
+    const insertProductCover = defaultImage.map(async (image) => {
+      // const filename = `${Date.now()}-${req.body.productName}.webp`;
+      // const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
+      await createProductCoverService(productId, `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`);
+    })
+    await Promise.all(insertProductCover);
+
     const updatedProduct = await updateProductService(
       productId,
       productName,
       productDescription,
       productCategoryName,
-      defaultImageString,
+      null,
       productSize,
       productCode,
       productWeight,

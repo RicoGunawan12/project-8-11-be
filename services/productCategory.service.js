@@ -1,5 +1,5 @@
 import { Op, Sequelize } from "sequelize";
-import { ProductCategoryModel, ProductModel, ProductVariantModel, PromoDetailModel, PromoModel, RatingModel } from "../association/association.js";
+import { ProductCategoryModel, ProductCoverModel, ProductModel, ProductVariantModel, PromoDetailModel, PromoModel, RatingModel } from "../association/association.js";
 import sequelize from "../config/database.js";
 
 
@@ -208,6 +208,11 @@ export const getCategoryWithProductService = async () => {
                     },
                 ]
             },
+            {
+              model: ProductCoverModel,
+              attributes: ["productCover"],
+              order: [['productCover', "DESC"]]
+            }
             // {
             //     model: RatingModel,
             //     required: false,

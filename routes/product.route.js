@@ -9,6 +9,7 @@ import { updateInactiveBestSellersSchema } from '../schema/product/updateInactiv
 import { updateActiveStatusProductsSchema } from '../schema/product/updateActiveStatusProducts.schema.js';
 import { updateInactiveStatusProductsSchema } from '../schema/product/updateInactiveStatusProducts.schema.js';
 import { productMultipleDeleteSchema } from '../schema/product/multipleDelete.schema.js';
+import { deletePhotoByProductId } from '../controllers/productCover.controller.js';
 
 
 const ProductRoute = express.Router();
@@ -36,6 +37,7 @@ ProductRoute.post('/',
 
 ProductRoute.put('/:id', 
     adminMiddleware, 
+    deletePhotoByProductId,
     // productsValidator, validateSchema, 
     upload.fields([
         { name: 'productImage', maxCount: 20 },

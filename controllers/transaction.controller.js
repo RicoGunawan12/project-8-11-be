@@ -139,7 +139,7 @@ export const createTransaction = async (req, res) => {
             voucherCode.length === 0 ? null : voucherCode,
             // null, 
             new Date(),
-            "Non COD",
+            "Unpaid",
             null,
             "Unpaid",
             expedition,
@@ -338,8 +338,7 @@ export const updateTransactionStatus = async (req, res) => {
 
     try {
         const updatedTransaction = await updateTransactionStatusService(reference_id, req.body);
-        const getTransactionById = await getTransactionsByIdService(reference_id);
-
+        // const getTransactionById = await getTransactionsByIdService(reference_id);
         // const response = await createKomshipOrderService(getTransactionById);
         return res.status(200).json({ message: "Transaction updated!", response });
         // return res.redirect('/');
@@ -442,6 +441,10 @@ export const updateTransactionDelivery = async (req, res) => {
     const { order_no, cnote, status } = req.body;
     if (!order_no || !cnote || !status) {
         return res.status(400).json({ message: "Invalid input" });
+    }
+
+    if (status != "Diterima") {
+        return res.status(200).json({ message: status })
     }
 
     try {
