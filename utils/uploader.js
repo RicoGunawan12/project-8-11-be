@@ -26,7 +26,14 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     try {
-      cb(null, `${Date.now()}-${req.body.productName}.png`);
+      if (file.fieldname === 'defaultImage') {
+        console.log(file);
+        
+        cb(null, file.originalname);
+      }
+      else {
+        cb(null, `${Date.now()}-${req.body.productName}.png`);
+      }
     } catch (error) {
       cb(error);
     }

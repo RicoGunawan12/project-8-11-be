@@ -13,6 +13,11 @@ const ProductVariant = sequelize.define('product_variants', {
     field: "ref_product_id",
     type: DataTypes.UUID
   },
+  productVariantCode: {
+    field: "product_variant_code",
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   productColor: {
     field: "product_color",
     type: DataTypes.STRING,
@@ -21,8 +26,20 @@ const ProductVariant = sequelize.define('product_variants', {
   sku: {
     field: "sku",
     type: DataTypes.STRING,
-    length: 100,
+    length: 200,
     allowNull: false
+  },
+  spu: {
+    field: "spu",
+    type: DataTypes.STRING,
+    length: 200,
+    allowNull: true
+  },
+  barcode: {
+    field: "barcode",
+    type: DataTypes.STRING,
+    length: 50,
+    allowNull: true
   },
   productImage: {
     field: "product_image",

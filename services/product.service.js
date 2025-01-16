@@ -11,6 +11,7 @@ import {
 import { deleteDirectory, deletePostImage } from "../utils/uploader.js";
 import { getCategoryByName } from "./productCategory.service.js";
 import sequelize from "../config/database.js";
+import { generateExcel} from "./excel.service.js";
 
 export const getProductsService = async (
   search,
@@ -89,7 +90,8 @@ export const getProductsService = async (
       {
         model: ProductCoverModel,
         attributes: ["productCover"],
-        order: [['productCover', "DESC"]]
+        separate: true,
+        order: [['productCover', 'ASC']]
       }
       // {
       //   model: RatingModel,
@@ -169,7 +171,8 @@ export const getNewestProductsService = async () => {
       {
         model: ProductCoverModel,
         attributes: ["productCover"],
-        order: [['productCover', "DESC"]]
+        separate: true,
+        order: [['productCover', 'ASC']]
       }
       // {
       //   model: RatingModel,
@@ -265,7 +268,8 @@ export const getProductPaginationService = async (
       {
         model: ProductCoverModel,
         attributes: ["productCover"],
-        order: [['productCover', "DESC"]]
+        separate: true,
+        order: [['productCover', 'ASC']]
       }
       // {
       //   model: RatingModel,
@@ -373,7 +377,8 @@ export const getProductByIdService = async (productId) => {
       {
         model: ProductCoverModel,
         attributes: ["productCover"],
-        order: [['productCover', "DESC"]]
+        separate: true,
+        order: [['productCover', 'ASC']]
       }
       // {
       //   model: RatingModel,
@@ -404,6 +409,18 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       "productWidth",
       "productHeight",
       "isBestSeller",
+      [
+        sequelize.literal(
+          "(SELECT AVG(rating) FROM ratings WHERE ratings.product_id = products.product_id)"
+        ),
+        "averageRating",
+      ],
+      [
+        sequelize.literal(
+          "(SELECT COUNT(rating) FROM ratings WHERE ratings.product_id = products.product_id)"
+        ),
+        "countRating",
+      ],
     ],
     include: [
       {
@@ -451,10 +468,25 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       {
         model: ProductCoverModel,
         attributes: ["productCover"],
-        order: [['productCover', "DESC"]]
+        separate: true,
+        order: [['productCover', 'ASC']]
       }
     ],
     where: { productId, productActivityStatus: "active" },
+    // group: [
+    //   "productId",
+    //   "product_categories.product_category_name",
+    //   "product_variants.product_variant_id", // Group by productVariantId
+    //   "product_variants.product_color",
+    //   "product_variants.sku",
+    //   "product_variants.product_price",
+    //   "product_variants.product_stock",
+    //   "product_variants.product_image",
+    //   "PromoDetailModel.promoDetailId",
+    //   "PromoModel.startDate",
+    //   "PromoModel.endDate",
+    //   "ProductCoverModel.productCover",
+    // ],
   });
 
   const ratingDistribution = await RatingModel.findAll({
@@ -549,7 +581,8 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       {
         model: ProductCoverModel,
         attributes: ["productCover"],
-        order: [['productCover', "DESC"]]
+        separate: true,
+        order: [['productCover', 'ASC']]
       }
       // {
       //   model: RatingModel,
@@ -561,6 +594,20 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       productId: { [Op.ne]: productId },
       productActivityStatus: "active",
     },
+    // group: [
+    //   "productId",
+    //   "ProductCategoryModel.productCategoryName",
+    //   "ProductVariantModel.productVariantId", // Group by productVariantId
+    //   "ProductVariantModel.productColor",
+    //   "ProductVariantModel.sku",
+    //   "ProductVariantModel.productPrice",
+    //   "ProductVariantModel.productStock",
+    //   "ProductVariantModel.productImage",
+    //   "PromoDetailModel.promoDetailId",
+    //   "PromoModel.startDate",
+    //   "PromoModel.endDate",
+    //   "ProductCoverModel.productCover",
+    // ],
     limit: 8,
   });
   
@@ -818,7 +865,7 @@ export const getBestSellerService = async () => {
       {
         model: ProductCoverModel,
         attributes: ["productCover"],
-        order: [['productCover', "DESC"]]
+        order: [['productCover', "ASC"]]
       }
       // {
       //   model: RatingModel,
@@ -868,3 +915,23 @@ export const deleteProductsService = async (productId) => {
   });
   return deletedProduct;
 };
+
+export const generateUpdateStockExcelService = async () => {
+  const columns = [
+    "Master Nama Produk",
+    "Nama Varian",
+    "Master SKU",
+    "ID varian utama",
+    "ID Varian Channel Telah Diikat",
+    "ID Kategori",
+    "SPU",
+    "Barcode",
+    "Merek",
+];
+
+// Generate the Excel file
+const { excelBuffer, fileName } = await generateExcel(columns);
+
+return {excelBuffer, fileName}
+};
+

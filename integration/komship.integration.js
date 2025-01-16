@@ -275,7 +275,7 @@ export const printLabelKomship = async (orderNumber) => {
     }
 
     try {
-        const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/print-label?order_no=${orderNumber}&page=page_1`, requestOptions);
+        const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/print-label?order_no=${orderNumber}&page=page_4`, requestOptions);
 
         if (!komshipResponse.ok) {
             throw new Error(`Error: ${komshipResponse.statusText}`);

@@ -345,8 +345,9 @@ export const deliveryDetailService = async (orderNumber) => {
     return deliveryDetail;
 }
 
-export const printLabelService = async (orderNumber) => {
-    const komshipLabel = await printLabelKomship(orderNumber);
+export const printLabelService = async (komshipOrderNumbers) => {
+    const formattedString = komshipOrderNumbers.join('%2C%20');
+    const komshipLabel = await printLabelKomship(formattedString);
     return komshipLabel;
 }
 
