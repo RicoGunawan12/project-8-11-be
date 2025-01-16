@@ -409,7 +409,9 @@ export const createProduct = async (req, res) => {
     // Process variants if they exist
     if (variants.length > 0) {
       const insertVariantPromise = variants.map(async (variant) => {
-        const insertedProduct = await createProductVariantService(product.productId, variant);
+        console.log(variant);
+        
+        const insertedProduct = await createProductVariantService(product.productId, variant.sku, variant.productColor, variant.productPrice, variant.productStock);
         console.log(insertedProduct);
       });
       await Promise.all(insertVariantPromise);

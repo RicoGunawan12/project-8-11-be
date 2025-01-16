@@ -177,7 +177,8 @@ export const createTransactionService = async (
     paymentDeadline,
     notes,
     totalPrice,
-    totalWeight
+    totalWeight,
+    customerNotes
 ) => {
     const transaction = await TransactionHeaderModel.create({
         readableId: generateReadableId(),
@@ -195,7 +196,8 @@ export const createTransactionService = async (
         paymentDeadline,
         notes,
         totalPrice,
-        totalWeight
+        totalWeight,
+        customerNotes
     })
     return transaction;
 }

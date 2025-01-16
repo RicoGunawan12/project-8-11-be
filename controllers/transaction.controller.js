@@ -69,7 +69,8 @@ export const createTransaction = async (req, res) => {
         shippingType,
         deliveryFee,
         deliveryCashback,
-        notes
+        notes,
+        customerNotes
     } = req.body;
     const userId = req.user.userId;
 
@@ -149,7 +150,8 @@ export const createTransaction = async (req, res) => {
             new Date(Date.now() + 1 * 60 * 60 * 1000),
             notes,
             totalPrice,
-            totalWeight
+            totalWeight,
+            customerNotes
         );
 
         // insert transaction detail

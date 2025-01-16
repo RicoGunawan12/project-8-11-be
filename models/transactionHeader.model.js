@@ -108,6 +108,11 @@ const TransactionHeader = sequelize.define('transaction_headers', {
     field: "payment_link",
     type: DataTypes.STRING,
     allowNull: true
+  },
+  customerNotes: {
+    field: "customer_notes",
+    type: DataTypes.STRING,
+    allowNull: true
   }
 },{
   timestamps: false
