@@ -3,7 +3,7 @@ import { cancelOrderKomship } from "../integration/komship.integration.js";
 import { createQrisTransactionXendit, refundXendit } from "../integration/xendit.integration.js";
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
 import { checkPromoService } from "../services/promo.service.js";
-import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, rollbackTransaction, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
+import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, getTransactionXenditService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, rollbackTransaction, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
 import { applyVoucherService } from "../services/voucher.service.js";
 
 
@@ -331,7 +331,8 @@ export const checkOutVATransaction = async (req, res) => {
 export const updateTransactionStatus = async (req, res) => {
     const {
         reference_id,
-        status
+        status,
+        attempt_details
     } = req.body.data;
 
     if (status != "SUCCEEDED") {
@@ -339,10 +340,11 @@ export const updateTransactionStatus = async (req, res) => {
     }
 
     try {
-        const updatedTransaction = await updateTransactionStatusService(reference_id, req.body);
+        const transaction = await getTransactionXenditService(attempt_details[0].action_id)
+        const updatedTransaction = await updateTransactionStatusService(reference_id, req.body, transaction.payment_method.type);
         // const getTransactionById = await getTransactionsByIdService(reference_id);
         // const response = await createKomshipOrderService(getTransactionById);
-        return res.status(200).json({ message: "Transaction updated!", response });
+        return res.status(200).json({ message: "Transaction updated!" });
         // return res.redirect('/');
     } catch (error) {
         return res.status(500).json({ message: error.message });

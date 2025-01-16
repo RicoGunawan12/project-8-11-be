@@ -1,6 +1,6 @@
 import { ProductCategoryModel, ProductModel, ProductVariantModel, TransactionDetailModel, TransactionHeaderModel, UserAddressModel, UserModel } from "../association/association.js"
 import { createOrderKomship, deliveryDetailKomship, printLabelKomship, requestPickUpKomship } from "../integration/komship.integration.js";
-import { checkOutVATransactionXendit, createCreditCardTransactionXendit, createPlanXendit, createQrisTransactionXendit } from "../integration/xendit.integration.js";
+import { checkOutVATransactionXendit, createCreditCardTransactionXendit, createPlanXendit, createQrisTransactionXendit, getTransactionXendit } from "../integration/xendit.integration.js";
 import { Op, Sequelize } from "sequelize";
 import { generateReadableId } from "../utils/utility.js";
 import { getPickUpPointService } from "./address.service.js";
@@ -279,11 +279,12 @@ export const checkOutVATransactionService = async (transactionId, amount, bank) 
     return response;
 }
 
-export const updateTransactionStatusService = async (transactionId, gatewayResponse) => {
+export const updateTransactionStatusService = async (transactionId, gatewayResponse, paymentMethod) => {
     const updatedTransaction = await TransactionHeaderModel.update(
         {
             status: 'Waiting for shipping',
-            gatewayResponse: JSON.stringify(gatewayResponse)
+            gatewayResponse: JSON.stringify(gatewayResponse),
+            paymentMethod: paymentMethod
         },
         {
             where: {
@@ -292,6 +293,11 @@ export const updateTransactionStatusService = async (transactionId, gatewayRespo
         }
     )
     return updatedTransaction;
+}
+
+export const getTransactionXenditService = async (actionId) => {
+    const transaction = await getTransactionXendit(actionId);
+    return transaction;
 }
 
 export const createKomshipOrderService = async (transaction) => {

@@ -277,6 +277,25 @@ export const createPlanXendit = async (transaction, customerId, productsInCart, 
     }
 }
 
+export const getTransactionXendit = async (actionId) => {
+    try {
+        const requestOptions = {
+            method: 'GET',
+            headers: headers,
+            redirect: 'follow'
+        }
+
+        const xenditResponse = await fetch(`${process.env.XENDIT_URL}/payment_requests/${actionId}`, requestOptions);
+        if (!xenditResponse.ok) {
+            throw new Error(`Error: ${xenditResponse.statusText}`);
+        }
+        const result = await xenditResponse.json();
+        return result;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
 export const refundXendit = async (transactionId, paymentRequestId, amount) => {
     try {
         const body = {
