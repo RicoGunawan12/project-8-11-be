@@ -2,9 +2,8 @@ import { ProductModel, ProductVariantModel } from "../association/association.js
 import { deletePostImage } from "../utils/uploader.js";
 
 
-export const createProductVariantService = async (productId, variant) => {
-    const { sku, productColor, productPrice, productStock, productImage } = variant;
-    const productVariant = await ProductVariantModel.create({ productId, sku, productColor, productPrice, productStock, productImage })
+export const createProductVariantService = async (productId, sku, productColor, productPrice, productStock ) => {
+    const productVariant = await ProductVariantModel.create({ productId, sku, productColor, productPrice, productStock })
     return productVariant;
 }
 

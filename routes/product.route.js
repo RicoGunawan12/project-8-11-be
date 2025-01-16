@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProduct, deleteProduct, getBestSeller, getCategoryWithProduct, getNewestProduct, getPaginateProduct, getProductById, getProductCount, getProducts, updateBestSeller, updateProduct, updateProductQuantity, updatePromo, updateVariant, validateProduct, updateActiveBestSellers, updateInactiveBestSellers, deleteProducts, updateActiveStatusProducts, updateInactiveStatusProducts, getProductByIdWithRelatedProduct, generateUpdateStockExcel, readUpdateStockExcel } from '../controllers/product.controller.js';
+import { createProduct, deleteProduct, getBestSeller, getCategoryWithProduct, getNewestProduct, getPaginateProduct, getProductById, getProductCount, getProducts, updateBestSeller, updateProduct, updateProductQuantity, updatePromo, updateVariant, validateProduct, updateActiveBestSellers, updateInactiveBestSellers, deleteProducts, updateActiveStatusProducts, updateInactiveStatusProducts, getProductByIdWithRelatedProduct, generateUpdateStockExcel, readUpdateStockExcel , createVariant} from '../controllers/product.controller.js';
 import { adminMiddleware } from '../middleware/auth.middleware.js';
 import { upload } from '../utils/uploader.js';
 import { generalValidator } from '../validator/general/general.validator.js';
@@ -52,6 +52,8 @@ ProductRoute.put('/promo/:id', adminMiddleware,
     // generalValidator(updateProductSchema),
     // validateSchema, 
     updatePromo)
+
+ProductRoute.post('/variant/:id', adminMiddleware, createVariant)
 ProductRoute.put('/quantity/:id', adminMiddleware, updateProductQuantity)
 
 ProductRoute.put('/update/variant', adminMiddleware, updateVariant)

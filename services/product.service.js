@@ -29,7 +29,6 @@ export const getProductsService = async (
       "productId",
       "productName",
       "productSize",
-      "productCode",
       "productDescription",
       "defaultImage",
       "productWeight",
@@ -113,7 +112,6 @@ export const getNewestProductsService = async () => {
       "productId",
       "productName",
       "productSize",
-      "productCode",
       "productDescription",
       "defaultImage",
       "productWeight",
@@ -211,7 +209,6 @@ export const getProductPaginationService = async (
       "productId",
       "productName",
       "productSize",
-      "productCode",
       "productDescription",
       "defaultImage",
       "productWeight",
@@ -322,7 +319,6 @@ export const getProductByIdService = async (productId) => {
       "productId",
       "productName",
       "productSize",
-      "productCode",
       "productDescription",
       "defaultImage",
       "productWeight",
@@ -406,7 +402,6 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       "productId",
       "productName",
       "productSize",
-      "productCode",
       "productDescription",
       "defaultImage",
       "productWeight",
@@ -520,7 +515,6 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       "productId",
       "productName",
       "productSize",
-      "productCode",
       "productDescription",
       "defaultImage",
       "productWeight",
@@ -626,12 +620,12 @@ export const createProductService = async (
   productCategoryName,
   defaultImage,
   productSize,
-  productCode,
   productWeight,
   productLength,
   productWidth,
   productHeight
 ) => {
+  console.log("checking category")
   const category = await getCategoryByName(productCategoryName);
   if (!category) {
     throw new Error("There is no " + productCategoryName + " category");
@@ -645,14 +639,13 @@ export const createProductService = async (
   }
 
   const productCategoryId = category.productCategoryId;
-
+  console.log("creating product")
   const product = await ProductModel.create({
     productName,
     productDescription,
     productCategoryId,
     defaultImage,
     productSize,
-    productCode,
     productWeight,
     productLength,
     productWidth,
@@ -668,7 +661,6 @@ export const updateProductService = async (
   productCategoryName,
   defaultImage,
   productSize,
-  productCode,
   productWeight,
   productLength,
   productWidth,
@@ -695,7 +687,6 @@ export const updateProductService = async (
         productCategoryId,
         defaultImage,
         productSize,
-        productCode,
         productWeight,
         productLength,
         productWidth,
@@ -816,7 +807,6 @@ export const getBestSellerService = async () => {
       "productId",
       "productName",
       "productSize",
-      "productCode",
       "productDescription",
       "defaultImage",
       "productWeight",

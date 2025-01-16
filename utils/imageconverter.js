@@ -17,7 +17,7 @@ export const convertImageToWebp = async (dirpath, image, filename) => {
     const newFile = path.resolve(path.join(__dirname, dirpath),filename);
     await sharp(image.path).webp().toFile(newFile);
 
-    fs.unlinkSync(image.path);
+    // fs.unlinkSync(image.path);
     return {
         filepath: newFile,
         filename: filename
