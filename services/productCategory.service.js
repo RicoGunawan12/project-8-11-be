@@ -142,6 +142,13 @@ export const getCategoryWithProductService = async () => {
                             },
                         ]
                       },
+                      {
+                        model: ProductCoverModel,
+                        attributes: ["productCover"],
+                        separate: true,
+                        order: [['productCover', 'ASC']]
+                      }
+                      
                     //   {
                     //     model: RatingModel,
                     //     required: false,
@@ -209,7 +216,7 @@ export const getCategoryWithProductService = async () => {
             {
               model: ProductCoverModel,
               attributes: ["productCover"],
-              order: [['productCover', "DESC"]]
+              order: [['productCover', "ASC"]]
             }
             // {
             //     model: RatingModel,
