@@ -33,7 +33,13 @@ const Promo = sequelize.define('promos', {
     createdAt: { 
       field: "created_at",
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: { 
+      field: "updated_at",
+      type: DataTypes.DATE,
+      allowNull: true,
       defaultValue: DataTypes.NOW,
     },
   },{

@@ -473,20 +473,23 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       }
     ],
     where: { productId, productActivityStatus: "active" },
-    // group: [
-    //   "productId",
-    //   "product_categories.product_category_name",
-    //   "product_variants.product_variant_id", // Group by productVariantId
-    //   "product_variants.product_color",
-    //   "product_variants.sku",
-    //   "product_variants.product_price",
-    //   "product_variants.product_stock",
-    //   "product_variants.product_image",
-    //   "PromoDetailModel.promoDetailId",
-    //   "PromoModel.startDate",
-    //   "PromoModel.endDate",
-    //   "ProductCoverModel.productCover",
-    // ],
+    group: [
+      "productId",
+      "productName",
+      "productSize",
+      "productCode",
+      "productDescription",
+      "defaultImage",
+      "productWeight",
+      "productLength",
+      "productWidth",
+      "productHeight",
+      "isBestSeller",
+      "product_variants.product_variant_id",
+      "promo_details.promo_detail_id",
+      "ratings.rating_id",
+      "product_covers.product_cover_id"
+    ],
   });
 
   const ratingDistribution = await RatingModel.findAll({
@@ -497,7 +500,7 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
     where: {
       product_id: productId,
     },
-    group: ["rating"],
+    group: ["rating", "product_id"],
     raw: true,
   });
 
