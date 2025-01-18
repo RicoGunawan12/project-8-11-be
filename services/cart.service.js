@@ -42,7 +42,7 @@ export const getCartItemsByUserService = async (userId) => {
                                                 [Op.lte]: new Date().setHours(0, 0, 0, 0), // Start of the day
                                             },
                                             endDate: {
-                                                [Op.gte]: new Date().setHours(23, 59, 59, 999), // End of the day
+                                                [Op.gte]: new Date().setHours(0, 0, 0, 0), // End of the day
                                             },
                                         },
                                     },
