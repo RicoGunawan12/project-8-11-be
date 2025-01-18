@@ -477,7 +477,6 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       "productId",
       "productName",
       "productSize",
-      "productCode",
       "productDescription",
       "defaultImage",
       "productWeight",
@@ -488,7 +487,7 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       "product_variants.product_variant_id",
       "promo_details.promo_detail_id",
       "ratings.rating_id",
-      "product_covers.product_cover_id",
+      // "product_covers.product_cover_id",
     ],
   });
 

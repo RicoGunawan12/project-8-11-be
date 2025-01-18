@@ -70,7 +70,8 @@ export const createTransaction = async (req, res) => {
         deliveryFee,
         deliveryCashback,
         notes,
-        customerNotes
+        customerNotes,
+        productNotes
     } = req.body;
     const userId = req.user.userId;
 
@@ -155,7 +156,7 @@ export const createTransaction = async (req, res) => {
         );
 
         // insert transaction detail
-        const transactionDetails = productsInCart.map(product => {
+        const transactionDetails = productsInCart.map((product, index) => {
             const currentDate = new Date();
 
             // const isPromoActive =
@@ -167,7 +168,8 @@ export const createTransaction = async (req, res) => {
                 productVariantId: product.product_variant.productVariantId,
                 quantity: product.quantity,
                 paidProductPrice: product.product_variant.productPrice,
-                realizedPromo: product.product_variant.realizedPromo
+                realizedPromo: product.product_variant.realizedPromo,
+                customerNotes: productNotes[index] || ""
             };
         });
         const insertedTransactionDetails = await createTransactionDetailService(transactionDetails);

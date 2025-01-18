@@ -27,6 +27,11 @@ export const registerUserService = async (fullName, email, password, phone) => {
     throw new Error('User already exists');
   }
 
+  const existingUserPhone = await UserModel.findOne({ where: { phone } });
+  if (existingUserPhone) {
+    throw new Error('Phone number already used');
+  }
+
   // const hashedPassword = await hashPassword(password);
   const user = await UserModel.create({ fullName, email, password: password, role: 'user', phone });
   const cart = await createCart(user.userId);
