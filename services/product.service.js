@@ -80,7 +80,7 @@ export const getProductsService = async (
                 [Op.lte]: new Date(),
               },
               endDate: {
-                [Op.gte]: new Date(),
+                [Op.gte]: new Date().setHours(0, 0, 0, 0),
               },
             },
             order: [["created_at", "DESC"]],
@@ -162,7 +162,7 @@ export const getNewestProductsService = async () => {
                 [Op.lte]: new Date(),
               },
               endDate: {
-                [Op.gte]: new Date(),
+                [Op.gte]: new Date().setHours(0, 0, 0, 0),
               },
             },
           },
@@ -259,7 +259,7 @@ export const getProductPaginationService = async (
                 [Op.lte]: new Date(),
               },
               endDate: {
-                [Op.gte]: new Date(),
+                [Op.gte]: new Date().setHours(0, 0, 0, 0),
               },
             },
           },
@@ -368,7 +368,7 @@ export const getProductByIdService = async (productId) => {
                 [Op.lte]: new Date(),
               },
               endDate: {
-                [Op.gte]: new Date(),
+                [Op.gte]: new Date().setHours(0, 0, 0, 0),
               },
             },
           },
@@ -451,7 +451,7 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
                 [Op.lte]: new Date(),
               },
               endDate: {
-                [Op.gte]: new Date(),
+                [Op.gte]: new Date().setHours(0, 0, 0, 0),
               },
             },
           },
@@ -574,7 +574,7 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
                 [Op.lte]: new Date(),
               },
               endDate: {
-                [Op.gte]: new Date(),
+                [Op.gte]: new Date().setHours(0, 0, 0, 0),
               },
             },
           },
@@ -858,7 +858,7 @@ export const getBestSellerService = async () => {
                 [Op.lte]: new Date(),
               },
               endDate: {
-                [Op.gte]: new Date(),
+                [Op.gte]: new Date().setHours(0, 0, 0, 0),
               },
             },
           },

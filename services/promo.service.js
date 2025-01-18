@@ -64,7 +64,7 @@ export const checkPromoService = async (productId) => {
                     as: "promo",
                     where: {
                         startDate: { [Op.lte]: today },
-                        endDate: { [Op.gte]: today },
+                        endDate: { [Op.gte]: new Date().setHours(0, 0, 0, 0) },
                     },
                 },
             ],

@@ -55,6 +55,9 @@ export const getCartItemsByUserService = async (userId) => {
         ],
         attributes: ['cartItemId', 'productVariantId', 'quantity']
     });
+
+    
+
     return cartItem;
 }
 

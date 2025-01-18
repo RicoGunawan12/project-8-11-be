@@ -136,7 +136,7 @@ export const getCategoryWithProductService = async () => {
                                         [Op.lte]: new Date(), 
                                     },
                                     endDate: {
-                                        [Op.gte]: new Date(),
+                                        [Op.gte]: new Date().setHours(0, 0, 0, 0),
                                     },
                                 },
                             },
@@ -207,7 +207,7 @@ export const getCategoryWithProductService = async () => {
                                 [Op.lte]: new Date(),
                             },
                             endDate: {
-                                [Op.gte]: new Date(),
+                                [Op.gte]: new Date().setHours(0, 0, 0, 0),
                             },
                         },
                     },
