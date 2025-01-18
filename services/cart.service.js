@@ -39,10 +39,10 @@ export const getCartItemsByUserService = async (userId) => {
                                         model: PromoModel,
                                         where: {
                                             startDate: {
-                                                [Op.lte]: new Date(), 
+                                                [Op.lte]: new Date().setHours(0, 0, 0, 0), // Start of the day
                                             },
                                             endDate: {
-                                                [Op.gte]: new Date(),
+                                                [Op.gte]: new Date().setHours(23, 59, 59, 999), // End of the day
                                             },
                                         },
                                     },
