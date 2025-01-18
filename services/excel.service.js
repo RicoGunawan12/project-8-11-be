@@ -25,7 +25,6 @@ export const generateExcel = async (columns) => {
 };
 
 export const readExcelFile = async (filePath, columns) => {
-  console.log(filePath);
   const workbook = XLSX.readFile(filePath);
   const sheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[sheetName];
@@ -39,7 +38,6 @@ export const readExcelFile = async (filePath, columns) => {
       newArr.push({ property : column.name , value: row[rowKeys[index]].toString() });
     });
     
-    console.log('transformedRow',transformedRow)
     transformedRow.push(newArr)
   });
 

@@ -89,7 +89,6 @@ export const bulkUpdateProductStockService = async (products) => {
     },
     attributes: ["sku"], 
   });
-  console.log("existingProducts", existingProducts);
   const existingSkus = existingProducts.map((product) => product.sku);
 
   const missingSkus = skus.filter((sku) => !existingSkus.includes(sku));
