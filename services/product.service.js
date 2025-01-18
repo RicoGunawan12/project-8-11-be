@@ -11,7 +11,7 @@ import {
 import { deleteDirectory, deletePostImage } from "../utils/uploader.js";
 import { getCategoryByName } from "./productCategory.service.js";
 import sequelize from "../config/database.js";
-import { generateExcel} from "./excel.service.js";
+import { generateExcel } from "./excel.service.js";
 
 export const getProductsService = async (
   search,
@@ -91,8 +91,8 @@ export const getProductsService = async (
         model: ProductCoverModel,
         attributes: ["productCover"],
         separate: true,
-        order: [['productCover', 'ASC']]
-      }
+        order: [["productCover", "ASC"]],
+      },
       // {
       //   model: RatingModel,
       //   required: false,
@@ -172,8 +172,8 @@ export const getNewestProductsService = async () => {
         model: ProductCoverModel,
         attributes: ["productCover"],
         separate: true,
-        order: [['productCover', 'ASC']]
-      }
+        order: [["productCover", "ASC"]],
+      },
       // {
       //   model: RatingModel,
       //   required: false,
@@ -269,8 +269,8 @@ export const getProductPaginationService = async (
         model: ProductCoverModel,
         attributes: ["productCover"],
         separate: true,
-        order: [['productCover', 'ASC']]
-      }
+        order: [["productCover", "ASC"]],
+      },
       // {
       //   model: RatingModel,
       //   required: false,
@@ -378,8 +378,8 @@ export const getProductByIdService = async (productId) => {
         model: ProductCoverModel,
         attributes: ["productCover"],
         separate: true,
-        order: [['productCover', 'ASC']]
-      }
+        order: [["productCover", "ASC"]],
+      },
       // {
       //   model: RatingModel,
       //   required: false,
@@ -469,8 +469,8 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
         model: ProductCoverModel,
         attributes: ["productCover"],
         separate: true,
-        order: [['productCover', 'ASC']]
-      }
+        order: [["productCover", "ASC"]],
+      },
     ],
     where: { productId, productActivityStatus: "active" },
     group: [
@@ -488,7 +488,7 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
       "product_variants.product_variant_id",
       "promo_details.promo_detail_id",
       "ratings.rating_id",
-      "product_covers.product_cover_id"
+      "product_covers.product_cover_id",
     ],
   });
 
@@ -585,8 +585,8 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
         model: ProductCoverModel,
         attributes: ["productCover"],
         separate: true,
-        order: [['productCover', 'ASC']]
-      }
+        order: [["productCover", "ASC"]],
+      },
       // {
       //   model: RatingModel,
       //   required: false,
@@ -613,7 +613,7 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
     // ],
     limit: 8,
   });
-  
+
   return { product, relatedProducts, ratingDistributionObject };
 };
 
@@ -628,7 +628,7 @@ export const createProductService = async (
   productWidth,
   productHeight
 ) => {
-  console.log("checking category")
+  console.log("checking category");
   const category = await getCategoryByName(productCategoryName);
   if (!category) {
     throw new Error("There is no " + productCategoryName + " category");
@@ -642,7 +642,7 @@ export const createProductService = async (
   }
 
   const productCategoryId = category.productCategoryId;
-  console.log("creating product")
+  console.log("creating product");
   const product = await ProductModel.create({
     productName,
     productDescription,
@@ -868,8 +868,8 @@ export const getBestSellerService = async () => {
       {
         model: ProductCoverModel,
         attributes: ["productCover"],
-        order: [['productCover', "ASC"]]
-      }
+        order: [["productCover", "ASC"]],
+      },
       // {
       //   model: RatingModel,
       //   required: false,
@@ -899,7 +899,6 @@ export const updatePromoService = async (
     },
     { where: { productId: productId } }
   );
-  // console.log(updatedProduct);
 
   if (updatedProduct[0] == 0) {
     throw new Error("Product not found or no changes applied!");
@@ -920,21 +919,11 @@ export const deleteProductsService = async (productId) => {
 };
 
 export const generateUpdateStockExcelService = async () => {
-  const columns = [
-    "Master Nama Produk",
-    "Nama Varian",
-    "Master SKU",
-    "ID varian utama",
-    "ID Varian Channel Telah Diikat",
-    "ID Kategori",
-    "SPU",
-    "Barcode",
-    "Merek",
-];
+  const columns = ["SKU", "Nama Produk", "Stock Produk"];
 
-// Generate the Excel file
-const { excelBuffer, fileName } = await generateExcel(columns);
+  const { excelBuffer, fileName } = await generateExcel(columns);
 
-return {excelBuffer, fileName}
+  return { excelBuffer, fileName };
 };
+
 

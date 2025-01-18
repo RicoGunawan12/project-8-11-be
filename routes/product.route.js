@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProduct, deleteProduct, getBestSeller, getCategoryWithProduct, getNewestProduct, getPaginateProduct, getProductById, getProductCount, getProducts, updateBestSeller, updateProduct, updateProductQuantity, updatePromo, updateVariant, validateProduct, updateActiveBestSellers, updateInactiveBestSellers, deleteProducts, updateActiveStatusProducts, updateInactiveStatusProducts, getProductByIdWithRelatedProduct, generateUpdateStockExcel, readUpdateStockExcel , createVariant} from '../controllers/product.controller.js';
+import { createProduct, deleteProduct, getBestSeller, getCategoryWithProduct, getNewestProduct, getPaginateProduct, getProductById, getProductCount, getProducts, updateBestSeller, updateProduct, updateProductQuantity, updatePromo, updateVariant, validateProduct, updateActiveBestSellers, updateInactiveBestSellers, deleteProducts, updateActiveStatusProducts, updateInactiveStatusProducts, getProductByIdWithRelatedProduct, generateUpdateStockExcel, readUpdateStockExcel , createVariant, bulkUpdateProductStock} from '../controllers/product.controller.js';
 import { adminMiddleware } from '../middleware/auth.middleware.js';
 import { upload } from '../utils/uploader.js';
 import { generalValidator } from '../validator/general/general.validator.js';
@@ -67,5 +67,6 @@ ProductRoute.post('/delete/multiple', adminMiddleware, generalValidator(productM
 // ProductRoute.post('/upload/updateStock',adminMiddleware,)
 ProductRoute.post('/generate/updateStock',adminMiddleware,generateUpdateStockExcel)
 ProductRoute.post('/upload/readUpdateStock',upload.single('file'),readUpdateStockExcel)
+ProductRoute.post('/update/bulkUpdateStock',bulkUpdateProductStock)
 
 export default ProductRoute;
