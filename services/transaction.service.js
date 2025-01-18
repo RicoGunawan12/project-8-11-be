@@ -22,7 +22,7 @@ export const getAllTransactionsService = async (status, startDate, endDate, offs
         endOfDay.setHours(23, 59, 59, 999);
 
         whereConditions.transactionDate = {
-            [Op.gte]: date,
+            [Op.gte]: startDate,
             [Op.lt]: endOfDay,
         };
     } else {

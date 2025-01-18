@@ -36,6 +36,12 @@ const TransactionDetail = sequelize.define('transaction_details', {
     defaultValue: 0,
     allowNull: false,
     length: 100
+  },
+  customerNotes: {
+    field: "customer_notes",
+    type: DataTypes.STRING,
+    allowNull: true,
+    length: 100
   }
 },{
   timestamps: false
