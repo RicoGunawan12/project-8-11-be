@@ -127,7 +127,7 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
             shipper_address: adminAddress.addressDetail,
             shipper_email: contact.email,
             receiver_name: transaction.user_address.receiverName, //ambil dari transaction
-            receiver_phone: transaction.user_address.receiverPhoneNumber, //ambil dari transaction
+            receiver_phone: transaction.user_address.receiverPhoneNumber.replace('+', ''), //ambil dari transaction
             receiver_destination_id: parseInt(transaction.user_address.komshipAddressId), //ambil dari transaction,
             receiver_address: transaction.user_address.addressDetail, // ambil dari transaction
             shipping: transaction.expedition, // ambil dari transaction,
