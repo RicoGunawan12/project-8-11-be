@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { ProductCategoryModel, ProductCoverModel, ProductModel, ProductVariantModel, PromoDetailModel, PromoModel } from "../association/association.js"
+import { ProductCategoryModel, ProductCoverModel, ProductModel, ProductVariantModel, PromoDetailModel, PromoHistoryModel, PromoModel } from "../association/association.js"
 
 
 export const getPromoService = async () => {
@@ -170,3 +170,9 @@ export const updatePromoService = async (promoId, promoName, promoAmount, startD
 
     return updatedPromo;
 };
+
+
+
+export const createPromoHistory = async (promoId, userId, productId) => {
+    PromoHistoryModel.create({ promoId, userId, productId })
+}
