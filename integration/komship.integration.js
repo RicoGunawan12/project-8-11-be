@@ -183,6 +183,8 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
         //     ]
         // })
     };
+    console.log(body);
+    
     // console.log(requestOptions);
     try {
         const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/store`, requestOptions);
