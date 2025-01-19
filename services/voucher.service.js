@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { VoucherModel } from "../association/association.js";
 
 
