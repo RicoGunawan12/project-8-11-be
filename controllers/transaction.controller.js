@@ -120,7 +120,7 @@ export const createTransaction = async (req, res) => {
             // minus the totalprice
             const voucherHasUsed = await checkTransactionWithVoucher(voucherCode, userId);
             if (voucherHasUsed) {
-                return res.status(400).json({ message: "Voucher has used!" });
+                return res.status(400).json({ message: "Voucher has been used!" });
             }
             else {
                 const discount = await applyVoucherService(voucherCode, totalPrice - deliveryFee);
