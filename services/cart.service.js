@@ -58,7 +58,7 @@ export const getCartItemsByUserService = async (userId) => {
     
     const filteredCartItems = await Promise.all(
         cartItem.map(async (item) => {
-            console.log(item.product_variant.product.promo_details[0].promo.promoId);
+            // console.log(item.product_variant.product.promo_details[0].promo.promoId);
             
             const promoDetail = item?.product_variant?.product?.promo_details[0];
 
