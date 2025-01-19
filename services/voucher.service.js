@@ -174,7 +174,7 @@ export const applyVoucherService = async (voucherCode, totalAmount) => {
     throw new Error("Voucher quota has reached the limit")
   }
 
-  if(voucher.voucherEndDate && (voucher.voucherEndDate && new Date(voucher.voucherEndDate) < new Date())){
+  if(voucher.voucherEndDate && (voucher.voucherEndDate && new Date(voucher.voucherEndDate) < new Date().setHours(0,0,0,0))){
     throw new Error("Voucher has expired")
   }
   const totalDiscount = calculateVoucherDiscount(voucher.voucherType,totalAmount,voucher.discount, voucher.maxDiscount)
