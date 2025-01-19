@@ -20,7 +20,7 @@ AddressRoute.get('/destination', searchDestination);
 AddressRoute.get('/calculate', userMiddleware, calculateDeliveryFee);
 
 AddressRoute.post('/admin', adminMiddleware, updatePickUpPoint);
-AddressRoute.get('/admin', generalMiddleware, getPickUpPoint);
+AddressRoute.get('/admin', getPickUpPoint);
 
 AddressRoute.get('/:id', userMiddleware, getAddressById)
 
