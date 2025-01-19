@@ -12,7 +12,7 @@ export const getVoucherByCodeService = async (code) => {
   const voucher =  await VoucherModel.findOne({
     where: {
       voucherCode: code,
-      voucherStartDate: { [Op.lte]: today },
+      voucherStartDate: { [Op.lte]: new Date() },
       voucherEndDate: { [Op.gte]: new Date().setHours(0, 0, 0, 0) },
     }
   })
