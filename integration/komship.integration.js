@@ -96,6 +96,10 @@ export const calculateDeliveryFeeKomship = async (shipperDestinationId, receiver
 // }
 // ]
 export const createOrderKomship = async (transaction, adminAddress, contact) => {
+    console.log(transaction);
+    console.log(adminAddress);
+    console.log(contact);
+    
     const transactionDetails = transaction.transaction_details.map((det) => {
         return {
             product_name: det.product_variant.product.productName,
