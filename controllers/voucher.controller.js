@@ -35,7 +35,7 @@ export const getVoucherByCode = async (req, res) => {
       if(vouchers){
         return res.status(200).json(vouchers);
       }
-      return res.status(400).json({ message: "Voucher not found!" });
+      return res.status(400).json({ message: "Invalid Voucher!" });
     }
     return res.status(400).json({ message: "Voucher has used!" });
 };
