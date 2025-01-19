@@ -286,11 +286,13 @@ export const createProduct = async (req, res) => {
     }
 
     if (
-      !productSize ||
-      typeof productSize !== "string" ||
-      productSize.trim().length < 1
+      !isValidNumber(productSize) &&
+      parseInt(productSize) <= 0
     ) {
-      throw new Error(`Product must have product size`);
+      throw new Error(`Product must have product size and more than 0`);
+    }
+    else {
+      productSize = parseInt(productSize)
     }
 
     if (
@@ -513,12 +515,15 @@ export const updateProduct = async (req, res) => {
         .status(400)
         .json({ message: "Product category name must be filled" });
     }
+    
     if (
-      !productSize ||
-      typeof productSize !== "string" ||
-      productSize.trim().length < 1
+      !isValidNumber(productSize) &&
+      parseInt(productSize) <= 0
     ) {
-      throw new Error(`Product must have product size`);
+      throw new Error(`Product must have product size and more than 0`);
+    }
+    else {
+      productSize = parseInt(productSize)
     }
     if (
       isValidNumber(productWeight) &&

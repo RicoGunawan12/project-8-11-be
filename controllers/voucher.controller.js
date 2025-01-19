@@ -7,6 +7,7 @@ import { createProductVariantService } from "../services/productVariantService.j
 import { checkTransactionWithVoucher } from "../services/transaction.service.js";
 import {
   applyVoucherService,
+  checkVoucherByCodeService,
   createVouchersService,
   deleteVoucherByCodeService,
   deleteVouchersByCodeService,
@@ -31,7 +32,7 @@ export const getVoucherByCode = async (req, res) => {
 
   const voucherHasUsed = await checkTransactionWithVoucher(code, userId);
   if (!voucherHasUsed) {
-      const vouchers = await getVoucherByCodeService(code);
+      const vouchers = await checkVoucherByCodeService(code);
       if(vouchers){
         return res.status(200).json(vouchers);
       }

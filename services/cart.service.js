@@ -45,6 +45,7 @@ export const getCartItemsByUserService = async (userId) => {
                                                 [Op.gte]: new Date().setHours(0, 0, 0, 0), // End of the day
                                             },
                                         },
+                                        order: [["created_at", "DESC"]],
                                     },
                                 ]
                             }
