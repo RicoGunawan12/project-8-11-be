@@ -117,7 +117,7 @@ export const updatePromo = async (req, res) => {
             message: "Start date must be today or a future date.",
         });
     }
-    else if (end <= start) {
+    else if (end < start) {
         return res.status(400).json({
             message: "End date must be greater than the start date.",
         });
