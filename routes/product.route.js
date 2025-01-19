@@ -66,7 +66,7 @@ ProductRoute.patch('/activitystatus/inactive', adminMiddleware, generalValidator
 ProductRoute.post('/delete/multiple', adminMiddleware, generalValidator(productMultipleDeleteSchema), validateSchema, deleteProducts);
 // ProductRoute.post('/upload/updateStock',adminMiddleware,)
 ProductRoute.post('/generate/updateStock',adminMiddleware,generateUpdateStockExcel)
-ProductRoute.post('/upload/readUpdateStock',upload.single('file'),readUpdateStockExcel)
-ProductRoute.post('/update/bulkUpdateStock',bulkUpdateProductStock)
+ProductRoute.post('/upload/readUpdateStock',adminMiddleware,upload.single('file'),readUpdateStockExcel)
+ProductRoute.post('/update/bulkUpdateStock',adminMiddleware,bulkUpdateProductStock)
 
 export default ProductRoute;
