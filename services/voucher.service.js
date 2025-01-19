@@ -10,7 +10,9 @@ export const getAllVouchersService =  async ()=> {
 export const getVoucherByCodeService = async (code) => {
   const voucher =  await VoucherModel.findOne({
     where: {
-      voucherCode: code
+      voucherCode: code,
+      voucherStartDate: { [Op.lte]: today },
+      voucherEndDate: { [Op.gte]: new Date().setHours(0, 0, 0, 0) },
     }
   })
   console.log(voucher)
