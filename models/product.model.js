@@ -38,7 +38,7 @@ const Product = sequelize.define('products', {
   },
   productSize: {
     field: "product_size",
-    type: DataTypes.STRING,
+    type: DataTypes.NUMBER,
     allowNull: true
   },
   productWeight: {

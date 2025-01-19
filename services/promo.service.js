@@ -66,6 +66,7 @@ export const checkPromoService = async (productId, userId) => {
                         startDate: { [Op.lte]: today },
                         endDate: { [Op.gte]: new Date().setHours(0, 0, 0, 0) },
                     },
+                    order: [["created_at", "DESC"]],
                 },
             ],
         });
