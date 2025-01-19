@@ -100,7 +100,7 @@ export const createTransaction = async (req, res) => {
             productsInCart.map(async (product) => {
                 if (product.quantity === 1) {
                     // console.log(product.product_variant.ref_product_id);
-                    const promoDetails = await checkPromoService(product.product_variant.ref_product_id);
+                    const promoDetails = await checkPromoService(product.product_variant.ref_product_id, userId);
                     // console.log(product.product_variant.productPrice);
                     if (promoDetails) {
                         product.product_variant.productPrice =

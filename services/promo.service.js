@@ -52,7 +52,7 @@ export const deletePromoService = async (promoId) => {
     return deletedPromo;
 }
 
-export const checkPromoService = async (productId) => {
+export const checkPromoService = async (productId, userId) => {
     try {
         const today = new Date();
 

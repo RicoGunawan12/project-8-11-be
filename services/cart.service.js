@@ -57,12 +57,18 @@ export const getCartItemsByUserService = async (userId) => {
     });
     
     const filteredCartItems = await Promise.all(
-        cartItem.map(async (item) => {
+        cartItem.map(async (cartItem) => {
             // console.log(item.product_variant.product.promo_details[0].promo.promoId);
-            
+            const item = cartItem.get({ plain: true });
             const promoDetail = item?.product_variant?.product?.promo_details[0];
-
+            console.log("PROMO DETAIL HEREE");
+            console.log(promoDetail);
+            
             if (promoDetail) {
+                console.log(promoDetail.promo.promoId);
+                console.log(item.product_variant.product.productId);
+                console.log(userId);
+                
                 const promoUsed = await PromoHistoryModel.findOne({
                     where: {
                         promoId: promoDetail.promo.promoId,
@@ -73,7 +79,11 @@ export const getCartItemsByUserService = async (userId) => {
 
                 if (promoUsed) {
                     // Remove the promo if it has been used
-                    delete item.product_variant.product.promo_details;
+                    // console.log(item.product_variant.product.promo_details);
+                    
+                    // item.product_variant.product.promo_details.pop();
+                    // delete 
+                    item.product_variant.product.promo_details = [];
                 }
             }
 
