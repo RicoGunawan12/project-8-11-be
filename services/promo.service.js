@@ -69,6 +69,19 @@ export const checkPromoService = async (productId) => {
                 },
             ],
         });
+
+        const promoUsed = await PromoHistoryModel.findOne({
+            where: {
+                productId,
+                userId,
+                promoId: promoDetail.promo.promoId,
+            },
+        });
+
+        if (promoUsed) {
+            return null;
+        }
+
         return promoDetail;
     } catch (error) {
         console.error("Error checking promo:", error);
@@ -173,6 +186,7 @@ export const updatePromoService = async (promoId, promoName, promoAmount, startD
 
 
 
-export const createPromoHistory = async (promoId, userId, productId) => {
-    PromoHistoryModel.create({ promoId, userId, productId })
+export const createPromoHistoryService = async (promoId, userId, productId) => {
+    const promoHistory = await PromoHistoryModel.create({ promoId, userId, productId });
+    return promoHistory;
 }
