@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { ProductCategoryModel, ProductCoverModel, ProductModel, ProductVariantModel, PromoDetailModel, PromoModel } from "../association/association.js"
+import { ProductCategoryModel, ProductCoverModel, ProductModel, ProductVariantModel, PromoDetailModel, PromoHistoryModel, PromoModel } from "../association/association.js"
 
 
 export const getPromoService = async () => {
@@ -52,7 +52,7 @@ export const deletePromoService = async (promoId) => {
     return deletedPromo;
 }
 
-export const checkPromoService = async (productId) => {
+export const checkPromoService = async (productId, userId) => {
     try {
         const today = new Date();
 
@@ -69,6 +69,20 @@ export const checkPromoService = async (productId) => {
                 },
             ],
         });
+        console.log(promoDetail);
+        
+        const promoUsed = await PromoHistoryModel.findOne({
+            where: {
+                productId,
+                userId,
+                promoId: promoDetail?.promo?.promoId,
+            },
+        });
+
+        if (promoUsed) {
+            return null;
+        }
+
         return promoDetail;
     } catch (error) {
         console.error("Error checking promo:", error);
@@ -170,3 +184,10 @@ export const updatePromoService = async (promoId, promoName, promoAmount, startD
 
     return updatedPromo;
 };
+
+
+
+export const createPromoHistoryService = async (promoId, userId, productId) => {
+    const promoHistory = await PromoHistoryModel.create({ promoId, userId, productId });
+    return promoHistory;
+}

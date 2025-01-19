@@ -2,7 +2,7 @@ import sequelize from "../config/database.js";
 import { cancelOrderKomship } from "../integration/komship.integration.js";
 import { createQrisTransactionXendit, refundXendit } from "../integration/xendit.integration.js";
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
-import { checkPromoService } from "../services/promo.service.js";
+import { checkPromoService, createPromoHistoryService } from "../services/promo.service.js";
 import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, getTransactionXenditService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, rollbackTransaction, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
 import { applyVoucherService } from "../services/voucher.service.js";
 
@@ -98,16 +98,20 @@ export const createTransaction = async (req, res) => {
         var totalWeight = 0;
         await Promise.all(
             productsInCart.map(async (product) => {
-                // console.log(product.product_variant.ref_product_id);
-                const promoDetails = await checkPromoService(product.product_variant.ref_product_id);
-                // console.log(product.product_variant.productPrice);
-                if (promoDetails) {
-                    product.product_variant.productPrice =
+                if (product.quantity === 1) {
+                    // console.log(product.product_variant.ref_product_id);
+                    const promoDetails = await checkPromoService(product.product_variant.ref_product_id, userId);
+                    // console.log(product.product_variant.productPrice);
+                    if (promoDetails) {
+                        product.product_variant.productPrice =
                         product.product_variant.productPrice - promoDetails.promo.promoAmount <= 0 ? 0 :
-                            product.product_variant.productPrice - promoDetails.promo.promoAmount;
-                    product.product_variant.realizedPromo = promoDetails.promo.promoAmount;
+                        product.product_variant.productPrice - promoDetails.promo.promoAmount;
+                        product.product_variant.realizedPromo = promoDetails.promo.promoAmount;
+                        
+                        const promoHistory = await createPromoHistoryService(promoDetails.promo.promoId, userId, product.product_variant.ref_product_id);
+                    }
+                    // console.log(product.product_variant.productPrice);
                 }
-                // console.log(product.product_variant.productPrice);
 
                 const itemTotal = product.product_variant.productPrice * product.quantity;
                 totalPrice += itemTotal;

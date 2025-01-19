@@ -22,9 +22,8 @@ const Product = sequelize.define('products', {
   },
   productDescription: {
     field: "product_description",
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT("long"),
     allowNull: true,
-    length: 255
   },
   defaultImage:  {
     field: "default_image",
