@@ -108,10 +108,10 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
                 " - " +
                 (det.product_variant.productColor ?? ""),
             product_price: det.product_variant.productPrice,
-            product_width: det.product_variant.productWidth / 100,
-            product_height: det.product_variant.productHeight / 100,
-            product_weight: Math.ceil(det.product_variant.productWeight / 1000),
-            product_length: det.product_variant.productLength / 100,
+            product_width: det.product_variant.product.productWidth / 100,
+            product_height: det.product_variant.product.productHeight / 100,
+            product_weight: Math.ceil(det.product_variant.product.productWeight / 1000),
+            product_length: det.product_variant.product.productLength / 100,
             qty: det.quantity,
             subtotal: det.quantity * det.product_variant.productPrice
         };
