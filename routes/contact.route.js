@@ -22,7 +22,7 @@ ContactRoute.put('/:id',
 );
 ContactRoute.delete('/:id', adminMiddleware, deleteContact);
 
-ContactRoute.get('/admin', adminMiddleware, getContactToSend);
+ContactRoute.get('/admin', getContactToSend);
 ContactRoute.put('/admin/:id', adminMiddleware, updateContactToSend);
 
 export default ContactRoute;
