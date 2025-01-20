@@ -127,7 +127,15 @@ export const updateWhyPhoto = async (req, res) => {
     
         let photoPhotoString = '';
         const photoPhoto = req.files['photo'];
+
+        if (!photoPhoto || photoPhoto.length === 0) {
+            return res.status(400).json({ message: "No file uploaded or changed" });
+        }
+
         image = photoPhoto[0];
+
+
+
         filename = `About Page${index + 1}.webp`;
         convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + 'photo', image, filename);
         photoPhotoString = `/${UPLOAD_FOLDER}photo/${filename}`;
