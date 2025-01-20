@@ -118,37 +118,38 @@ export const updateBackgroundPage = async (req, res) => {
 
 export const updateWhyPhoto = async (req, res) => {
     // converts image to WebP format
-    const index = parseInt(req.body.index);
-    let image = null;
-    let filename = '';
-    let convertedImageData = null;
-
-    let photoPhotoString = '';
-    const photoPhoto = req.files['photo'];
-    image = photoPhoto[0];
-    filename = `About Page${index + 1}.webp`;
-    convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + 'photo', image, filename);
-    photoPhotoString = `/${UPLOAD_FOLDER}photo/${filename}`;
-
-    const whyContents = await getWhyContentService();
-    const whyId = whyContents[0].whyId;
-    const condition = element => element.contentId === (index + 1);
-
-    let jsonContentEng = whyContents[0].whyContentJSONEng;
-    let foundItem = jsonContentEng.find(condition);
-    let foundIndex = jsonContentEng.findIndex(condition);
-
-    foundItem.photo = photoPhotoString;
-    jsonContentEng[foundIndex] = foundItem;
-
-    let jsonContentIndo = whyContents[0].whyContentJSONIndo;
-    foundItem = jsonContentIndo.find(condition);
-    foundIndex = jsonContentIndo.findIndex(condition);
-
-    foundItem.photo = photoPhotoString;
-    jsonContentIndo[foundIndex] = foundItem;
-
+    
     try {
+        const index = parseInt(req.body.index);
+        let image = null;
+        let filename = '';
+        let convertedImageData = null;
+    
+        let photoPhotoString = '';
+        const photoPhoto = req.files['photo'];
+        image = photoPhoto[0];
+        filename = `About Page${index + 1}.webp`;
+        convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + 'photo', image, filename);
+        photoPhotoString = `/${UPLOAD_FOLDER}photo/${filename}`;
+    
+        const whyContents = await getWhyContentService();
+        const whyId = whyContents[0].whyId;
+        const condition = element => element.contentId === (index + 1);
+    
+        let jsonContentEng = whyContents[0].whyContentJSONEng;
+        let foundItem = jsonContentEng.find(condition);
+        let foundIndex = jsonContentEng.findIndex(condition);
+    
+        foundItem.photo = photoPhotoString;
+        jsonContentEng[foundIndex] = foundItem;
+    
+        let jsonContentIndo = whyContents[0].whyContentJSONIndo;
+        foundItem = jsonContentIndo.find(condition);
+        foundIndex = jsonContentIndo.findIndex(condition);
+    
+        foundItem.photo = photoPhotoString;
+        jsonContentIndo[foundIndex] = foundItem;
+        
         await updateEngWhyContentService(jsonContentEng, whyId);
         await updateIndoWhyContentService(jsonContentIndo, whyId);
 
