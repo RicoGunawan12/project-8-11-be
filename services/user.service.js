@@ -74,9 +74,12 @@ export const migrateAdminService = async () => {
 }
 
 export const loginUserService = async (email, password) => {
+  const normalizedEmailOrPhone = email.startsWith('0') 
+  ? '+62' + email.slice(1) 
+  : email;
   const existingUser = await UserModel.findOne({
     where: {
-      [Op.or]: [{ email }, { phone: email }],
+      [Op.or]: [{ email }, { phone: normalizedEmailOrPhone }],
       status: "active",
     },
   });
