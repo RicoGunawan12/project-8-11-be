@@ -108,10 +108,10 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
                 " - " +
                 (det.product_variant.productColor ?? ""),
             product_price: det.product_variant.productPrice,
-            product_width: det.product_variant.product.productWidth / 100,
-            product_height: det.product_variant.product.productHeight / 100,
+            product_width: Math.ceil(det.product_variant.product.productWidth / 100),
+            product_height: Math.ceil(det.product_variant.product.productHeight / 100),
             product_weight: Math.ceil(det.product_variant.product.productWeight / 1000),
-            product_length: det.product_variant.product.productLength / 100,
+            product_length: Math.ceil(det.product_variant.product.productLength / 100),
             qty: det.quantity,
             subtotal: det.quantity * det.product_variant.productPrice
         };
@@ -183,7 +183,30 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
         //     ]
         // })
     };
-    console.log(body);
+    console.log({
+        order_date: formatDateToString(new Date()),
+        brand_name: "Tyeso Indonesia Official Store",
+        shipper_name: adminAddress.senderName,
+        shipper_phone: adminAddress.senderPhoneNumber,
+        shipper_destination_id: parseInt(adminAddress.komshipAddressId),
+        shipper_address: adminAddress.addressDetail,
+        shipper_email: contact.email,
+        receiver_name: transaction.user_address.receiverName, //ambil dari transaction
+        receiver_phone: transaction.user_address.receiverPhoneNumber.replace('+', ''), //ambil dari transaction
+        receiver_destination_id: parseInt(transaction.user_address.komshipAddressId), //ambil dari transaction,
+        receiver_address: transaction.user_address.addressDetail, // ambil dari transaction
+        shipping: transaction.expedition, // ambil dari transaction,
+        shipping_type: transaction.shippingType, // ambil dari transaction
+        payment_method: "BANK TRANSFER",
+        shipping_cost: transaction.deliveryFee, // ambil dari transaction
+        shipping_cashback: transaction.deliveryCashback,
+        service_fee: 0,
+        additional_cost: 0,
+        grand_total: transaction.totalPrice,
+        cod_value: 0,
+        insurance_value: 0,
+        order_details: transactionDetails
+    });
     
     // console.log(requestOptions);
     try {
