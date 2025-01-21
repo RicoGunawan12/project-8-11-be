@@ -216,6 +216,7 @@ export const getCategoryWithProductService = async () => {
             {
               model: ProductCoverModel,
               attributes: ["productCover"],
+              separate: true,
               order: [['productCover', "ASC"]]
             }
             // {
