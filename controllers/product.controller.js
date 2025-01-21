@@ -384,7 +384,7 @@ export const createProduct = async (req, res) => {
       }
 
       // Process images only if we have variants and images
-      if (images.length > 0) {
+      if (images && images.length > 0) {
         const hash = new Map();
         for (let i = 0; i < images.length; i++) {
           const image = images[i];
@@ -437,7 +437,7 @@ export const createProduct = async (req, res) => {
 
     console.log("default image");
     // Process default images if they exist
-    if (defaultImage.length > 0) {
+    if (defaultImage && defaultImage.length > 0) {
       const insertProductCover = defaultImage.map(async (image) => {
         await createProductCoverService(
           product.productId,
@@ -619,23 +619,28 @@ export const updateProduct = async (req, res) => {
     const hash = new Map();
     console.log(images);
 
-    for (let i = 0; i < images.length; i++) {
-      const image = images[i];
-
-      // console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
-
-      // converts image to WebP format
-      const filename = `${Date.now()}-${req.body.productName}.webp`;
-      const convertedImageData = await convertImageToWebp(
-        "../" + UPLOAD_FOLDER + "product/" + req.body.productName,
-        image,
-        filename
-      );
-
-      hash.set(
-        image.originalname,
-        `/${UPLOAD_FOLDER}product/${productName}/${filename}`
-      );
+    if (images) {
+      for (let i = 0; i < images.length; i++) {
+        const image = images[i];
+  
+        // console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
+  
+        // converts image to WebP format
+        const filename = `${Date.now()}-${req.body.productName}.webp`;
+        const convertedImageData = await convertImageToWebp(
+          "../" + UPLOAD_FOLDER + "product/" + req.body.productName,
+          image,
+          filename
+        );
+  
+        hash.set(
+          image.originalname,
+          `/${UPLOAD_FOLDER}product/${productName}/${filename}`
+        );
+      }
+    }
+    else {
+      return res.status(400).json({ message: "Please insert the product variant image" })
     }
 
     if (productName.length < 1) {
@@ -665,14 +670,14 @@ export const updateProduct = async (req, res) => {
     //   if (i === 0) defaultImageString = `/${UPLOAD_FOLDER}product/${productName}/${filename}`;
     // }
 
-    const insertProductCover = defaultImage.map(async (image) => {
+    const insertProductCover = defaultImage ? defaultImage.map(async (image) => {
       // const filename = `${Date.now()}-${req.body.productName}.webp`;
       // const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
       await createProductCoverService(
         productId,
         `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`
       );
-    });
+    }) : [];
     await Promise.all(insertProductCover);
 
     const updatedProduct = await updateProductService(

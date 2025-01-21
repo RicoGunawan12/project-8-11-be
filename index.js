@@ -29,6 +29,8 @@ import { migrateAdminService } from './services/user.service.js';
 import RatingRoute from './routes/rating.route.js';
 import CarouselRoute from './routes/carousel.route.js';
 import LocationRoute from './routes/location.route.js';
+import FreeOngkirRoute from './routes/freeOngkir.route.js';
+import { migrateFreeOngkirService } from './services/freeOngkir.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -69,6 +71,7 @@ app.use('/api/banners', BannerRoute);
 app.use('/api/ratings', RatingRoute);
 app.use('/api/carousels', CarouselRoute);
 app.use('/api/locations', LocationRoute);
+app.use('/api/free/ongkir', FreeOngkirRoute);
 
 (async () => {
   try {
@@ -83,6 +86,7 @@ app.use('/api/locations', LocationRoute);
     await migrateContactService();
     await migrateBanner();
     await migrateWhyContent();
+    await migrateFreeOngkirService();
 
     app.listen(5000, () => {
       console.log('Server running on port 5000');
