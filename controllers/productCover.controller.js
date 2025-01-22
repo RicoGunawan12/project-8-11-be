@@ -5,8 +5,11 @@ export const deletePhotoByProductId = async (req, res, next) => {
     const productId = req.params.id;
     try {
         await deleteProductByProductIdService(productId, productName);
-        next();
+        
     } catch (error) {
         return res.status(500).json({ message: error.message });
+    }
+    finally {
+        next();
     }
 }
