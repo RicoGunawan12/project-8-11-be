@@ -750,19 +750,19 @@ export const createVariant = async (req, res) => {
     return res.status(400).json({ message: "Product id is required!" });
   }
 
-  if (!color || typeof color !== "string" || color.trim().length < 1) {
+  if (!color) {
     return res.status(400).json({ message: "Product color must be filled" });
   }
 
-  if (!sku || typeof sku !== "string" || sku.trim().length < 1) {
+  if (!sku) {
     return res.status(400).json({ message: "Product sku must be filled" });
   }
 
-  if (!price || typeof price !== "number") {
+  if (typeof price !== "number") {
     return res.status(400).json({ message: "Product price must be filled" });
   }
 
-  if (!stock || typeof stock !== "number") {
+  if (typeof stock !== "number") {
     return res.status(400).json({ message: "Product stock must be filled" });
   }
 
