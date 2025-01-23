@@ -7,7 +7,7 @@ import { validateSchema } from '../validator/validate.js';
 
 const EmailTemplateRoute = express.Router();
 
-EmailTemplateRoute.get('/', getEmailTemplate);
-EmailTemplateRoute.post('/', generalValidator(updateEmailTemplateSchema), validateSchema, updateEmailTemplate);
+EmailTemplateRoute.get('/', adminMiddleware, getEmailTemplate);
+EmailTemplateRoute.post('/', adminMiddleware, generalValidator(updateEmailTemplateSchema), validateSchema, updateEmailTemplate);
 
 export default EmailTemplateRoute;
