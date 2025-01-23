@@ -40,6 +40,17 @@ const AboutPage = sequelize.define('about_pages', {
     type: DataTypes.TEXT,
     allowNull: false
   },
+  introduceIndo: {
+    field: "introduce_indo",
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  introduceEng: {
+    field: "intorduce_eng",
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  
 },{
   timestamps: false
 })
