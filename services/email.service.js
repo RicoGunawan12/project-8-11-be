@@ -1,6 +1,9 @@
 import { SMTPClient } from 'emailjs';
 import nodemailer from 'nodemailer';
 import { google } from 'googleapis';
+import LanguageEnum from '../enums/lang.enum.js';
+import EmailTemplate from '../models/emailTemplate.model.js';
+
 
 export const sendEmailService = async (email, name, topic, orderNumber, message) => {
 
@@ -92,3 +95,46 @@ export const sendEmailService = async (email, name, topic, orderNumber, message)
 
   const result = await transporter.sendMail(mailOptions);
 };
+
+export const getEmailTemplateService = async (key) => {
+    const emailTemplate = await EmailTemplate.findOne({
+        where: {
+            key: key
+        }
+    });
+
+    return emailTemplate;
+}
+
+export const updateEmailTemplateService = async (key, title, content, lang) => {
+    const existingEmailTemplate = await getEmailTemplateService(key);
+
+    let dataToBeInserted = {
+        key: key,
+    }
+
+    if (lang === LanguageEnum.ENGLISH) {
+        dataToBeInserted.titleEng = title;
+        dataToBeInserted.contentEng = content;
+
+        dataToBeInserted.titleIndo = existingEmailTemplate ? existingEmailTemplate.titleIndo : "";
+        dataToBeInserted.contentIndo = existingEmailTemplate ? existingEmailTemplate.contentIndo : "";
+    } else if (lang === LanguageEnum.INDONESIA) {
+        dataToBeInserted.titleIndo = title;
+        dataToBeInserted.contentIndo = content;
+
+        dataToBeInserted.titleEng = existingEmailTemplate ? existingEmailTemplate.titleEng : "";
+        dataToBeInserted.contentEng = existingEmailTemplate ? existingEmailTemplate.contentEng : "";
+    } else {
+        dataToBeInserted.titleEng = existingEmailTemplate ? existingEmailTemplate.titleEng : "";
+        dataToBeInserted.titleIndo = existingEmailTemplate ? existingEmailTemplate.titleIndo : "";
+        dataToBeInserted.contentEng = existingEmailTemplate ? existingEmailTemplate.contentEng : "";
+        dataToBeInserted.contentIndo = existingEmailTemplate ? existingEmailTemplate.contentIndo : "";
+    }
+
+    const status = await EmailTemplate.upsert(dataToBeInserted, {
+        fields: ["titleEng", "titleIndo", "contentEng", "contentIndo"]
+    });
+
+    return status;
+}
