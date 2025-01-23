@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { registerUserService, getUsersService, loginUserService, getUserByIdService, loginAdminService, registerAdminService, activateUserService, deactivateUserService } from '../services/user.service.js';
+import { sendEmailPostRegister } from '../services/email.service.js';
 
 
 export const registerUser = async (req, res) => {
@@ -20,9 +21,11 @@ export const registerUser = async (req, res) => {
   }
   
   try {
+    await sendEmailPostRegister(email, fullName, "id");
     const user = await registerUserService(fullName, email, password, phoneNumber);
     return res.status(201).json({ message: 'User registered successfully', user: user.fullName });
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ message: error.message });
   }
 };
