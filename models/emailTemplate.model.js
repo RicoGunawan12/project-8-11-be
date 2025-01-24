@@ -1,14 +1,19 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
-
-const AboutPage = sequelize.define('about_pages', {
-  pageId: {
+const EmailTemplate = sequelize.define("email_templates", {
+  emailTemplateId: {
     field: "page_id",
     type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4, 
+    defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
-    allowNull: false
+    allowNull: false,
+  },
+  key: {
+    field: "key",
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
   },
   titleEng: {
     field: "title_eng",
@@ -30,29 +35,6 @@ const AboutPage = sequelize.define('about_pages', {
     type: DataTypes.TEXT("long"),
     allowNull: false
   },
-  whyEng: {
-    field: "why_eng",
-    type: DataTypes.TEXT,
-    allowNull: false
-  },
-  whyIndo: {
-    field: "why_indo",
-    type: DataTypes.TEXT,
-    allowNull: false
-  },
-  introduceIndo: {
-    field: "introduce_indo",
-    type: DataTypes.TEXT,
-    allowNull: false
-  },
-  introduceEng: {
-    field: "intorduce_eng",
-    type: DataTypes.TEXT,
-    allowNull: false
-  },
-  
-},{
-  timestamps: false
-})
+});
 
-export default AboutPage;
+export default EmailTemplate;

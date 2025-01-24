@@ -72,16 +72,21 @@ export const checkPromoService = async (productId, userId) => {
         });
         console.log(promoDetail);
         
-        const promoUsed = await PromoHistoryModel.findOne({
-            where: {
-                productId,
-                userId,
-                promoId: promoDetail?.promo?.promoId,
-            },
-        });
-
-        if (promoUsed) {
-            return null;
+        if (promoDetail) {
+            const promoUsed = await PromoHistoryModel.findOne({
+                where: {
+                    productId,
+                    userId,
+                    promoId: promoDetail?.promo?.promoId,
+                },
+            });
+    
+            if (promoUsed) {
+                return null;
+            }
+        }
+        else {
+            return null
         }
 
         return promoDetail;

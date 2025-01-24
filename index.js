@@ -33,6 +33,7 @@ import FreeOngkirRoute from './routes/freeOngkir.route.js';
 import { migrateFreeOngkirService } from './services/freeOngkir.service.js';
 import { migrateCODDataService } from './services/codData.service.js';
 import CODRoute from './routes/codData.route.js';
+import EmailTemplateRoute from './routes/emailTemplate.route.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -75,6 +76,7 @@ app.use('/api/carousels', CarouselRoute);
 app.use('/api/locations', LocationRoute);
 app.use('/api/free/ongkir', FreeOngkirRoute);
 app.use('/api/cod', CODRoute);
+app.use('/api/email-templates', EmailTemplateRoute);
 
 (async () => {
   try {

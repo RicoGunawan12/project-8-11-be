@@ -189,7 +189,9 @@ export const migrateAboutPage = async () => {
             const titleIndo = "test indo"
             const whyEng = "why tyeso???"
             const whyIndo = "kenapa tyeso???"
-            AboutPage.create({ contentEng, contentIndo, titleEng, titleIndo, whyEng, whyIndo });
+            const introduceEng = "Introduce Eng"
+            const introduceIndo = "Introduce Indo"
+            AboutPage.create({ contentEng, contentIndo, titleEng, titleIndo, whyEng, whyIndo, introduceEng, introduceIndo });
             // console.log("Migrate page success!");
         } catch (error) {
             console.error(error.message);

@@ -627,11 +627,11 @@ export const updateProduct = async (req, res) => {
   
         // converts image to WebP format
         const filename = `${Date.now()}-${req.body.productName}.webp`;
-        const convertedImageData = await convertImageToWebp(
-          "../" + UPLOAD_FOLDER + "product/" + req.body.productName,
-          image,
-          filename
-        );
+        // const convertedImageData = await convertImageToWebp(
+        //   "../" + UPLOAD_FOLDER + "product/" + req.body.productName,
+        //   image,
+        //   filename
+        // );
   
         hash.set(
           image.originalname,

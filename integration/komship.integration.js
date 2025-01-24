@@ -136,13 +136,13 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
             receiver_address: transaction.user_address.addressDetail, // ambil dari transaction
             shipping: transaction.expedition, // ambil dari transaction,
             shipping_type: transaction.shippingType, // ambil dari transaction
-            payment_method: "BANK TRANSFER",
+            payment_method: transaction.paymentMethod === "COD" ? "COD" : "BANK TRANSFER",
             shipping_cost: transaction.deliveryFee, // ambil dari transaction
             shipping_cashback: transaction.deliveryCashback,
-            service_fee: 0,
+            service_fee: transaction.paymentMethod === "COD" ? transaction.totalPrice * 2.8 / 100 : 0,
             additional_cost: 0,
             grand_total: transaction.totalPrice,
-            cod_value: 0,
+            cod_value: transaction.paymentMethod === "COD" ? transaction.totalPrice : 0,
             insurance_value: 0,
             order_details: transactionDetails
         })
@@ -197,13 +197,13 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
         receiver_address: transaction.user_address.addressDetail, // ambil dari transaction
         shipping: transaction.expedition, // ambil dari transaction,
         shipping_type: transaction.shippingType, // ambil dari transaction
-        payment_method: "BANK TRANSFER",
+        payment_method: transaction.paymentMethod === "COD" ? "COD" : "BANK TRANSFER",
         shipping_cost: transaction.deliveryFee, // ambil dari transaction
         shipping_cashback: transaction.deliveryCashback,
-        service_fee: 0,
+        service_fee: transaction.paymentMethod === "COD" ? transaction.totalPrice * 2.8 / 100 : 0,
         additional_cost: 0,
         grand_total: transaction.totalPrice,
-        cod_value: 0,
+        cod_value: transaction.paymentMethod === "COD" ? transaction.totalPrice : 0,
         insurance_value: 0,
         order_details: transactionDetails
     });

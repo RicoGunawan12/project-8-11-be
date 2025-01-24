@@ -71,7 +71,7 @@ export const createTransaction = async (req, res) => {
         deliveryCashback,
         notes,
         customerNotes,
-        productNotes
+        productNotes,
     } = req.body;
     const userId = req.user.userId;
 
@@ -145,9 +145,9 @@ export const createTransaction = async (req, res) => {
             voucherCode.length === 0 ? null : voucherCode,
             // null, 
             new Date(),
-            "Unpaid",
+            paymentMethod,
             null,
-            "Unpaid",
+            paymentMethod === "COD" ? "Waiting for shipping" : "Unpaid",
             expedition,
             shippingType,
             deliveryFee,
@@ -178,13 +178,20 @@ export const createTransaction = async (req, res) => {
         });
         const insertedTransactionDetails = await createTransactionDetailService(transactionDetails);
         const deletedCartItem = await removeAllCartItemInUserService(userId);
-        const payTransactionResponse = await payTransactionService(transaction, req.user.customerId, productsInCart, disc)
-        console.log(payTransactionResponse);
-
-        const updatePaymentLink = await updatePaymentLinkService(transaction, payTransactionResponse.actions[0].url);
-
-        await seqTransaction.commit();
-        return res.status(200).json({ message: "Transaction created!", payTransactionResponse, transaction, insertedTransactionDetails });
+        
+        if (paymentMethod !== "COD") {
+            const payTransactionResponse = await payTransactionService(transaction, req.user.customerId, productsInCart, disc)
+            console.log(payTransactionResponse);
+            const updatePaymentLink = await updatePaymentLinkService(transaction, payTransactionResponse.actions[0].url);
+            await seqTransaction.commit();
+            return res.status(200).json({ message: "Transaction created!", payTransactionResponse, transaction, insertedTransactionDetails });
+            
+        }
+        else {
+            await seqTransaction.commit();
+            return res.status(200).json({ message: "Transaction created!", transaction, insertedTransactionDetails });
+        }
+        
 
     } catch (error) {
         console.log(error);
