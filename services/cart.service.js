@@ -62,7 +62,7 @@ export const getCartItemsByUserService = async (userId) => {
         cartItem.map(async (cartItem) => {
             // console.log(item.product_variant.product.promo_details[0].promo.promoId);
             const item = cartItem.get({ plain: true });
-            const sortedPromo = item?.product_variant?.product?.promo_details.sort((a, b) => new Date(b.promo.created_at) - new Date(a.promo.created_at));
+            const sortedPromo = item?.product_variant?.product?.promo_details.sort((a, b) => new Date(b.promo.createdAt) - new Date(a.promo.createdAt));
             console.log(sortedPromo);
             
             const promoDetail = sortedPromo[0];
