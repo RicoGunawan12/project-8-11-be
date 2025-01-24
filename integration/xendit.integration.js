@@ -207,7 +207,7 @@ export const createPlanXendit = async (transaction, customerId, productsInCart, 
         customer_id: customerId,
         recurring_action: "PAYMENT",
         currency: "IDR",
-        amount: transaction.totalPrice,
+        amount: transaction.totalPrice + freeOngkir,
         payment_methods: [],
         schedule: {
             reference_id: transaction.transactionId,
