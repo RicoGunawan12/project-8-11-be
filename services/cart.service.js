@@ -34,6 +34,7 @@ export const getCartItemsByUserService = async (userId) => {
                             {
                                 model: PromoDetailModel,
                                 attributes: ['promoDetailId'],
+                                separate: true,
                                 include: [
                                     {
                                         model: PromoModel,
@@ -45,7 +46,7 @@ export const getCartItemsByUserService = async (userId) => {
                                                 [Op.gte]: new Date().setHours(0, 0, 0, 0), // End of the day
                                             },
                                         },
-                                        // order: [["created_at", "DESC"]],
+                                        order: [["created_at", "DESC"]],
                                     },
                                 ]
                             }
@@ -54,17 +55,15 @@ export const getCartItemsByUserService = async (userId) => {
                 ]
             }
         ],
-        attributes: ['cartItemId', 'productVariantId', 'quantity'],
-        order: [
-            [PromoModel, 'created_at', 'DESC'], // Correctly apply sorting here
-        ],
+        attributes: ['cartItemId', 'productVariantId', 'quantity']
     });
     
     const filteredCartItems = await Promise.all(
         cartItem.map(async (cartItem) => {
             // console.log(item.product_variant.product.promo_details[0].promo.promoId);
             const item = cartItem.get({ plain: true });
-            const promoDetail = item?.product_variant?.product?.promo_details[0];
+            const sortedPromo = item?.product_variant?.product?.promo_details.sort((a, b) => new Date(b.promo.created_at) - new Date(a.promo.created_at));
+            const promoDetail = sortedPromo[0];
             console.log("PROMO DETAIL HEREE");
             console.log(promoDetail);
             
