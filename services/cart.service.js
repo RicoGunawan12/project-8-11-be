@@ -34,7 +34,6 @@ export const getCartItemsByUserService = async (userId) => {
                             {
                                 model: PromoDetailModel,
                                 attributes: ['promoDetailId'],
-                                separate: true,
                                 include: [
                                     {
                                         model: PromoModel,
@@ -46,7 +45,7 @@ export const getCartItemsByUserService = async (userId) => {
                                                 [Op.gte]: new Date().setHours(0, 0, 0, 0), // End of the day
                                             },
                                         },
-                                        order: [["created_at", "DESC"]],
+                                        // order: [["created_at", "DESC"]],
                                     },
                                 ]
                             }
@@ -55,7 +54,10 @@ export const getCartItemsByUserService = async (userId) => {
                 ]
             }
         ],
-        attributes: ['cartItemId', 'productVariantId', 'quantity']
+        attributes: ['cartItemId', 'productVariantId', 'quantity'],
+        order: [
+            [PromoModel, 'created_at', 'DESC'], // Correctly apply sorting here
+        ],
     });
     
     const filteredCartItems = await Promise.all(
