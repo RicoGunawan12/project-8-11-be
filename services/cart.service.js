@@ -63,6 +63,8 @@ export const getCartItemsByUserService = async (userId) => {
             // console.log(item.product_variant.product.promo_details[0].promo.promoId);
             const item = cartItem.get({ plain: true });
             const sortedPromo = item?.product_variant?.product?.promo_details.sort((a, b) => new Date(b.promo.created_at) - new Date(a.promo.created_at));
+            console.log(sortedPromo);
+            
             const promoDetail = sortedPromo[0];
             console.log("PROMO DETAIL HEREE");
             console.log(promoDetail);
