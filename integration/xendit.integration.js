@@ -248,7 +248,7 @@ export const createPlanXendit = async (transaction, customerId, productsInCart, 
     items.push({
         type: "DIGITAL_PRODUCT",
         name: "Delivery Fee",
-        net_unit_amount: transaction.deliveryFee,
+        net_unit_amount: transaction.deliveryFee + freeOngkir,
         quantity: 1,
         url: "https://th.bing.com/th/id/OIP.ULq5QQnJfNFuhcLNBVqzAwHaE7?w=250&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
     })
