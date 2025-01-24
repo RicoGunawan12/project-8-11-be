@@ -254,7 +254,7 @@ export const createPlanXendit = async (transaction, customerId, productsInCart, 
     })
     if (freeOngkir > 0) {
         items.push({
-            type: "DIGITAL_PRODUCT",
+            type: "DISCOUNT",
             name: "Free Ongkir Promo",
             net_unit_amount: freeOngkir * -1,
             quantity: 1,
