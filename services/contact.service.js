@@ -74,7 +74,8 @@ export const migrateContactService = async () => {
         if (!contactToSend) {
             const body = {
                 email: "tyeso@gmail.com",
-                phone: "628123456788"
+                phone: "628123456788",
+                business: "628123456788"
             }
             ContactToSend.create(body);
         }
@@ -89,11 +90,12 @@ export const getContactToSendService = async () => {
     return contactToSend[0];
 }
 
-export const updateContactToSendService = async (id, email, phone) => {
+export const updateContactToSendService = async (id, email, phone, business) => {
     const updatedContact = await ContactToSend.update(
         {
             email: email,
-            phone: phone
+            phone: phone,
+            business: business
         },
         {
             where: {

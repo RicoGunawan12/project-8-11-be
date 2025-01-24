@@ -22,6 +22,12 @@ const ContactToSend = sequelize.define('contact_to_sends', {
         length: 50,
         allowNull: false
     },
+    business: {
+        field: "business",
+        type: DataTypes.STRING,
+        length: 50,
+        allowNull: false
+    }
 }, {
     timestamps: false
 })

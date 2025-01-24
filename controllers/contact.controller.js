@@ -85,11 +85,11 @@ export const getContactToSend = async (req, res) => {
 }
 
 export const updateContactToSend = async (req, res) => {
-    const { email, phone } = req.body;
+    const { email, phone, business } = req.body;
     const id = req.params.id
 
     try {
-        const updated = await updateContactToSendService(id, email, phone);
+        const updated = await updateContactToSendService(id, email, phone, business);
         return res.status(200).json({ message: "Contact updated!" });
     } catch (error) {
         return res.status(500).json({ message: error.message });
