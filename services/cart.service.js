@@ -34,6 +34,7 @@ export const getCartItemsByUserService = async (userId) => {
                             {
                                 model: PromoDetailModel,
                                 attributes: ['promoDetailId'],
+                                separate: true,
                                 include: [
                                     {
                                         model: PromoModel,
@@ -45,7 +46,6 @@ export const getCartItemsByUserService = async (userId) => {
                                                 [Op.gte]: new Date().setHours(0, 0, 0, 0), // End of the day
                                             },
                                         },
-                                        separate: true,
                                         order: [["created_at", "DESC"]],
                                     },
                                 ]
