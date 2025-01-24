@@ -2,6 +2,7 @@ import sequelize from "../config/database.js";
 import { cancelOrderKomship } from "../integration/komship.integration.js";
 import { createQrisTransactionXendit, refundXendit } from "../integration/xendit.integration.js";
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
+import { getFreeOngkirService } from "../services/freeOngkir.service.js";
 import { checkPromoService, createPromoHistoryService } from "../services/promo.service.js";
 import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, getTransactionXenditService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, rollbackTransaction, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
 import { applyVoucherService } from "../services/voucher.service.js";
@@ -119,6 +120,14 @@ export const createTransaction = async (req, res) => {
             })
         );
         // console.log(totalWeight);
+        var freeOngkir = 0;
+        const freeOngkirData = await getFreeOngkirService();
+        if (freeOngkirData.status === "Active" && totalPrice - deliveryFee >= freeOngkirData.minimumPaymentAmount) {
+            freeOngkir = freeOngkirData.maximumFreeOngkir;
+            totalPrice -= freeOngkirData.maximumFreeOngkir;
+        }
+
+
         var disc = 0;
         if (voucherCode) {
             // minus the totalprice
@@ -127,12 +136,13 @@ export const createTransaction = async (req, res) => {
                 return res.status(400).json({ message: "Voucher has been used!" });
             }
             else {
-                const discount = await applyVoucherService(voucherCode, totalPrice - deliveryFee);
+                const discount = await applyVoucherService(voucherCode, totalPrice - deliveryFee + freeOngkir);
                 totalPrice -= discount;
                 disc = discount;
                 
             }
         }
+
 
         // set transaction date to now 
         // set gateway response to null
@@ -156,7 +166,8 @@ export const createTransaction = async (req, res) => {
             notes,
             totalPrice,
             totalWeight,
-            customerNotes
+            customerNotes,
+            freeOngkir
         );
 
         // insert transaction detail
@@ -179,8 +190,8 @@ export const createTransaction = async (req, res) => {
         const insertedTransactionDetails = await createTransactionDetailService(transactionDetails);
         const deletedCartItem = await removeAllCartItemInUserService(userId);
         
-        if (paymentMethod !== "COD") {
-            const payTransactionResponse = await payTransactionService(transaction, req.user.customerId, productsInCart, disc)
+        if (paymentMethod !== "COD" && totalPrice >= 1000) {
+            const payTransactionResponse = await payTransactionService(transaction, req.user.customerId, productsInCart, disc, freeOngkir)
             console.log(payTransactionResponse);
             const updatePaymentLink = await updatePaymentLinkService(transaction, payTransactionResponse.actions[0].url);
             await seqTransaction.commit();

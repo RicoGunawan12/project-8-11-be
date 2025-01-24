@@ -113,6 +113,17 @@ const TransactionHeader = sequelize.define('transaction_headers', {
     field: "customer_notes",
     type: DataTypes.STRING,
     allowNull: true
+  },
+  freeOngkir: {
+    field: "free_ongkir",
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
+  },
+  awb: {
+    field: "awb",
+    type: DataTypes.STRING,
+    allowNull: true
   }
 },{
   timestamps: false
