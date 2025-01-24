@@ -124,7 +124,6 @@ export const createTransaction = async (req, res) => {
         const freeOngkirData = await getFreeOngkirService();
         if (freeOngkirData.status === "Active" && totalPrice - deliveryFee >= freeOngkirData.minimumPaymentAmount) {
             freeOngkir = freeOngkirData.maximumFreeOngkir;
-            totalPrice -= freeOngkirData.maximumFreeOngkir;
         }
 
 
@@ -157,7 +156,7 @@ export const createTransaction = async (req, res) => {
             new Date(),
             paymentMethod,
             null,
-            paymentMethod === "COD" ? "Waiting for shipping" : "Unpaid",
+            paymentMethod === "COD" || totalPrice < 1000 ? "Waiting for shipping" : "Unpaid",
             expedition,
             shippingType,
             deliveryFee,
