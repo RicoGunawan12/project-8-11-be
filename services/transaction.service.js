@@ -341,14 +341,14 @@ export const requestPickupTransactionService = async (transaction) => {
                 },
             }
         )
+        return updatedTransaction;
     } catch (error) {
         console.log(error);
         
         throw new Error("Failed to request pickup");
     }
 
-
-    return updatedTransaction;
+    return null;
 }
 
 export const deliveryDetailService = async (orderNumber) => {
