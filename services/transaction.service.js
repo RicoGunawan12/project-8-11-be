@@ -330,23 +330,23 @@ export const createKomshipOrderService = async (transaction) => {
 export const requestPickupTransactionService = async (transaction) => {
     try {
         const pickupResponse = await requestPickUpKomship(transaction.komshipOrderNumber);
+        const updatedTransaction = await TransactionHeaderModel.update(
+            {
+                status: 'Shipping',
+                awb: pickupResponse.data[0].awb ? pickupResponse.data[0].awb : "-"
+            },
+            {
+                where: {
+                    transactionId: transaction.transactionId
+                },
+            }
+        )
     } catch (error) {
         console.log(error);
         
         throw new Error("Failed to request pickup");
     }
 
-    const updatedTransaction = await TransactionHeaderModel.update(
-        {
-            status: 'Shipping',
-            awb: pickupResponse.data[0].awb ? pickupResponse.data[0].awb : "-"
-        },
-        {
-            where: {
-                transactionId: transaction.transactionId
-            },
-        }
-    )
 
     return updatedTransaction;
 }
