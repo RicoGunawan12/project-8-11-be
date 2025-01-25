@@ -123,7 +123,7 @@ export const createTransaction = async (req, res) => {
         var freeOngkir = 0;
         const freeOngkirData = await getFreeOngkirService();
         if (freeOngkirData.status === "Active" && totalPrice - deliveryFee >= freeOngkirData.minimumPaymentAmount) {
-            freeOngkir = deliveryFee - freeOngkirData.maximumFreeOngkir == 0 ? 
+            freeOngkir = deliveryFee - freeOngkirData.maximumFreeOngkir <= 0 ? 
                         deliveryFee : 
                         deliveryFee - freeOngkirData.maximumFreeOngkir;
             totalPrice -= freeOngkir;
