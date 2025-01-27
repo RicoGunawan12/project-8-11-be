@@ -44,6 +44,11 @@ const Voucher = sequelize.define('vouchers', {
     field: "quota",
     type: DataTypes.INTEGER,
     // allowNull: true
+  },
+  minimumPayment: {
+    field: "minimum_payment",
+    type: DataTypes.INTEGER,
+    allowNull: false
   }
 },{
   timestamps: false

@@ -55,5 +55,13 @@ export const voucherSchema = {
     },
     optional: true,
     toFloat: true,
+  },
+  minimumPayment: {
+    isInt: {
+      options: { min: 1 },
+      errorMessage: 'Minimum payment must be more than 0',
+    },
+    optional: true,
+    toFloat: true,
   }
 };

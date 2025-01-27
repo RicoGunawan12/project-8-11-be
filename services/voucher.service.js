@@ -8,7 +8,7 @@ export const getAllVouchersService =  async ()=> {
   return voucher
 }
 
-export const checkVoucherByCodeService = async (code) => {
+export const checkVoucherByCodeService = async (code, totalPrice) => {
   const voucher =  await VoucherModel.findOne({
     where: {
       voucherCode: code,
@@ -16,6 +16,14 @@ export const checkVoucherByCodeService = async (code) => {
       voucherEndDate: { [Op.gte]: new Date().setHours(0, 0, 0, 0) },
     }
   })
+
+  if (!voucher) {
+    throw new Error(`There is no voucher with ${code} code`)
+  }
+
+  if (totalPrice < voucher.minimumPayment) {
+    throw new Error(`The total price must be at least Rp ${voucher.minimumPayment.toLocaleString('id-ID')} to use this voucher.`)
+  }
   console.log(voucher)
   return voucher
 }
@@ -105,6 +113,7 @@ export const updateVouchersService = async (req) => {
           voucherStartDate: voucher.voucherStartDate || null,
           maxDiscount: voucher.maxDiscount,
           discount: voucher.discount,
+          minimumPayment: voucher.minimumPayment
         },
         {
           where: {
@@ -189,6 +198,10 @@ export const applyVoucherService = async (voucherCode, totalAmount) => {
 
   if(voucher.voucherEndDate && (voucher.voucherEndDate && new Date(voucher.voucherEndDate) < new Date().setHours(0,0,0,0))){
     throw new Error("Voucher has expired")
+  }
+
+  if (totalAmount < voucher.minimumPayment) {
+    throw new Error(`The total price must be at least Rp ${voucher.minimumPayment.toLocaleString('id-ID')} to use this voucher.`)
   }
   const totalDiscount = calculateVoucherDiscount(voucher.voucherType,totalAmount,voucher.discount, voucher.maxDiscount)
 

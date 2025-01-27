@@ -27,16 +27,20 @@ export const getAllVouchers = async (req, res) => {
 export const getVoucherByCode = async (req, res) => {
   // console.log(req);
   res.set("Cache-Control", "no-store");
-  const { code } = req.query;
+  const { code, totalPrice } = req.query;
   const userId = req.user.userId;
 
   const voucherHasUsed = await checkTransactionWithVoucher(code, userId);
   if (!voucherHasUsed) {
-      const vouchers = await checkVoucherByCodeService(code);
-      if(vouchers){
-        return res.status(200).json(vouchers);
+      try {
+        const vouchers = await checkVoucherByCodeService(code, totalPrice);
+        if(vouchers){
+          return res.status(200).json(vouchers);
+        }
+        return res.status(400).json({ message: "Invalid Voucher!" });
+      } catch (error) {
+        return res.status(400).json({ message: error.message });
       }
-      return res.status(400).json({ message: "Invalid Voucher!" });
     }
     return res.status(400).json({ message: "Voucher has used!" });
 };
