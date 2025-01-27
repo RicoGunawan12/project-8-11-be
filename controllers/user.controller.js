@@ -21,7 +21,7 @@ export const registerUser = async (req, res) => {
   }
   
   try {
-    await sendEmailPostRegister(email, fullName, "id");
+    // await sendEmailPostRegister(email, fullName, "id");
     const user = await registerUserService(fullName, email, password, phoneNumber);
     return res.status(201).json({ message: 'User registered successfully', user: user.fullName });
   } catch (error) {
@@ -42,7 +42,6 @@ export const getUsers = async (req, res) => {
 export const getUserById = async (req, res) => {
   const userId = req.user.userId;
 
-  // console.log(userId)
   try {
     const user = await getUserByIdService(userId);
     return res.status(200).json(user)
@@ -142,7 +141,6 @@ export const getLoggedInUser = async (req, res) => {
       const userId = decoded.userId;
 
       const user = await getUserByIdService(userId);
-      console.log(user, decoded, userId);
 
       if (!(user.role == "admin" || user.role == "user")) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -155,7 +153,6 @@ export const getLoggedInUser = async (req, res) => {
         status: user.status
       }});
     } catch (error) {
-      console.log(error);
       if (error.name == "TokenExpiredError") {
         return res.status(401).json({ message: "Token has expired" });
       }

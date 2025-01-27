@@ -21,6 +21,16 @@ export const createProductVariantService = async (
   return productVariant;
 };
 
+export const getProductVariantByIdSevice = async(
+  id
+) => {
+
+ 
+  return await ProductVariantModel.findOne({
+    where: {productVariantId : id}
+  })
+}
+
 export const updateProductQuantityService = async (
   productVariantId,
   quantity
@@ -93,7 +103,7 @@ export const bulkUpdateProductStockService = async (products) => {
 
   const missingSkus = skus.filter((sku) => !existingSkus.includes(sku));
 
-  console.log("missing", missingSkus);
+ 
   if (missingSkus.length > 0) {
     throw new Error(
       `The following SKUs were not found: ${missingSkus.join(", ")}`

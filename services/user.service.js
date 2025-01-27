@@ -12,7 +12,7 @@ export const getUsersService = async () => {
 }
 
 export const getUserByIdService = async (userId) => {
-  // console.log("pong")
+ 
   const user = await UserModel.findOne({ where: { userId }});
   if (!user) {
     throw new Error('User not found!');
@@ -37,7 +37,7 @@ export const registerUserService = async (fullName, email, password, phone) => {
   const cart = await createCart(user.userId);
 
   const customer = await createCustomerXendit(user.userId, fullName, email, phone);
-  // console.log(customer);
+ 
   await UserModel.update(
     { customerId: customer.id },
     { where: { userId: user.userId }}
@@ -57,7 +57,7 @@ export const registerAdminService = async (fullName, email, password, phone) => 
   // const cart = await createCart(user.userId);
   
   // const customer = await createCustomerXendit(user.userId, fullName, email, phone);
-  // console.log(customer);
+ 
   // await UserModel.update(
   //   { customerId: customer.id },
   //   { where: { userId: user.userId }}
@@ -112,8 +112,8 @@ export const loginAdminService = async (email, password) => {
     throw new Error('Invalid credential!');
   }
 
-  console.log(password);
-  console.log(existingUser.password);
+ 
+ 
   
   const isMatch = await matchPassword(password, existingUser.password);
   if (!isMatch) {

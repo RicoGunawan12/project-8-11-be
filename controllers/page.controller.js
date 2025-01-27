@@ -188,7 +188,7 @@ export const getWhyContent = async (req, res) => {
 
 export const updateEngAboutPage = async (req, res) => {
 
-    const { contentEng, titleEng, whyEng, whyContentJSONEng, whyContentId } = req.body;
+    const { contentEng, titleEng, whyEng, whyContentJSONEng, whyContentId, introduceEng } = req.body;
     const id = req.params.id
     if (!id || typeof id !== 'string') {
         return res.status(400).json({ error: "Invalid or missing ID parameter." });
@@ -212,9 +212,8 @@ export const updateEngAboutPage = async (req, res) => {
     if (!whyContentId || typeof whyContentId !== 'string') {
         return res.status(400).json({ error: "Invalid or missing why content ID parameter." });
     }
-
     try {
-        const response = await updateEngAboutPageService(id, contentEng, titleEng, whyEng);
+        const response = await updateEngAboutPageService(id, contentEng, titleEng, whyEng, introduceEng);
         const whyResponse = await updateEngWhyContentService(whyContentJSONEng, whyContentId);
         return res.status(200).json({ message: "About Page updated!" });
     } catch (error) {
@@ -224,7 +223,7 @@ export const updateEngAboutPage = async (req, res) => {
 
 export const updateIndoAboutPage = async (req, res) => {
 
-    const { contentIndo, titleIndo, whyIndo, whyContentJSONIndo, whyContentId } = req.body;
+    const { contentIndo, titleIndo, whyIndo, whyContentJSONIndo, whyContentId, introduceIndo } = req.body;
     const id = req.params.id
 
     if (!id || typeof id !== 'string') {
@@ -251,8 +250,9 @@ export const updateIndoAboutPage = async (req, res) => {
     }
 
 
+
     try {
-        const response = await updateIndoAboutPageService(id, contentIndo, titleIndo, whyIndo);
+        const response = await updateIndoAboutPageService(id, contentIndo, titleIndo, whyIndo, introduceIndo);
         const whyResponse = await updateIndoWhyContentService(whyContentJSONIndo, whyContentId);
         return res.status(200).json({ message: "About Page updated!" });
     } catch (error) {

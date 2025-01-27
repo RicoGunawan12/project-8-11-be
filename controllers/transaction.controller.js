@@ -91,7 +91,6 @@ export const createTransaction = async (req, res) => {
             return res.status(400).json({ message: "There is no items in cart!" });
         }
         const productsInCart = userCart;
-        // console.log(userCart);
 
         // calculate the total price
         // calculate the total weight
@@ -100,9 +99,7 @@ export const createTransaction = async (req, res) => {
         await Promise.all(
             productsInCart.map(async (product) => {
                 if (product.quantity === 1) {
-                    // console.log(product.product_variant.ref_product_id);
                     const promoDetails = await checkPromoService(product.product_variant.ref_product_id, userId);
-                    // console.log(product.product_variant.productPrice);
                     if (promoDetails) {
                         product.product_variant.productPrice =
                         product.product_variant.productPrice - promoDetails.promo.promoAmount <= 0 ? 0 :
@@ -111,7 +108,6 @@ export const createTransaction = async (req, res) => {
                         
                         const promoHistory = await createPromoHistoryService(promoDetails.promo.promoId, userId, product.product_variant.ref_product_id);
                     }
-                    // console.log(product.product_variant.productPrice);
                 }
 
                 const itemTotal = product.product_variant.productPrice * product.quantity;
@@ -207,7 +203,6 @@ export const createTransaction = async (req, res) => {
         
 
     } catch (error) {
-        console.log(error);
 
         await seqTransaction.rollback();
         return res.status(500).json({ message: error.message });
@@ -407,11 +402,9 @@ export const printLabel = async (req, res) => {
 
     try {
         const label = await printLabelService(komshipOrderNumbers);
-        console.log(label);
 
         return res.status(200).json({ message: "Success!", label });
     } catch (error) {
-        console.log(error);
         return res.status(500).json({ message: error.message });
     }
 }
@@ -592,14 +585,12 @@ export const refundTransaction = async (req, res) => {
     try {
         const transaction = await getTransactionsByIdService(transactionId);
         const gatewayResponse = JSON.parse(transaction.gatewayResponse);
-        console.log(gatewayResponse);
 
         const refundRequest = await refundXendit(transactionId, gatewayResponse.data.attempt_details[0].action_id, transaction.totalPrice);
         await updateTransactionService(transactionId, "Return");
 
         return res.status(200).json({ message: "Transaction refunded!" })
     } catch (error) {
-        console.log(error);
         return res.status(500).json({ message: error.message });
     }
 }
@@ -616,18 +607,14 @@ export const cancelPaidTransaction = async (req, res) => {
 
         await rollbackTransaction(transactionId);
         const cancelledTransaction = await cancelTransactionService(transactionId);
-        console.log(transaction.komshipOrderNumber);
 
         const gatewayResponse = JSON.parse(transaction.gatewayResponse);
         const refundRequest = await refundXendit(transactionId, gatewayResponse.data.attempt_details[0].action_id, transaction.totalPrice);
-        console.log(refundRequest);
 
         // const cancelledKomshipOrder = await cancelOrderKomship(transaction.komshipOrderNumber);
-        // console.log(cancelledKomshipOrder);
 
         return res.status(200).json({ message: "Transaction cancelled!" })
     } catch (error) {
-        console.log(error);
 
         return res.status(500).json({ message: error.message });
     }

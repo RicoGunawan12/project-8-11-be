@@ -343,7 +343,7 @@ export const requestPickupTransactionService = async (transaction) => {
         )
         return updatedTransaction;
     } catch (error) {
-        console.log(error);
+ 
         
         throw new Error("Failed to request pickup");
     }
@@ -530,7 +530,7 @@ export const cancelTransactionService = async (transactionId) => {
             },
         }
     )
-    console.log(updatedTransaction);
+ 
     
     // if (updatedTransaction[0] === 0) {
     //     throw new Error("There is no change or no transaction");
@@ -621,8 +621,8 @@ export const checkTransactionWithVoucher = async (voucherCode, userId) => {
 };
 
 export const updatePaymentLinkService = async (transaction, paymentLink) => {
-    console.log(paymentLink);
-    console.log(transaction.transactionId);
+ 
+ 
 
     const updatedTransaction = await TransactionHeaderModel.update(
         {
@@ -672,7 +672,7 @@ export const rollbackTransaction = async (transactionId) => {
         }
   
         productVariant.productStock = productVariant.productStock + quantity;
-        console.log(productVariant);
+ 
         
         await productVariant.save({ transaction });
       }

@@ -9,8 +9,8 @@ export const getPageService = async () => {
         const contentJSONEng = page.contentJSONEng ? JSON.parse(page.contentJSONEng) : {};
         const contentJSONIndo = page.contentJSONIndo ? JSON.parse(page.contentJSONIndo) : {};
         
-        // console.log("Parsed contentJSONEng:", contentJSONEng);
-        // console.log("Parsed contentJSONIndo:", contentJSONIndo);
+ 
+ 
         
         return {
             ...page.toJSON(),
@@ -32,8 +32,8 @@ export const getWhyContentService = async () => {
         const whyContentJSONEng = whyContent.whyContentJSONEng ? JSON.parse(whyContent.whyContentJSONEng) : {};
         const whyContentJSONIndo = whyContent.whyContentJSONIndo ? JSON.parse(whyContent.whyContentJSONIndo) : {};
         
-        // console.log("Parsed contentJSONEng:", contentJSONEng);
-        // console.log("Parsed contentJSONIndo:", contentJSONIndo);
+ 
+ 
         
         return {
             ...whyContent.toJSON(),
@@ -172,7 +172,7 @@ export const migratePage = async () => {
             const contentJSONEng = JSON.stringify(body)
             const contentJSONIndo = JSON.stringify(body2)
             Page.create({ contentJSONEng, contentJSONIndo });
-            // console.log("Migrate page success!");
+ 
         } catch (error) {
             console.error(error.message);
         }
@@ -192,7 +192,7 @@ export const migrateAboutPage = async () => {
             const introduceEng = "Introduce Eng"
             const introduceIndo = "Introduce Indo"
             AboutPage.create({ contentEng, contentIndo, titleEng, titleIndo, whyEng, whyIndo, introduceEng, introduceIndo });
-            // console.log("Migrate page success!");
+ 
         } catch (error) {
             console.error(error.message);
         }
@@ -287,12 +287,13 @@ export const updateIndoPageService = async (id, contentJSONIndo) => {
     return updatedPage;
 }
 
-export const updateEngAboutPageService = async (id, contentEng, titleEng, whyEng) => {
+export const updateEngAboutPageService = async (id, contentEng, titleEng, whyEng, introduceEng) => {
     const updatedPage = await AboutPage.update(
         { 
             contentEng: contentEng, 
             titleEng: titleEng,
-            whyEng: whyEng
+            whyEng: whyEng,
+            introduceEng : introduceEng
         },
         { 
             where: {
@@ -304,12 +305,13 @@ export const updateEngAboutPageService = async (id, contentEng, titleEng, whyEng
     return updatedPage;
 }
 
-export const updateIndoAboutPageService = async (id, contentIndo, titleIndo, whyIndo) => {
+export const updateIndoAboutPageService = async (id, contentIndo, titleIndo, whyIndo, introduceIndo) => {
     const updatedPage = await AboutPage.update(
         { 
             contentIndo: contentIndo, 
             titleIndo: titleIndo,
-            whyIndo: whyIndo
+            whyIndo: whyIndo,
+            introduceIndo: introduceIndo
         },
         { 
             where: {
