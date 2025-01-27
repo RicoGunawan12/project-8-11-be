@@ -26,7 +26,7 @@ export const createCreditCardTransactionXendit = async (
     card_holder_last_name,
     card_holder_phone_number,
 ) => {
-    // console.log(
+ 
     //     amount,
     //     card_number,
     //     card_exp_month,
@@ -176,19 +176,19 @@ export const createCustomerXendit = async (userId, fullName, email, phone) => {
         const result = await xenditResponse.json();
         return result;
     } catch (error) {
-        // console.log(error);
+ 
         throw new Error(error.message);
     }
 }
 
 export const createPlanXendit = async (transaction, customerId, productsInCart, disc) => {
-    console.log(disc);
+ 
     
     const items = productsInCart.map((product) => {
-        console.log(product.product_variant.product.productName + " - " + product.product_variant.productColor);
-        console.log(product.product_variant.productPrice);
-        console.log(product.quantity);
-        console.log(process.env.BASE_URL + product.product_variant.productImage);
+ 
+ 
+ 
+ 
         
         return {
             type: "PHYSICAL_PRODUCT",
@@ -253,7 +253,7 @@ export const createPlanXendit = async (transaction, customerId, productsInCart, 
         url: "https://th.bing.com/th/id/OIP.ULq5QQnJfNFuhcLNBVqzAwHaE7?w=250&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
     })
     body.items = items; 
-    console.log(body);
+ 
 
     const requestOptions = {
         method: 'POST',
@@ -264,7 +264,7 @@ export const createPlanXendit = async (transaction, customerId, productsInCart, 
 
     try {
         const xenditResponse = await fetch(`${process.env.XENDIT_URL}/recurring/plans`, requestOptions);
-        console.log(xenditResponse);
+ 
         
         if (!xenditResponse.ok) {
             throw new Error(`Error: ${xenditResponse.statusText}`);
@@ -272,7 +272,7 @@ export const createPlanXendit = async (transaction, customerId, productsInCart, 
         const result = await xenditResponse.json();
         return result;
     } catch (error) {
-        console.log(error);
+ 
         throw new Error(error.message);
     }
 }
@@ -304,7 +304,7 @@ export const refundXendit = async (transactionId, paymentRequestId, amount) => {
             reason: "REQUESTED_BY_CUSTOMER",
             payment_request_id: paymentRequestId
         }
-        console.log(body);
+ 
         
         const requestOptions = {
             method: 'POST',
@@ -314,7 +314,7 @@ export const refundXendit = async (transactionId, paymentRequestId, amount) => {
         }
 
         const xenditResponse = await fetch(`${process.env.XENDIT_URL}/refunds`, requestOptions);
-        console.log(xenditResponse);
+ 
         
         if (!xenditResponse.ok) {
             throw new Error(`Error: ${xenditResponse.statusText}`);

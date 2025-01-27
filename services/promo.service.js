@@ -70,7 +70,7 @@ export const checkPromoService = async (productId, userId) => {
                 },
             ],
         });
-        console.log(promoDetail);
+ 
         
         if (promoDetail) {
             const promoUsed = await PromoHistoryModel.findOne({

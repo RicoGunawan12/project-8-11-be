@@ -118,7 +118,6 @@ export const calculateDeliveryFee = async (req, res) => {
 
     try {
         const adminAddress = await getPickUpPointService();
-        console.log(adminAddress);
         
         const calculationResult = await calculateDeliveryFeeService(adminAddress[0].komshipAddressId, receiverDestinationId, weight, itemValue, cod);
         return res.status(200).json({ message: "Fetch success!", calculationResult });

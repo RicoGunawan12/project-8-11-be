@@ -25,7 +25,7 @@ export const getAllVouchers = async (req, res) => {
 };
 
 export const getVoucherByCode = async (req, res) => {
-  // console.log(req);
+ 
   res.set("Cache-Control", "no-store");
   const { code } = req.query;
   const userId = req.user.userId;
@@ -42,7 +42,7 @@ export const getVoucherByCode = async (req, res) => {
 };
 
 export const getByCodeNonUser = async (req, res) => {
-  // console.log(req);
+ 
   res.set("Cache-Control", "no-store");
   const { code } = req.query;
   const vouchers = await getVoucherByCodeService(code);
@@ -71,7 +71,7 @@ export const createVouchers = async (req, res) => {
 
 export const updateVouchers = async (req, res) => {
   try {
-    // console.log("dasd");
+ 
     await updateVouchersService(req.body);
     return res.status(200).json({ message: "Voucher updated successfully" });
   } catch (error) {

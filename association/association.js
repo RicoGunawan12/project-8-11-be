@@ -1,4 +1,5 @@
 
+import { Bogo } from "./bogo.association.js";
 import { Cart, CartItem } from "./cart.association.js";
 import { ContentDetail, ContentHeader, Page } from "./content.association.js";
 import { ProductCategory, ProductCover, Rating } from "./product.association.js";
@@ -30,6 +31,7 @@ const ContentHeaderModel = ContentHeader
 const ContentDetailModel = ContentDetail
 const PageModel = Page
 const ProductCoverModel = ProductCover
+const BogoModel = Bogo
 
 export { 
     PaymentMethodModel, 
@@ -49,5 +51,6 @@ export {
     PromoDetailModel,
     RatingModel,
     ProductCoverModel,
-    PromoHistoryModel
+    PromoHistoryModel,
+    BogoModel,
 };

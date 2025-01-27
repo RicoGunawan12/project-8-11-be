@@ -25,7 +25,6 @@ export const createCarousel = async (req, res) => {
 
     const image = req.files['carouselImage'];
     const imageMobile = req.files['carouselImageMobile'];
-    // console.log(image);
     if (typeof titleEng !== 'string' || titleEng.trim() === '') {
         return res.status(400).json({ message: 'English title is required' });
     }
@@ -79,7 +78,6 @@ export const createCarousel = async (req, res) => {
         );
         return res.status(200).json({ message: "Carousel created!", carousel })
     } catch (error) {
-        console.log(error);
 
         return res.status(500).json({ message: error.message });
     }
@@ -158,7 +156,6 @@ export const updateCarousel = async (req, res) => {
         );
         return res.status(200).json({ message: "Carousel updated!", carousel })
     } catch (error) {
-        console.log(error);
         return res.status(500).json({ message: error.message });
     }
 }

@@ -202,7 +202,7 @@ export const getProductPaginationService = async (
   };
   whereCondition.productActivityStatus = "active";
 
-  // console.log(search)
+ 
 
   const products = ProductModel.findAll({
     attributes: [
@@ -282,11 +282,11 @@ export const getProductPaginationService = async (
     limit: parseInt(limit) || 0,
     offset: parseInt(offset) || 0,
   });
-  // console.log("asd")
+ 
   // if (!products || products.length === 0) {
   //   throw new Error("No products match the query parameters");
   // }
-  // console.log(products)
+ 
   return products;
 };
 
@@ -296,7 +296,7 @@ export const getProductCountService = async (search, category) => {
     [Op.like]: `%${search}%`,
   };
   whereCondition.productActivityStatus = "active";
-  // console.log(search);
+ 
 
   const count = await ProductModel.count({
     where: whereCondition,
@@ -308,7 +308,7 @@ export const getProductCountService = async (search, category) => {
       },
     ],
   });
-  // console.log(count);
+ 
 
   return count;
 };
@@ -627,7 +627,7 @@ export const createProductService = async (
   productWidth,
   productHeight
 ) => {
-  console.log("checking category");
+ 
   const category = await getCategoryByName(productCategoryName);
   if (!category) {
     throw new Error("There is no " + productCategoryName + " category");
@@ -641,7 +641,7 @@ export const createProductService = async (
   }
 
   const productCategoryId = category.productCategoryId;
-  console.log("creating product");
+ 
   const product = await ProductModel.create({
     productName,
     productDescription,
@@ -724,7 +724,7 @@ export const updateProductService = async (
         transaction,
       });
     }
-    console.log(variantsToUpdate);
+ 
 
     // Update existing variants
     for (const variant of variantsToUpdate) {
@@ -759,7 +759,7 @@ export const updateProductService = async (
     return product;
   } catch (error) {
     // Rollback the transaction on error
-    console.log(error);
+ 
 
     await transaction.rollback();
     if (error.name === "SequelizeUniqueConstraintError") {
@@ -877,7 +877,7 @@ export const getBestSellerService = async () => {
     ],
     // group: ["products.product_id"],
   });
-  console.log(bestSellerProduct);
+ 
 
   return bestSellerProduct;
 };
@@ -925,4 +925,8 @@ export const generateUpdateStockExcelService = async () => {
   return { excelBuffer, fileName };
 };
 
+export const getAllVariantService = async() => {
+  const variants = await ProductVariantModel.findAll()
 
+  return variants
+}

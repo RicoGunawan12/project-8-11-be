@@ -16,7 +16,7 @@ export const checkVoucherByCodeService = async (code) => {
       voucherEndDate: { [Op.gte]: new Date().setHours(0, 0, 0, 0) },
     }
   })
-  console.log(voucher)
+ 
   return voucher
 }
 
@@ -26,7 +26,7 @@ export const getVoucherByCodeService = async (code) => {
       voucherCode: code,
     }
   })
-  console.log(voucher)
+ 
   return voucher
 }
 
@@ -77,11 +77,11 @@ export const createVouchersService = async (vouchers) => {
 // #region UPDATE
 
 export const updateVouchersService = async (req) => {
-  // console.log("asdd")
+ 
   const { vouchers } = req;
   const voucherCodes = vouchers.map((code) => code.voucherCode);
 
-  // console.log(voucherCodes)
+ 
 
   const isExists = await getVoucherByCodeListService(voucherCodes);
   if (isExists.length !== vouchers.length) {
@@ -97,7 +97,7 @@ export const updateVouchersService = async (req) => {
   for (const voucher of vouchers) {
 
     try {
-      // console.log('Voucher to update:', voucher);
+ 
   
       const [updatedRowCount] = await VoucherModel.update(
         {
@@ -113,7 +113,7 @@ export const updateVouchersService = async (req) => {
         }
       );
   
-      // console.log(`Updated ${updatedRowCount} rows for voucher code ${voucher.voucherCode}`);
+ 
       if (updatedRowCount === 0) {
         console.warn(`No rows updated for voucher code ${voucher.voucherCode}`);
       }
@@ -122,7 +122,7 @@ export const updateVouchersService = async (req) => {
     }
   }
 
-  // console.log("test")
+ 
 
   return;
 };
@@ -161,7 +161,7 @@ export const deleteVouchersByCodeService = async (code) =>{
 
 export const calculateVoucherDiscount = async (voucherTypeCode, amount, discountAmount, maxDiscount) => {
   voucherTypeCode = voucherTypeCode.toUpperCase();
-  console.log(voucherTypeCode, amount, discountAmount, maxDiscount);
+ 
   
   switch(voucherTypeCode) {
     case 'FIXED':

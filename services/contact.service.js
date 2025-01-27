@@ -78,7 +78,7 @@ export const migrateContactService = async () => {
             }
             ContactToSend.create(body);
         }
-        // console.log("Migrate contact success!");
+ 
     } catch (error) {
         throw new Error(error.message)
     }

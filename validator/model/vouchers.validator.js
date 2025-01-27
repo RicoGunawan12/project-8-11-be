@@ -13,12 +13,12 @@ export const vouchersValidator = [
     for (const validator of schemaValidator) {
       await validator.run(voucherRequest);
     }
-    // console.log("testing")
+ 
     const result = validationResult(voucherRequest);
     if (!result.isEmpty()) {
       throw new Error(result.array()[0].msg);
     }
-    // console.log("voucher good")
+ 
     return true;
   }),
 ];

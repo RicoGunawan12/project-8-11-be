@@ -15,7 +15,6 @@ export const getPromo = async (req, res) => {
 export const createPromo = async (req, res) => {
 
     const { promoName, promoAmount, startDate, endDate, products } = req.body;
-    // console.log(req.body);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);

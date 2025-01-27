@@ -34,6 +34,7 @@ import { migrateFreeOngkirService } from './services/freeOngkir.service.js';
 import { migrateCODDataService } from './services/codData.service.js';
 import CODRoute from './routes/codData.route.js';
 import EmailTemplateRoute from './routes/emailTemplate.route.js';
+import BogoRoute from './routes/bogo.route.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -77,6 +78,7 @@ app.use('/api/locations', LocationRoute);
 app.use('/api/free/ongkir', FreeOngkirRoute);
 app.use('/api/cod', CODRoute);
 app.use('/api/email-templates', EmailTemplateRoute);
+app.use('/api/bogos', BogoRoute);
 
 (async () => {
   try {

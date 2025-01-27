@@ -14,7 +14,8 @@ import {
   deleteProductsService,
   updateActivityStatusService,
   getProductByIdWithRelatedProductService,
-  generateUpdateStockExcelService
+  generateUpdateStockExcelService,
+  getAllVariantService
 } from "../services/product.service.js";
 import { getCategoryWithProductService } from "../services/productCategory.service.js";
 import { createProductCoverService } from "../services/productCover.service.js";
@@ -249,7 +250,6 @@ export const validateProduct = (req, res, next) => {
 
 export const createProduct = async (req, res) => {
   try {
-    console.log("create product");
     const images = req.files?.["productImage"] || [];
     const defaultImage = req.files?.["defaultImage"] || [];
 
@@ -265,7 +265,6 @@ export const createProduct = async (req, res) => {
       productHeight,
     } = req.body;
 
-    console.log("validation");
     // Input validation (keeping existing validation)
     if (
       !productName ||
@@ -334,7 +333,6 @@ export const createProduct = async (req, res) => {
         .json({ message: `Product height must be greater than 0` });
     }
 
-    console.log("variant");
     let variants = [];
     if (productVariants) {
       let tempVariants;
@@ -410,18 +408,6 @@ export const createProduct = async (req, res) => {
     }
 
     // Create the base product
-    console.log("create product");
-    console.log(
-      productName,
-      productDescription,
-      productCategoryName,
-      null,
-      productSize,
-      productWeight,
-      productLength,
-      productWidth,
-      productHeight
-    );
 
     const product = await createProductService(
       productName,
@@ -435,7 +421,6 @@ export const createProduct = async (req, res) => {
       productHeight
     );
 
-    console.log("default image");
     // Process default images if they exist
     if (defaultImage && defaultImage.length > 0) {
       const insertProductCover = defaultImage.map(async (image) => {
@@ -447,11 +432,9 @@ export const createProduct = async (req, res) => {
       await Promise.all(insertProductCover);
     }
 
-    console.log("variant image");
     // Process variants if they exist
     if (variants.length > 0) {
       const insertVariantPromise = variants.map(async (variant) => {
-        console.log(variant);
 
         const insertedProduct = await createProductVariantService(
           product.productId,
@@ -460,7 +443,6 @@ export const createProduct = async (req, res) => {
           variant.productPrice,
           variant.productStock
         );
-        console.log(insertedProduct);
       });
       await Promise.all(insertVariantPromise);
     }
@@ -565,7 +547,6 @@ export const updateProduct = async (req, res) => {
 
     let tempVariants;
 
-    console.log("variant");
 
     try {
       tempVariants = JSON.parse(productVariants);
@@ -603,7 +584,6 @@ export const updateProduct = async (req, res) => {
       return res.status(400).json({ message: `${error.message}` });
     }
 
-    console.log("past variant");
 
     // if (!images || !Array.isArray(images) || images.length < 1) {
     //   return res.status(400).json({ message: "Variant image is required" });
@@ -617,13 +597,11 @@ export const updateProduct = async (req, res) => {
     // }
 
     const hash = new Map();
-    console.log(images);
 
     if (images) {
       for (let i = 0; i < images.length; i++) {
         const image = images[i];
   
-        // console.log("img: " + image.originalname.replace(/\.[^/.]+$/, ""));
   
         // converts image to WebP format
         const filename = `${Date.now()}-${req.body.productName}.webp`;
@@ -649,16 +627,13 @@ export const updateProduct = async (req, res) => {
 
     const variants = JSON.parse(productVariants);
     variants.forEach((variant) => {
-      // console.log(productName + " - " + variant.productSize + " - " + variant.productColor);
 
-      // console.log("hash: " + hash.get(productName + " - " + variant.productSize + " - " + variant.productColor));
 
       variant.productImage = hash.get(
         productName + " - " + variant.productColor
       );
     });
 
-    // console.log(defaultImage);
 
     // converts image to WebP format
     // let defaultImageString = '';
@@ -890,7 +865,6 @@ export const getCategoryWithProduct = async (req, res) => {
     const products = await getCategoryWithProductService();
     return res.status(200).json({ message: "Product fetched!", products });
   } catch (error) {
-    console.log(error);
 
     return res.status(500).json({ message: error.message });
   }
@@ -975,7 +949,6 @@ export const generateUpdateStockExcel = async (req, res) => {
 
 export const readUpdateStockExcel = async (req, res) => {
   try {
-    console.log(req.file);
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
@@ -995,12 +968,21 @@ export const readUpdateStockExcel = async (req, res) => {
 
 export const bulkUpdateProductStock = async (req,res) => {
   const { products } = req.body;
-  console.log(products)
   try {
     await bulkUpdateProductStockService(products)
     return res.status(200).json({ message: "Product Stock Successfully Updated !" });
   } catch (error) {
-    console.log(error)
+    return res.status(500).json({ message: error.message });
+  }
+}
+
+export const getAllVariant = async(req, res) => {
+  try {
+    const allVariant = await getAllVariantService();
+    return res
+      .status(200)
+      .json({ message: "Variant fetched!", allVariant });
+  } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 }

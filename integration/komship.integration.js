@@ -183,30 +183,6 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
         //     ]
         // })
     };
-    console.log({
-        order_date: formatDateToString(new Date()),
-        brand_name: "Tyeso Indonesia Official Store",
-        shipper_name: adminAddress.senderName,
-        shipper_phone: adminAddress.senderPhoneNumber,
-        shipper_destination_id: parseInt(adminAddress.komshipAddressId),
-        shipper_address: adminAddress.addressDetail,
-        shipper_email: contact.email,
-        receiver_name: transaction.user_address.receiverName, //ambil dari transaction
-        receiver_phone: transaction.user_address.receiverPhoneNumber.replace('+', ''), //ambil dari transaction
-        receiver_destination_id: parseInt(transaction.user_address.komshipAddressId), //ambil dari transaction,
-        receiver_address: transaction.user_address.addressDetail, // ambil dari transaction
-        shipping: transaction.expedition, // ambil dari transaction,
-        shipping_type: transaction.shippingType, // ambil dari transaction
-        payment_method: transaction.paymentMethod === "COD" ? "COD" : "BANK TRANSFER",
-        shipping_cost: transaction.deliveryFee, // ambil dari transaction
-        shipping_cashback: transaction.deliveryCashback,
-        service_fee: transaction.paymentMethod === "COD" ? transaction.totalPrice * 2.8 / 100 : 0,
-        additional_cost: 0,
-        grand_total: transaction.totalPrice,
-        cod_value: transaction.paymentMethod === "COD" ? transaction.totalPrice : 0,
-        insurance_value: 0,
-        order_details: transactionDetails
-    });
     
     // console.log(requestOptions);
     try {

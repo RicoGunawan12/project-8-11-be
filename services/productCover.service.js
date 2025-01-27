@@ -7,7 +7,7 @@ export const createProductCoverService = async (productId, productCover) => {
 }
 
 export const deleteProductByProductIdService = async (productId, productName) => {
-    console.log(`assets/product/${productName}`);
+ 
     
     deleteDirectory(`assets/product/${productName}`);
     await ProductCoverModel.destroy({ where: { productId }})

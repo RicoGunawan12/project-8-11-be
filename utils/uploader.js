@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
   filename: function (req, file, cb) {
     try {
       if (file.fieldname === 'defaultImage') {
-        console.log(file);
+ 
         
         cb(null, file.originalname);
       }
@@ -137,11 +137,11 @@ const storageBackground = multer.diskStorage({
     cb(null, uploadPath);
   },
   filename: async function (req, file, cb) {
-    console.log("asdasdasd");
+ 
     try {
       // Validate index from the request body
       // var { index } = req.body;
-      console.log(req.body);
+ 
       if (!isValidNumber(req.body.index)) {
         return cb(new Error("Invalid index"));
       }
@@ -158,7 +158,7 @@ const storageBackground = multer.diskStorage({
       const index = parseInt(req.body.index);
       const page = pages[0].contentJSONEng[index].page;
       const newFilename = `${page}${index + 1}.png`;
-      console.log(newFilename);
+ 
 
       // Check if a previous file exists and delete it
       const previousFilePath = path.join(uploadPath, newFilename);
@@ -169,7 +169,7 @@ const storageBackground = multer.diskStorage({
       // Set the new filename
       cb(null, newFilename);
     } catch (error) {
-      console.log("asdasdas");
+ 
 
       console.error("Error in filename function:", error);
       cb(error); // Handle any errors gracefully
@@ -190,7 +190,7 @@ const storageWhyPhoto = multer.diskStorage({
     try {
       // Validate index from the request body
       // var { index } = req.body;
-      console.log(req.body);
+ 
       if (!isValidNumber(req.body.index)) {
         return cb(new Error("Invalid index"));
       }
@@ -208,7 +208,7 @@ const storageWhyPhoto = multer.diskStorage({
       // Set the new filename
       cb(null, newFilename);
     } catch (error) {
-      console.log("asdasdas");
+ 
 
       console.error("Error in filename function:", error);
       cb(error); // Handle any errors gracefully
@@ -233,7 +233,7 @@ const storageCarousel = multer.diskStorage({
     cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
-    console.log(req);
+ 
     cb(null, `${Date.now()}.png`);
   }
 });
@@ -251,7 +251,7 @@ export const uploadCarousel = multer({ storage: storageCarousel });
 export const deleteDirectory = (productName) => {
   const dirPath = path.join(__dirname, "../", UPLOAD_FOLDER + productName);
 
-  // console.log(dirPath);
+ 
 
 
   fs.rm(dirPath, { recursive: true, force: true }, (err) => {
@@ -259,7 +259,7 @@ export const deleteDirectory = (productName) => {
       console.error("Error deleting directory:", err);
       return { success: false, message: "Directory not found or error deleting directory" };
     }
-    // console.log("Directory deleted successfully");
+ 
     return { success: true, message: "Directory deleted successfully" };
   });
 };
@@ -274,7 +274,7 @@ export const deletePostImage = (postImage) => {
         console.error("Error deleting file:", err);
         reject({ success: false, message: "File not found or error deleting file" });
       } else {
-        // console.log("File deleted successfully");
+ 
         resolve({ success: true, message: "File deleted successfully" });
       }
     });

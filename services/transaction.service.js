@@ -329,7 +329,7 @@ export const requestPickupTransactionService = async (transaction) => {
     try {
         const pickupResponse = await requestPickUpKomship(transaction.komshipOrderNumber);
     } catch (error) {
-        console.log(error);
+ 
         
         throw new Error("Failed to request pickup");
     }
@@ -527,7 +527,7 @@ export const cancelTransactionService = async (transactionId) => {
             },
         }
     )
-    console.log(updatedTransaction);
+ 
     
     // if (updatedTransaction[0] === 0) {
     //     throw new Error("There is no change or no transaction");
@@ -590,7 +590,7 @@ export const returnTransactionService = async (transactionId) => {
 
 export const payTransactionService = async (transaction, customerId, productsInCart, disc) => {
     const response = await createPlanXendit(transaction, customerId, productsInCart, disc);
-    // console.log(response);
+ 
     return response
 }
 
@@ -618,8 +618,8 @@ export const checkTransactionWithVoucher = async (voucherCode, userId) => {
 };
 
 export const updatePaymentLinkService = async (transaction, paymentLink) => {
-    console.log(paymentLink);
-    console.log(transaction.transactionId);
+ 
+ 
 
     const updatedTransaction = await TransactionHeaderModel.update(
         {
@@ -669,7 +669,7 @@ export const rollbackTransaction = async (transactionId) => {
         }
   
         productVariant.productStock = productVariant.productStock + quantity;
-        console.log(productVariant);
+ 
         
         await productVariant.save({ transaction });
       }
