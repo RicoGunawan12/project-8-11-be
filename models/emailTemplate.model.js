@@ -13,7 +13,7 @@ const EmailTemplate = sequelize.define("email_templates", {
     field: "key",
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
+    unique: 'key',
   },
   titleEng: {
     field: "title_eng",

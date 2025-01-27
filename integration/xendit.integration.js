@@ -181,15 +181,10 @@ export const createCustomerXendit = async (userId, fullName, email, phone) => {
     }
 }
 
-export const createPlanXendit = async (transaction, customerId, productsInCart, disc) => {
- 
+export const createPlanXendit = async (transaction, customerId, productsInCart, disc, freeOngkir) => {
     
     const items = productsInCart.map((product) => {
  
- 
- 
- 
-        
         return {
             type: "PHYSICAL_PRODUCT",
             name: product.product_variant.product.productName + " - " + product.product_variant.productColor,
@@ -252,6 +247,15 @@ export const createPlanXendit = async (transaction, customerId, productsInCart, 
         quantity: 1,
         url: "https://th.bing.com/th/id/OIP.ULq5QQnJfNFuhcLNBVqzAwHaE7?w=250&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
     })
+    if (freeOngkir > 0) {
+        items.push({
+            type: "DISCOUNT",
+            name: "Free Ongkir Promo",
+            net_unit_amount: freeOngkir * -1,
+            quantity: 1,
+            url: "https://th.bing.com/th/id/OIP.ULq5QQnJfNFuhcLNBVqzAwHaE7?w=250&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+        })
+    } 
     body.items = items; 
  
 

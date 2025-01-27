@@ -627,8 +627,8 @@ export const createProductService = async (
   productWidth,
   productHeight
 ) => {
- 
-  const category = await getCategoryByName(productCategoryName);
+  console.log("checking category");
+  const category = await ProductCategoryModel.findOne({ where: { productCategoryName } });
   if (!category) {
     throw new Error("There is no " + productCategoryName + " category");
   }

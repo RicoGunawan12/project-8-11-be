@@ -178,7 +178,8 @@ export const createTransactionService = async (
     notes,
     totalPrice,
     totalWeight,
-    customerNotes
+    customerNotes,
+    freeOngkir
 ) => {
     const transaction = await TransactionHeaderModel.create({
         readableId: generateReadableId(),
@@ -197,7 +198,8 @@ export const createTransactionService = async (
         notes,
         totalPrice,
         totalWeight,
-        customerNotes
+        customerNotes,
+        freeOngkir
     })
     return transaction;
 }
@@ -328,24 +330,25 @@ export const createKomshipOrderService = async (transaction) => {
 export const requestPickupTransactionService = async (transaction) => {
     try {
         const pickupResponse = await requestPickUpKomship(transaction.komshipOrderNumber);
+        const updatedTransaction = await TransactionHeaderModel.update(
+            {
+                status: 'Shipping',
+                awb: pickupResponse.data[0].awb ? pickupResponse.data[0].awb : "-"
+            },
+            {
+                where: {
+                    transactionId: transaction.transactionId
+                },
+            }
+        )
+        return updatedTransaction;
     } catch (error) {
  
         
         throw new Error("Failed to request pickup");
     }
 
-    const updatedTransaction = await TransactionHeaderModel.update(
-        {
-            status: 'Shipping',
-        },
-        {
-            where: {
-                transactionId: transaction.transactionId
-            },
-        }
-    )
-
-    return updatedTransaction;
+    return null;
 }
 
 export const deliveryDetailService = async (orderNumber) => {
@@ -588,9 +591,9 @@ export const returnTransactionService = async (transactionId) => {
     return updatedTransaction;
 }
 
-export const payTransactionService = async (transaction, customerId, productsInCart, disc) => {
-    const response = await createPlanXendit(transaction, customerId, productsInCart, disc);
- 
+export const payTransactionService = async (transaction, customerId, productsInCart, disc, freeOngkir) => {
+    const response = await createPlanXendit(transaction, customerId, productsInCart, disc, freeOngkir);
+    // console.log(response);
     return response
 }
 

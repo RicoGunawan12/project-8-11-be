@@ -421,6 +421,14 @@ export const createProduct = async (req, res) => {
       productHeight
     );
 
+    if (!product) {
+      return res.status(400).json({ message: "There is no such category" });
+    }
+
+    console.log(product);
+    
+
+    console.log("default image");
     // Process default images if they exist
     if (defaultImage && defaultImage.length > 0) {
       const insertProductCover = defaultImage.map(async (image) => {
