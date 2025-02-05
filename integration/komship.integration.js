@@ -298,7 +298,7 @@ export const cancelOrderKomship = async (orderNumber) => {
         order_no: orderNumber
     }
     const requestOptions = {
-        method: 'POST',
+        method: 'PUT',
         headers: myHeaders,
         redirect: 'follow',
         body: JSON.stringify(body)
