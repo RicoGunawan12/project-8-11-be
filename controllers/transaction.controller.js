@@ -189,7 +189,7 @@ export const createTransaction = async (req, res) => {
         const deletedCartItem = await removeAllCartItemInUserService(userId);
         
         if (paymentMethod !== "COD" && totalPrice >= 1000) {
-            const payTransactionResponse = await payTransactionService(transaction, req.user.customerId, productsInCart, disc, freeOngkir)
+            const payTransactionResponse = await payTransactionService(transaction, productsInCart, disc, freeOngkir)
             console.log(payTransactionResponse);
             const updatePaymentLink = await updatePaymentLinkService(transaction, payTransactionResponse.actions[0].url);
             await seqTransaction.commit();
