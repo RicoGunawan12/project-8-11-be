@@ -38,10 +38,10 @@ export const registerUserService = async (fullName, email, password, phone) => {
 
   // const customer = await createCustomerXendit(user.userId, fullName, email, phone);
  
-  await UserModel.update(
-    { customerId: customer.id },
-    { where: { userId: user.userId }}
-  )
+  // await UserModel.update(
+  //   { customerId: customer.id },
+  //   { where: { userId: user.userId }}
+  // )
   
   return {user, cart};
 };
