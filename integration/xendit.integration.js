@@ -227,7 +227,7 @@ export const createPlanXendit = async (transaction, productsInCart, disc, freeOn
         })
     } 
     body.items = items; 
- 
+    body.fees = fees;
 
     const requestOptions = {
         method: 'POST',
