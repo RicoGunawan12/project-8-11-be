@@ -36,7 +36,7 @@ export const registerUserService = async (fullName, email, password, phone) => {
   const user = await UserModel.create({ fullName, email, password: password, role: 'user', phone });
   const cart = await createCart(user.userId);
 
-  const customer = await createCustomerXendit(user.userId, fullName, email, phone);
+  // const customer = await createCustomerXendit(user.userId, fullName, email, phone);
  
   await UserModel.update(
     { customerId: customer.id },

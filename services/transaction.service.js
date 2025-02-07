@@ -591,8 +591,8 @@ export const returnTransactionService = async (transactionId) => {
     return updatedTransaction;
 }
 
-export const payTransactionService = async (transaction, customerId, productsInCart, disc, freeOngkir) => {
-    const response = await createPlanXendit(transaction, customerId, productsInCart, disc, freeOngkir);
+export const payTransactionService = async (transaction, productsInCart, disc, freeOngkir) => {
+    const response = await createPlanXendit(transaction, productsInCart, disc, freeOngkir);
     // console.log(response);
     return response
 }

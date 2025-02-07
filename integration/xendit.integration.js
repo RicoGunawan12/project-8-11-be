@@ -182,16 +182,15 @@ export const createCustomerXendit = async (userId, fullName, email, phone) => {
     }
 }
 
-export const createPlanXendit = async (transaction, customerId, productsInCart, disc, freeOngkir) => {
+export const createPlanXendit = async (transaction, productsInCart, disc, freeOngkir) => {
     
     const items = productsInCart.map((product) => {
  
         return {
-            type: "PHYSICAL_PRODUCT",
             name: product.product_variant.product.productName + " - " + product.product_variant.productColor,
-            net_unit_amount: product.product_variant.productPrice === 0 ? 1 : product.product_variant.productPrice,
+            price: product.product_variant.productPrice === 0 ? 1 : product.product_variant.productPrice,
             quantity: product.quantity,
-            url: process.env.BASE_URL + product.product_variant.productImage
+            // url: process.env.BASE_URL + product.product_variant.productImage
             // url: "https://th.bing.com/th/id/OIP.ULq5QQnJfNFuhcLNBVqzAwHaE7?w=250&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
             // category: "Gaming",
             // subcategory: "Open World"
@@ -199,62 +198,33 @@ export const createPlanXendit = async (transaction, customerId, productsInCart, 
     })
     
     const body = {
-        reference_id: transaction.transactionId,
-        customer_id: customerId,
-        recurring_action: "PAYMENT",
-        currency: "IDR",
+        external_id: transaction.transactionId,
         amount: transaction.totalPrice,
-        payment_methods: [],
-        schedule: {
-            reference_id: transaction.transactionId,
-            interval: "DAY",
-            interval_count: 1,
-            total_recurrence: 1,
-            anchor_date: new Date().toISOString(),
-            retry_interval: "DAY",
-            retry_interval_count: 3,
-            total_retry: 2,
-            failed_attempt_notifications: [1, 2]
-        },
-        immediate_action_type: "FULL_AMOUNT",
-        notification_config: {
-            recurring_created: ["WHATSAPP", "EMAIL"],
-            recurring_succeeded: ["WHATSAPP", "EMAIL"],
-            recurring_failed: ["WHATSAPP", "EMAIL"],
-            locale: "en"
-        },
-        failed_cycle_action: "STOP",
-        payment_link_for_failed_attempt: true,
-        metadata: null,
-        description: "Tyeso Payment",
-        success_return_url: process.env.PRODUCTION_WEB + "/transactions/" + transaction.transactionId,
-        failure_return_url: process.env.PRODUCTION_WEB
     }
+    const fees = []
     if (disc != 0) {
-        items.push({
+        fees.push({
             type: "DISCOUNT",
-            name: "Discount",
-            net_unit_amount: disc * -1,
-            quantity: 1,
-            url: "https://th.bing.com/th/id/OIP.ULq5QQnJfNFuhcLNBVqzAwHaE7?w=250&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+            value: disc * -1,
+            // quantity: 1,
+            // url: "https://th.bing.com/th/id/OIP.ULq5QQnJfNFuhcLNBVqzAwHaE7?w=250&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
         })    
     }
-    if (process.env.BASE_URL !== "http://localhost:5000") {
-    }
+
     items.push({
-        type: "DIGITAL_PRODUCT",
+        // type: "DIGITAL_PRODUCT",
         name: "Delivery Fee",
-        net_unit_amount: transaction.deliveryFee,
+        price: transaction.deliveryFee,
         quantity: 1,
-        url: "https://th.bing.com/th/id/OIP.ULq5QQnJfNFuhcLNBVqzAwHaE7?w=250&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+        // url: "https://th.bing.com/th/id/OIP.ULq5QQnJfNFuhcLNBVqzAwHaE7?w=250&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
     })
     if (freeOngkir > 0) {
-        items.push({
-            type: "DISCOUNT",
-            name: "Free Ongkir Promo",
-            net_unit_amount: freeOngkir * -1,
-            quantity: 1,
-            url: "https://th.bing.com/th/id/OIP.ULq5QQnJfNFuhcLNBVqzAwHaE7?w=250&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+        fees.push({
+            type: "Free Ongkir",
+            // name: "Free Ongkir Promo",
+            value: freeOngkir * -1,
+            // quantity: 1,
+            // url: "https://th.bing.com/th/id/OIP.ULq5QQnJfNFuhcLNBVqzAwHaE7?w=250&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
         })
     } 
     body.items = items; 
@@ -269,7 +239,7 @@ export const createPlanXendit = async (transaction, customerId, productsInCart, 
     }
 
     try {
-        const xenditResponse = await fetch(`${process.env.XENDIT_URL}/recurring/plans`, requestOptions);
+        const xenditResponse = await fetch(`${process.env.XENDIT_URL}/v2/invoices`, requestOptions);
  
         
         if (!xenditResponse.ok) {
