@@ -297,6 +297,21 @@ export const updateTransactionStatusService = async (transactionId, gatewayRespo
     return updatedTransaction;
 }
 
+export const updateExpiredTransaction = async (transactionId, gatewayResponse) => {
+    const updatedTransaction = await TransactionHeaderModel.update(
+        {
+            status: 'Failed',
+            gatewayResponse: JSON.stringify(gatewayResponse)
+        },
+        {
+            where: {
+                transactionId: transactionId
+            },
+        }
+    )
+    return updatedTransaction;
+}
+
 export const getTransactionXenditService = async (actionId) => {
     const transaction = await getTransactionXendit(actionId);
     return transaction;
