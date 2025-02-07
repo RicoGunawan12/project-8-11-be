@@ -612,7 +612,7 @@ export const updateProduct = async (req, res) => {
   
   
         // converts image to WebP format
-        const filename = `${Date.now()}-${req.body.productName}.webp`;
+        // const filename = `${Date.now()}-${req.body.productName}.webp`;
         // const convertedImageData = await convertImageToWebp(
         //   "../" + UPLOAD_FOLDER + "product/" + req.body.productName,
         //   image,
@@ -621,7 +621,7 @@ export const updateProduct = async (req, res) => {
   
         hash.set(
           image.originalname,
-          `/${UPLOAD_FOLDER}product/${productName}/${filename}`
+          `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`
         );
       }
     }
