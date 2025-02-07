@@ -199,6 +199,8 @@ export const createPlanXendit = async (transaction, productsInCart, disc, freeOn
     const body = {
         external_id: transaction.transactionId,
         amount: transaction.totalPrice,
+        success_redirect_url: process.env.PRODUCTION_WEB + "/transactions/" + transaction.transactionId,
+        failure_return_url: process.env.PRODUCTION_WEB
     }
     const fees = []
     if (disc != 0) {

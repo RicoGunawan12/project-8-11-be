@@ -351,19 +351,19 @@ export const checkOutVATransaction = async (req, res) => {
 // }
 export const updateTransactionStatus = async (req, res) => {
     const {
-        reference_id,
+        external_id,
         status,
-        attempt_details
-    } = req.body.data;
+        payment_channel
+    } = req.body;
 
     if (status != "SUCCEEDED") {
         return res.status(400).json({ message: "Transaction not succeeded" });
     }
 
     try {
-        const transaction = await getTransactionXenditService(attempt_details[0].action_id)
-        const updatedTransaction = await updateTransactionStatusService(reference_id, req.body, transaction.payment_method.type);
-        // const getTransactionById = await getTransactionsByIdService(reference_id);
+        // const transaction = await getTransactionXenditService(attempt_details[0].action_id)
+        const updatedTransaction = await updateTransactionStatusService(external_id, req.body, payment_channel);
+        // const getTransactionById = await getTransactionsByIdService(external_id);
         // const response = await createKomshipOrderService(getTransactionById);
         return res.status(200).json({ message: "Transaction updated!" });
         // return res.redirect('/');
