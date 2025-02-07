@@ -191,7 +191,7 @@ export const createTransaction = async (req, res) => {
         if (paymentMethod !== "COD" && totalPrice >= 1000) {
             const payTransactionResponse = await payTransactionService(transaction, productsInCart, disc, freeOngkir)
             console.log(payTransactionResponse);
-            const updatePaymentLink = await updatePaymentLinkService(transaction, payTransactionResponse.actions[0].url);
+            const updatePaymentLink = await updatePaymentLinkService(transaction, payTransactionResponse.invoice_url);
             await seqTransaction.commit();
             return res.status(200).json({ message: "Transaction created!", payTransactionResponse, transaction, insertedTransactionDetails });
             
