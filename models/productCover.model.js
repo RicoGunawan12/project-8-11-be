@@ -20,6 +20,12 @@ const ProductCover = sequelize.define('product_covers', {
         type: DataTypes.TEXT,
         allowNull: false
     },
+}, {
+    indexes: [
+        {
+            fields: ["product_id"], // Indexing Foreign Key
+        }
+    ]
 })
 
 export default ProductCover

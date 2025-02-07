@@ -5,7 +5,7 @@ const { PaymentRequest } = xenditClient
 
 const xenditPaymentRequestClient = new PaymentRequestClient({ secretKey: process.env.XENDIT_API })
 
-const credentials = btoa(`${process.env.XENDIT_API_TEST}:`);
+const credentials = btoa(`${process.env.XENDIT_API}:`);
 const headers = new Headers({
     "Authorization": `Basic ${credentials}`,
     "Content-Type": "application/json",
@@ -160,7 +160,8 @@ export const createCustomerXendit = async (userId, fullName, email, phone) => {
         email: email,
         mobile_number: phone
     }
-
+    console.log(body);
+    
     const requestOptions = {
         method: 'POST',
         headers: headers,
@@ -229,6 +230,8 @@ export const createPlanXendit = async (transaction, productsInCart, disc, freeOn
         })
     } 
     body.items = items; 
+    console.log(body);
+    
     body.fees = fees;
 
     const requestOptions = {

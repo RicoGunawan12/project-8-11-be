@@ -373,6 +373,30 @@ export const updateTransactionStatus = async (req, res) => {
 
 }
 
+export const updateQRTransactionStatus = async (req, res) => {
+    const {
+        reference_id,
+        status,
+        payment_detail
+    } = req.body.data;
+
+    if (status != "SUCCEEDED") {
+        return res.status(400).json({ message: "Transaction not succeeded" });
+    }
+
+    try {
+        // const transaction = await getTransactionXenditService(attempt_details[0].action_id)
+        const updatedTransaction = await updateTransactionStatusService(reference_id, req.body, "QR " + payment_detail.source);
+        // const getTransactionById = await getTransactionsByIdService(reference_id);
+        // const response = await createKomshipOrderService(getTransactionById);
+        return res.status(200).json({ message: "Transaction updated!" });
+        // return res.redirect('/');
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+
+}
+
 export const requestPickupTransaction = async (req, res) => {
     const { transactionId } = req.body;
     try {
@@ -609,7 +633,9 @@ export const cancelPaidTransaction = async (req, res) => {
         const cancelledTransaction = await cancelTransactionService(transactionId);
 
         const gatewayResponse = JSON.parse(transaction.gatewayResponse);
-        const refundRequest = await refundXendit(transactionId, gatewayResponse.data.attempt_details[0].action_id, transaction.totalPrice);
+        if (transaction.paymentMethod !== "COD") {
+            const refundRequest = await refundXendit(transactionId, gatewayResponse.data.attempt_details[0].action_id, transaction.totalPrice);
+        }
 
         // const cancelledKomshipOrder = await cancelOrderKomship(transaction.komshipOrderNumber);
 

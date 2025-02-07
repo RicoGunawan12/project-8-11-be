@@ -49,57 +49,45 @@ export const getCartItemsByUserService = async (userId) => {
                 model: PromoDetailModel,
                 attributes: ["promoDetailId"],
                 include: [
-                    {
-                        model: ProductModel,
-                        attributes: ['productId', 'productName', 'productWeight', 'productSize'],
-                        include: [
-                            {
-                                model: PromoDetailModel,
-                                attributes: ['promoDetailId'],
-                                separate: true,
-                                include: [
-                                    {
-                                        model: PromoModel,
-                                        where: {
-                                            startDate: {
-                                                [Op.lte]: new Date(), // Start of the day
-                                            },
-                                            endDate: {
-                                                [Op.gte]: new Date().setHours(0, 0, 0, 0), // End of the day
-                                            },
-                                        },
-                                        order: [["created_at", "DESC"]],
-                                    },
-                                ]
-                            },{
-                                include: BogoModel
-                            }
-                        ]
-                    }
+                  {
+                    model: PromoModel,
+                    where: {
+                      startDate: {
+                        [Op.lte]: new Date(),
+                      },
+                      endDate: {
+                        [Op.gte]: new Date().setHours(0, 0, 0, 0),
+                      },
+                    },
+                    order: [["created_at", "DESC"]],
+                  }
                 ]
-            }
-        ]}],
-        attributes: ['cartItemId', 'productVariantId', 'quantity']
-        }
-    ]});
-    
-    const filteredCartItems = await Promise.all(
-        cartItem.map(async (cartItem) => {
-            // console.log(item.product_variant.product.promo_details[0].promo.promoId);
-            const item = cartItem.get({ plain: true });
-            const sortedPromo = item?.product_variant?.product?.promo_details.sort((a, b) => new Date(b.promo.createdAt) - new Date(a.promo.createdAt));
-            console.log(sortedPromo);
-            
-            const promoDetail = sortedPromo[0];
-            console.log("PROMO DETAIL HEREE");
-            console.log(promoDetail);
-            
-            if (promoDetail) {
-                console.log(promoDetail.promo.promoId);
-                console.log(item.product_variant.product.productId);
-                console.log(userId);
-                
-                const promoUsed = await PromoHistoryModel.findOne({
+              }, {
+                model: BogoModel
+              }
+            ]
+          }],
+      }
+    ]
+  });
+
+  const filteredCartItems = await Promise.all(
+    cartItem.map(async (cartItem) => {
+      // console.log(item.product_variant.product.promo_details[0].promo.promoId);
+      const item = cartItem.get({ plain: true });
+      const sortedPromo = item?.product_variant?.product?.promo_details.sort((a, b) => new Date(b.promo.createdAt) - new Date(a.promo.createdAt));
+      console.log(sortedPromo);
+
+      const promoDetail = sortedPromo[0];
+      console.log("PROMO DETAIL HEREE");
+      console.log(promoDetail);
+
+      if (promoDetail) {
+        console.log(promoDetail.promo.promoId);
+        console.log(item.product_variant.product.productId);
+        console.log(userId);
+
+        const promoUsed = await PromoHistoryModel.findOne({
           where: {
             promoId: promoDetail.promo.promoId,
             productId: item.product_variant.product.productId,
@@ -213,8 +201,8 @@ export const updateCartItemService = async (cartItemId, quantity) => {
   if (getProductVariant.product_variant.productStock < quantity) {
     throw new Error(
       "There are only " +
-        getProductVariant.product_variant.productStock +
-        " stock"
+      getProductVariant.product_variant.productStock +
+      " stock"
     );
   }
 
