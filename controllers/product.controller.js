@@ -478,6 +478,9 @@ export const updateProduct = async (req, res) => {
     } = req.body;
     const productId = req.params.id;
 
+    const timestamp = req.timestamp
+    console.log(timestamp)
+
     if (!productId) {
       return res.status(400).json({ message: "Product id is required!" });
     }
@@ -606,28 +609,28 @@ export const updateProduct = async (req, res) => {
 
     const hash = new Map();
 
-    if (images) {
-      for (let i = 0; i < images.length; i++) {
-        const image = images[i];
+    // if (images) {
+    //   for (let i = 0; i < images.length; i++) {
+    //     const image = images[i];
   
   
-        // converts image to WebP format
-        // const filename = `${Date.now()}-${req.body.productName}.webp`;
-        // const convertedImageData = await convertImageToWebp(
-        //   "../" + UPLOAD_FOLDER + "product/" + req.body.productName,
-        //   image,
-        //   filename
-        // );
-  
-        hash.set(
-          image.originalname,
-          `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`
-        );
-      }
-    }
-    else {
-      return res.status(400).json({ message: "Please insert the product variant image" })
-    }
+    //     // converts image to WebP format
+    //     console.log(timestamp)
+    //     // const convertedImageData = await convertImageToWebp(
+    //       //   "../" + UPLOAD_FOLDER + "product/" + req.body.productName,
+    //       //   image,
+    //       //   filename
+    //       // );
+          
+    //       hash.set(
+    //         productName + " - " + ,
+    //         `/${UPLOAD_FOLDER}product/${productName}/${filename}`
+    //       );
+    //     }
+    //   }
+    // else {
+    //   return res.status(400).json({ message: "Please insert the product variant image" })
+    // }
 
     if (productName.length < 1) {
       return res.status(400).json({ message: "Product name must be filled" });
@@ -635,11 +638,10 @@ export const updateProduct = async (req, res) => {
 
     const variants = JSON.parse(productVariants);
     variants.forEach((variant) => {
+      
+      const filename = `${timestamp}-${req.body.productName} - ${variant.productColor}.webp`;
 
-
-      variant.productImage = hash.get(
-        productName + " - " + variant.productColor
-      );
+      variant.productImage = filename
     });
 
 
@@ -662,6 +664,8 @@ export const updateProduct = async (req, res) => {
       );
     }) : [];
     await Promise.all(insertProductCover);
+
+    console.log(variants)
 
     const updatedProduct = await updateProductService(
       productId,

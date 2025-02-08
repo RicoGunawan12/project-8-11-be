@@ -724,10 +724,12 @@ export const updateProductService = async (
         transaction,
       });
     }
- 
 
     // Update existing variants
     for (const variant of variantsToUpdate) {
+
+      console.log(variant)
+
       const existingVariant = existingVariants.find(
         (v) => v.productVariantId === variant.productVariantId
       );
