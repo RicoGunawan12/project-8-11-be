@@ -393,9 +393,10 @@ export const createProduct = async (req, res) => {
             filename
           );
 
+          const sanitizedProductName = req.body.productName.replace(/\//g, "");
           hash.set(
             productName + " - " + variants[i].productColor,
-            `/${UPLOAD_FOLDER}product/${productName}/${filename}`
+            `/${UPLOAD_FOLDER}product/${sanitizedProductName}/${filename}`
           );
         }
 
@@ -432,9 +433,10 @@ export const createProduct = async (req, res) => {
     // Process default images if they exist
     if (defaultImage && defaultImage.length > 0) {
       const insertProductCover = defaultImage.map(async (image) => {
+        const sanitizedProductName = req.body.productName.replace(/\//g, "");
         await createProductCoverService(
           product.productId,
-          `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`
+          `/${UPLOAD_FOLDER}product/${sanitizedProductName}/${image.filename}`
         );
       });
       await Promise.all(insertProductCover);
@@ -477,6 +479,9 @@ export const updateProduct = async (req, res) => {
       productHeight,
     } = req.body;
     const productId = req.params.id;
+
+    const timestamp = req.timestamp
+    console.log(timestamp)
 
     if (!productId) {
       return res.status(400).json({ message: "Product id is required!" });
@@ -606,28 +611,28 @@ export const updateProduct = async (req, res) => {
 
     const hash = new Map();
 
-    if (images) {
-      for (let i = 0; i < images.length; i++) {
-        const image = images[i];
+    // if (images) {
+    //   for (let i = 0; i < images.length; i++) {
+    //     const image = images[i];
   
   
-        // converts image to WebP format
-        // const filename = `${Date.now()}-${req.body.productName}.webp`;
-        // const convertedImageData = await convertImageToWebp(
-        //   "../" + UPLOAD_FOLDER + "product/" + req.body.productName,
-        //   image,
-        //   filename
-        // );
-  
-        hash.set(
-          image.originalname,
-          `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`
-        );
-      }
-    }
-    else {
-      return res.status(400).json({ message: "Please insert the product variant image" })
-    }
+    //     // converts image to WebP format
+    //     console.log(timestamp)
+    //     // const convertedImageData = await convertImageToWebp(
+    //       //   "../" + UPLOAD_FOLDER + "product/" + req.body.productName,
+    //       //   image,
+    //       //   filename
+    //       // );
+          
+    //       hash.set(
+    //         productName + " - " + ,
+    //         `/${UPLOAD_FOLDER}product/${productName}/${filename}`
+    //       );
+    //     }
+    //   }
+    // else {
+    //   return res.status(400).json({ message: "Please insert the product variant image" })
+    // }
 
     if (productName.length < 1) {
       return res.status(400).json({ message: "Product name must be filled" });
@@ -635,11 +640,10 @@ export const updateProduct = async (req, res) => {
 
     const variants = JSON.parse(productVariants);
     variants.forEach((variant) => {
+      const sanitizedProductName = req.body.productName.replace(/\//g, "");
+      const filename = `${timestamp}-${sanitizedProductName} - ${variant.productColor}.webp`;
 
-
-      variant.productImage = hash.get(
-        productName + " - " + variant.productColor
-      );
+      variant.productImage = filename
     });
 
 
@@ -656,12 +660,15 @@ export const updateProduct = async (req, res) => {
     const insertProductCover = defaultImage ? defaultImage.map(async (image) => {
       // const filename = `${Date.now()}-${req.body.productName}.webp`;
       // const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
+      const sanitizedProductName = req.body.productName.replace(/\//g, "");
       await createProductCoverService(
         productId,
-        `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`
+        `/${UPLOAD_FOLDER}product/${sanitizedProductName}/${image.filename}`
       );
     }) : [];
     await Promise.all(insertProductCover);
+
+    console.log(variants)
 
     const updatedProduct = await updateProductService(
       productId,

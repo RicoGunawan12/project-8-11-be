@@ -22,25 +22,33 @@ const storage = multer.diskStorage({
       }
       cb(null, uploadPath);
     } catch (error) {
-      cb(error)
+      cb(error);
     }
   },
   filename: function (req, file, cb) {
+
+    // console.log(req)
+    console.log(req.body)
+    console.log(file)
+    console.log(cb)
+
     try {
-      if (file.fieldname === 'defaultImage') {
- 
-        
-        cb(null, file.originalname);
+      if (!req.timestamp) {
+        req.timestamp = Date.now();
+        console.log(req.timestamp)
       }
-      else {
-        const sanitizedProductName = req.body.productName.replace(/\//g, "");
-        cb(null, `${Date.now()}-${sanitizedProductName}.png`);
+
+      if (file.fieldname === 'defaultImage') {
+        cb(null, file.originalname);
+      } else {
+        cb(null, `${req.timestamp}-${file.originalname}`);
       }
     } catch (error) {
       cb(error);
     }
   }
 });
+
 
 const storageBlog = multer.diskStorage({
   destination: async function (req, file, cb) {
