@@ -333,7 +333,8 @@ export const refundXendit = async (transactionId, gatewayResponse, amount) => {
             return result;
         }
         else {
-            throw new Error("Refund feature is not available as the method is not provided. Please contact admin for this payment method");
+            
+            // throw new Error("Refund feature is not available as the method is not provided. Please contact admin for this payment method");
         }
 
     } catch (error) {
