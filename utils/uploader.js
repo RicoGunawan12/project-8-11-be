@@ -14,7 +14,8 @@ export const UPLOAD_FOLDER = process.env.FOLDER_PATH || 'assets/';
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     try {
-      const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + "product/" + req.body.productName);
+      const sanitizedProductName = req.body.productName.replace(/\//g, "");
+      const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + "product/" + sanitizedProductName);
 
       if (!fs.existsSync(uploadPath)) {
         fs.mkdirSync(uploadPath, { recursive: true });
@@ -32,7 +33,8 @@ const storage = multer.diskStorage({
         cb(null, file.originalname);
       }
       else {
-        cb(null, `${Date.now()}-${req.body.productName}.png`);
+        const sanitizedProductName = req.body.productName.replace(/\//g, "");
+        cb(null, `${Date.now()}-${sanitizedProductName}.png`);
       }
     } catch (error) {
       cb(error);
