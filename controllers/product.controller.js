@@ -392,9 +392,10 @@ export const createProduct = async (req, res) => {
 
           console.log(productName + " - " + variants[i].productColor)
 
+          const sanitizedProductName = req.body.productName.replace(/\//g, "");
           hash.set(
             productName + " - " + variants[i].productColor,
-            `/${UPLOAD_FOLDER}product/${productName}/${filename}`
+            `/${UPLOAD_FOLDER}product/${sanitizedProductName}/${filename}`
           );
         }
 
@@ -435,9 +436,10 @@ export const createProduct = async (req, res) => {
     // Process default images if they exist
     if (defaultImage && defaultImage.length > 0) {
       const insertProductCover = defaultImage.map(async (image) => {
+        const sanitizedProductName = req.body.productName.replace(/\//g, "");
         await createProductCoverService(
           product.productId,
-          `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`
+          `/${UPLOAD_FOLDER}product/${sanitizedProductName}/${image.filename}`
         );
       });
       await Promise.all(insertProductCover);
@@ -645,8 +647,8 @@ export const updateProduct = async (req, res) => {
 
     const variants = JSON.parse(productVariants);
     variants.forEach((variant) => {
-      
-      const filename = `${timestamp}-${req.body.productName} - ${variant.productColor}.webp`;
+      const sanitizedProductName = req.body.productName.replace(/\//g, "");
+      const filename = `${timestamp}-${sanitizedProductName} - ${variant.productColor}.webp`;
 
       variant.productImage = filename
     });
@@ -665,9 +667,10 @@ export const updateProduct = async (req, res) => {
     const insertProductCover = defaultImage ? defaultImage.map(async (image) => {
       // const filename = `${Date.now()}-${req.body.productName}.webp`;
       // const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "product/" + req.body.productName, image, filename);
+      const sanitizedProductName = req.body.productName.replace(/\//g, "");
       await createProductCoverService(
         productId,
-        `/${UPLOAD_FOLDER}product/${productName}/${image.filename}`
+        `/${UPLOAD_FOLDER}product/${sanitizedProductName}/${image.filename}`
       );
     }) : [];
     await Promise.all(insertProductCover);

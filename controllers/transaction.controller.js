@@ -619,7 +619,7 @@ export const refundTransaction = async (req, res) => {
         const transaction = await getTransactionsByIdService(transactionId);
         const gatewayResponse = JSON.parse(transaction.gatewayResponse);
 
-        const refundRequest = await refundXendit(transactionId, gatewayResponse.data.attempt_details[0].action_id, transaction.totalPrice);
+        const refundRequest = await refundXendit(transactionId, gatewayResponse, transaction.totalPrice);
         await updateTransactionService(transactionId, "Return");
 
         return res.status(200).json({ message: "Transaction refunded!" })
@@ -643,7 +643,7 @@ export const cancelPaidTransaction = async (req, res) => {
 
         const gatewayResponse = JSON.parse(transaction.gatewayResponse);
         if (transaction.paymentMethod !== "COD") {
-            const refundRequest = await refundXendit(transactionId, gatewayResponse.data.attempt_details[0].action_id, transaction.totalPrice);
+            const refundRequest = await refundXendit(transactionId, gatewayResponse, transaction.totalPrice);
         }
 
         // const cancelledKomshipOrder = await cancelOrderKomship(transaction.komshipOrderNumber);

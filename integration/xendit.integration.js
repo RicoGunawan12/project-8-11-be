@@ -275,31 +275,67 @@ export const getTransactionXendit = async (actionId) => {
     }
 }
 
-export const refundXendit = async (transactionId, paymentRequestId, amount) => {
+export const refundXendit = async (transactionId, gatewayResponse, amount) => {
     try {
-        const body = {
-            amount: amount,
-            external_refund_id: transactionId,
-            reason: "REQUESTED_BY_CUSTOMER",
-            payment_request_id: paymentRequestId
-        }
- 
+        const body = {}
+        // const body = {
+        //     amount: amount,
+        //     external_refund_id: transactionId,
+        //     reason: "REQUESTED_BY_CUSTOMER",
+        //     payment_request_id: paymentRequestId
+        // }
         
-        const requestOptions = {
-            method: 'POST',
-            headers: headers,
-            redirect: 'follow',
-            body: JSON.stringify(body)
+        if (gatewayResponse.payment_method === "EWALLET" && 
+            gatewayResponse.payment_channel != "OVO" &&
+            gatewayResponse.payment_channel != "JENIUSPAY"
+        ) {
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                redirect: 'follow',
+                body: JSON.stringify(body)
+            }
+    
+            const xenditResponse = await fetch(`${process.env.XENDIT_URL}/ewallets/charges/${gatewayResponse.payment_id}/refunds`, requestOptions);
+     
+            
+            if (!xenditResponse.ok) {
+                throw new Error(`Error: ${xenditResponse.statusText}`);
+            }
+            const result = await xenditResponse.json();
+            return result;
         }
-
-        const xenditResponse = await fetch(`${process.env.XENDIT_URL}/refunds`, requestOptions);
- 
-        
-        if (!xenditResponse.ok) {
-            throw new Error(`Error: ${xenditResponse.statusText}`);
+        else if (
+            ["BCA", 
+             "BNI", 
+             "BSI", 
+             "BRI", 
+             "MANDIRI", 
+             "PERMATA", 
+             "SAHABAT_SAMPOERNA", 
+             "BNC", 
+             "DD_BRI", 
+             "DD_BCA_KLIKPAY"].includes(gatewayResponse.payment_method)
+        ) {
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                redirect: 'follow',
+                body: JSON.stringify(body)
+            }
+    
+            const xenditResponse = await fetch(`${process.env.XENDIT_URL}/cards/charges/${gatewayResponse.payment_id}/refunds`, requestOptions);
+                 
+            if (!xenditResponse.ok) {
+                throw new Error(`Error: ${xenditResponse.statusText}`);
+            }
+            const result = await xenditResponse.json();
+            return result;
         }
-        const result = await xenditResponse.json();
-        return result;
+        else {
+            
+            // throw new Error("Refund feature is not available as the method is not provided. Please contact admin for this payment method");
+        }
 
     } catch (error) {
         throw new Error(error.message);
