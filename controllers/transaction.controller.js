@@ -675,3 +675,15 @@ export const rejectReviewTransaction = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
+export const changeTransactionStatus = async (req, res) => {
+    const transactionId = req.params.id;
+    const { status } = req.body;
+
+    try {
+        await updateTransactionService(transactionId, status);
+        return res.status(200).json({ message: "Transaction status changed!" });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}

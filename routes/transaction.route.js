@@ -7,7 +7,7 @@ import { checkoutQrisSchema } from '../schema/transaction/checkout/checkoutQris.
 import { checkoutVASchema } from './../schema/transaction/checkout/checkoutVA.schema.js';
 import { updateStatusValidator } from './../validator/transaction/updateStatus.validator.js';
 import { transactionIdSchema } from '../schema/general/transactionId.schema.js';
-import { allMonthSalesAnalytic, cancelPaidTransaction, cancelTransaction, checkOutCreditTransaction, checkOutQrisTransaction, checkOutVATransaction, createTransaction, deliveryDetail, fetchSalesByCategory, getAllTransactions, getTransactionById, getTransactionCount, getTransactionsByUser, monthlySalesReport, onReviewReturnTransaction, onReviewTransaction, payTransaction, printLabel, refundTransaction, rejectReviewTransaction, requestPickupTransaction, returnTransaction, updateQRTransactionStatus, updateTransactionDelivery, updateTransactionStatus } from '../controllers/transaction.controller.js';
+import { allMonthSalesAnalytic, cancelPaidTransaction, cancelTransaction, changeTransactionStatus, checkOutCreditTransaction, checkOutQrisTransaction, checkOutVATransaction, createTransaction, deliveryDetail, fetchSalesByCategory, getAllTransactions, getTransactionById, getTransactionCount, getTransactionsByUser, monthlySalesReport, onReviewReturnTransaction, onReviewTransaction, payTransaction, printLabel, refundTransaction, rejectReviewTransaction, requestPickupTransaction, returnTransaction, updateQRTransactionStatus, updateTransactionDelivery, updateTransactionStatus } from '../controllers/transaction.controller.js';
 import { adminMiddleware, generalMiddleware, userMiddleware } from '../middleware/auth.middleware.js';
 
 const TransactionRoute = express.Router();
@@ -64,5 +64,6 @@ TransactionRoute.post('/refund', adminMiddleware, refundTransaction);
 
 TransactionRoute.put('/reject/:id', adminMiddleware, rejectReviewTransaction);
 
+TransactionRoute.put('/change/:id', adminMiddleware, changeTransactionStatus);
 
 export default TransactionRoute;
