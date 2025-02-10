@@ -66,8 +66,8 @@ export const createCarousel = async (req, res) => {
         // const imagePath = "../" + UPLOAD_FOLDER + "carousel/" + filename
         // const convertedImageData = await convertImageToWebp("../" + UPLOAD_FOLDER + "carousel/", image, filename);
         const carousel = await createCarouselService(
-            "/" + UPLOAD_FOLDER + "carousel/" + image[0].filename,
-            "/" + UPLOAD_FOLDER + "carousel/mobile/" + imageMobile[0].filename,
+            "/" + UPLOAD_FOLDER + "carousel/" + image[0].filename + ".webp",
+            "/" + UPLOAD_FOLDER + "carousel/mobile/" + imageMobile[0].filename + ".webp",
             titleEng,
             titleIndo,
             contentEng,
@@ -144,8 +144,8 @@ export const updateCarousel = async (req, res) => {
         // const convertedImageData = await convertImageToWebp(imagePath, image, filename);
         const carousel = await updateCarouselService(
             carouselId,
-            "/" + UPLOAD_FOLDER + "carousel/" + image[0].filename,
-            "/" + UPLOAD_FOLDER + "carousel/mobile/" + imageMobile[0].filename,
+            "/" + UPLOAD_FOLDER + "carousel/" + image[0].filename + ".webp",
+            "/" + UPLOAD_FOLDER + "carousel/mobile/" + imageMobile[0].filename + ".webp",
             titleEng,
             titleIndo,
             contentEng,

@@ -5,6 +5,8 @@ import { fileURLToPath } from 'url';
 import { getPageService, getWhyContentService } from "../services/page.service.js";
 import { isValidNumber } from "./utility.js";
 
+import webp from "webp-converter"
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -20,35 +22,35 @@ const storage = multer.diskStorage({
       if (!fs.existsSync(uploadPath)) {
         fs.mkdirSync(uploadPath, { recursive: true });
       }
+      
+      // Store the upload path in the request object for later use
+      req.uploadPath = uploadPath;
       cb(null, uploadPath);
     } catch (error) {
       cb(error);
     }
   },
-  filename: function (req, file, cb) {
-
-    // console.log(req)
-    console.log(req.body)
-    console.log(file)
-    console.log(cb)
-
+  filename: async function (req, file, cb) {
     try {
       if (!req.timestamp) {
         req.timestamp = Date.now();
-        console.log(req.timestamp)
       }
 
-      if (file.fieldname === 'defaultImage') {
-        cb(null, file.originalname);
-      } else {
-        cb(null, `${req.timestamp}-${file.originalname}`);
-      }
+      // Generate filename but always use .webp extension
+      const filename = file.fieldname === "defaultImage"
+        ? `${path.parse(file.originalname).name}`
+        : `${req.timestamp}-${path.parse(file.originalname).name}`;
+
+      // Store the full path for Sharp processing
+      const fullPath = path.join(req.uploadPath, filename);
+      req.currentFile = { path: fullPath, filename };
+
+      cb(null, filename);
     } catch (error) {
       cb(error);
     }
   }
 });
-
 
 const storageBlog = multer.diskStorage({
   destination: async function (req, file, cb) {
@@ -96,15 +98,40 @@ const storageContact = multer.diskStorage({
 
 const storageBanner = multer.diskStorage({
   destination: async function (req, file, cb) {
-    const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'banner');
+    try {
+      const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'banner');
 
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath, { recursive: true });
+      }
+      cb(null, uploadPath);
+    } catch (error) {
+      cb(error);
     }
-    cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
-    cb(null, `${Date.now()}-${req.body.page}.png`);
+    try {
+      if (!req.timestamp) {
+        req.timestamp = Date.now();
+      }
+
+      const fileName = `${req.timestamp}-${req.body.page}.webp`;
+
+      const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'banner');
+      const inputFilePath = path.join(uploadPath, file.originalname);
+      const outputFilePath = path.join(uploadPath, fileName);
+
+      cb(null, fileName);
+
+      process.nextTick(() => {
+        webp.cwebp(inputFilePath, outputFilePath, "-q 80")
+          // .then(() => fs.unlinkSync(inputFilePath))
+          .catch(err => console.error("WebP conversion error:", err));
+      });
+
+    } catch (error) {
+      cb(error);
+    }
   }
 });
 
@@ -226,27 +253,49 @@ const storageWhyPhoto = multer.diskStorage({
   }
 })
 
-
 const storageCarousel = multer.diskStorage({
-  destination: async function (req, file, cb) {
-    let uploadPath = '';
-    if (file.fieldname === 'carouselImage') {
-      uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'carousel');
-    }
-    else if (file.fieldname === 'carouselImageMobile') {
-      uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + '/carousel/mobile');
-    }
+  destination: function (req, file, cb) {
+    try {
+      let uploadPath = '';
 
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
+      if (file.fieldname === 'carouselImage') {
+        uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'carousel');
+      } else if (file.fieldname === 'carouselImageMobile') {
+        uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + '/carousel/mobile');
+      }
+
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath, { recursive: true });
+      }
+
+      // Store the upload path in req for later use
+      req.uploadPath = uploadPath;
+      cb(null, uploadPath);
+    } catch (error) {
+      cb(error);
     }
-    cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
- 
-    cb(null, `${Date.now()}.png`);
+    try {
+      if (!req.timestamp) {
+        req.timestamp = Date.now();
+      }
+
+      const filename = file.fieldname === "carouselImage"
+        ? `${path.parse(file.originalname).name}`
+        : `${req.timestamp}-${path.parse(file.originalname).name}`;
+
+      // Store full path for processing
+      const fullPath = path.join(req.uploadPath, filename);
+      req.currentFile = { path: fullPath, filename };
+
+      cb(null, filename);
+    } catch (error) {
+      cb(error);
+    }
   }
 });
+
 
 export const upload = multer({ storage: storage });
 export const uploadBlog = multer({ storage: storageBlog });

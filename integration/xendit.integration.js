@@ -289,6 +289,8 @@ export const refundXendit = async (transactionId, gatewayResponse, amount) => {
             gatewayResponse.payment_channel != "OVO" &&
             gatewayResponse.payment_channel != "JENIUSPAY"
         ) {
+            console.log("IN EWALLET REFUND");
+            
             const requestOptions = {
                 method: 'POST',
                 headers: headers,
@@ -306,7 +308,8 @@ export const refundXendit = async (transactionId, gatewayResponse, amount) => {
             return result;
         }
         else if (
-            ["BCA", 
+            [
+             "BCA", 
              "BNI", 
              "BSI", 
              "BRI", 
@@ -315,8 +318,9 @@ export const refundXendit = async (transactionId, gatewayResponse, amount) => {
              "SAHABAT_SAMPOERNA", 
              "BNC", 
              "DD_BRI", 
-             "DD_BCA_KLIKPAY"].includes(gatewayResponse.payment_method)
+             "DD_BCA_KLIKPAY"].includes(gatewayResponse.payment_channel)
         ) {
+            console.log("IN DEBIT OR CREDIT REFUND");
             const requestOptions = {
                 method: 'POST',
                 headers: headers,
@@ -331,6 +335,9 @@ export const refundXendit = async (transactionId, gatewayResponse, amount) => {
             }
             const result = await xenditResponse.json();
             return result;
+        }
+        else if (gatewayResponse.payment_method === "CREDIT_CARD") {
+
         }
         else {
             
