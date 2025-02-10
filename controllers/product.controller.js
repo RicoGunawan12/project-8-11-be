@@ -253,6 +253,8 @@ export const createProduct = async (req, res) => {
     const images = req.files?.["productImage"] || [];
     const defaultImage = req.files?.["defaultImage"] || [];
 
+    const timestamp = req.timestamp
+
     var {
       productName,
       productDescription,
@@ -386,12 +388,9 @@ export const createProduct = async (req, res) => {
         const hash = new Map();
         for (let i = 0; i < images.length; i++) {
           const image = images[i];
-          const filename = `${Date.now()}-${productName}.webp`;
-          const convertedImageData = await convertImageToWebp(
-            "../" + UPLOAD_FOLDER + "product/" + productName,
-            image,
-            filename
-          );
+          const filename = `${timestamp}-${productName} - ${variants[i].productColor}.webp`;
+
+          console.log(productName + " - " + variants[i].productColor)
 
           hash.set(
             productName + " - " + variants[i].productColor,
@@ -399,7 +398,11 @@ export const createProduct = async (req, res) => {
           );
         }
 
+        console.log(hash)
+        
+        console.log("this is getting")
         variants.forEach((variant) => {
+          console.log(productName + " - " + variant.productColor)
           variant.productImage = hash.get(
             productName + " - " + variant.productColor
           );
@@ -441,6 +444,9 @@ export const createProduct = async (req, res) => {
     }
 
     // Process variants if they exist
+
+    console.log(variants)
+
     if (variants.length > 0) {
       const insertVariantPromise = variants.map(async (variant) => {
 
@@ -449,7 +455,8 @@ export const createProduct = async (req, res) => {
           variant.sku,
           variant.productColor,
           variant.productPrice,
-          variant.productStock
+          variant.productStock,
+          variant.productImage
         );
       });
       await Promise.all(insertVariantPromise);

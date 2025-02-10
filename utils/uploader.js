@@ -5,6 +5,8 @@ import { fileURLToPath } from 'url';
 import { getPageService, getWhyContentService } from "../services/page.service.js";
 import { isValidNumber } from "./utility.js";
 
+import webp from "webp-converter"
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -25,23 +27,29 @@ const storage = multer.diskStorage({
     }
   },
   filename: function (req, file, cb) {
-
-    // console.log(req)
-    console.log(req.body)
-    console.log(file)
-    console.log(cb)
-
     try {
       if (!req.timestamp) {
         req.timestamp = Date.now();
-        console.log(req.timestamp)
       }
 
-      if (file.fieldname === 'defaultImage') {
-        cb(null, file.originalname);
-      } else {
-        cb(null, `${req.timestamp}-${file.originalname}`);
-      }
+      // Define the output filename with .webp extension
+      const fileName = file.fieldname === "defaultImage"
+        ? `${path.parse(file.originalname).name}.webp`
+        : `${req.timestamp}-${path.parse(file.originalname).name}.webp`;
+
+      const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + "product/" + req.body.productName);
+      const inputFilePath = path.join(uploadPath, file.originalname);
+      const outputFilePath = path.join(uploadPath, fileName);
+
+      // Convert to WebP after saving the original file
+      cb(null, fileName);
+
+      process.nextTick(() => {
+        webp.cwebp(inputFilePath, outputFilePath, "-q 80")
+          // .then(() => fs.unlinkSync(inputFilePath)) // Remove the original file after conversion
+          .catch(err => console.error("WebP conversion error:", err));
+      });
+
     } catch (error) {
       cb(error);
     }
@@ -224,7 +232,6 @@ const storageWhyPhoto = multer.diskStorage({
     }
   }
 })
-
 
 const storageCarousel = multer.diskStorage({
   destination: async function (req, file, cb) {

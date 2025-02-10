@@ -9,7 +9,8 @@ export const createProductVariantService = async (
   sku,
   productColor,
   productPrice,
-  productStock
+  productStock,
+  productImage,
 ) => {
   const productVariant = await ProductVariantModel.create({
     productId,
@@ -17,6 +18,7 @@ export const createProductVariantService = async (
     productColor,
     productPrice,
     productStock,
+    productImage
   });
   return productVariant;
 };
