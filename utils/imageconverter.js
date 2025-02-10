@@ -23,3 +23,47 @@ export const convertImageToWebp = async (dirpath, image, filename) => {
         filename: filename
     };
 }
+
+export const processImage = async (req, res, next) => {
+    try {
+      if (!req.file && !req.files) return next();
+  
+      const processFile = async (file) => {
+        const inputPath = file.path;
+        const ext = path.extname(inputPath).toLowerCase();
+        
+        // If the file is already .webp, don't process it
+        if (ext === ".webp") {
+          console.log("Skipping already WebP file:", inputPath);
+          return;
+        }
+  
+        // Create the output path with a .webp extension
+        const outputPath = path.join(
+          path.dirname(inputPath),
+          `${path.basename(inputPath, ext)}.webp`
+        );
+  
+        console.log("Converting:", inputPath, "->", outputPath);
+  
+        // Convert to WebP
+        await sharp(inputPath)
+          .webp({ quality: 80 })
+          .toFile(outputPath);
+  
+        // Delete the original file after conversion
+        await fs.promises.unlink(inputPath);
+      };
+  
+      if (req.files) {
+        await Promise.all(Object.values(req.files).flat().map(processFile));
+      } else if (req.file) {
+        await processFile(req.file);
+      }
+  
+      next();
+    } catch (error) {
+      console.error("Image processing error:", error);
+      next(error);
+    }
+  };

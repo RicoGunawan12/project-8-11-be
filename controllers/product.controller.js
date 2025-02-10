@@ -395,7 +395,7 @@ export const createProduct = async (req, res) => {
           const sanitizedProductName = req.body.productName.replace(/\//g, "");
           hash.set(
             productName + " - " + variants[i].productColor,
-            `/${UPLOAD_FOLDER}product/${sanitizedProductName}/${filename}`
+            `/${sanitizedProductName}/${filename}`
           );
         }
 
@@ -439,7 +439,7 @@ export const createProduct = async (req, res) => {
         const sanitizedProductName = req.body.productName.replace(/\//g, "");
         await createProductCoverService(
           product.productId,
-          `/${UPLOAD_FOLDER}product/${sanitizedProductName}/${image.filename}`
+          `/${UPLOAD_FOLDER}product/${sanitizedProductName}/${image.filename}.webp`
         );
       });
       await Promise.all(insertProductCover);
@@ -648,11 +648,10 @@ export const updateProduct = async (req, res) => {
     const variants = JSON.parse(productVariants);
     variants.forEach((variant) => {
       const sanitizedProductName = req.body.productName.replace(/\//g, "");
-      const filename = `${timestamp}-${sanitizedProductName} - ${variant.productColor}.webp`;
+      const filename = `/${timestamp}-${sanitizedProductName} - ${variant.productColor}.webp`;
 
       variant.productImage = filename
     });
-
 
     // converts image to WebP format
     // let defaultImageString = '';
@@ -670,7 +669,7 @@ export const updateProduct = async (req, res) => {
       const sanitizedProductName = req.body.productName.replace(/\//g, "");
       await createProductCoverService(
         productId,
-        `/${UPLOAD_FOLDER}product/${sanitizedProductName}/${image.filename}`
+        `/${UPLOAD_FOLDER}product/${sanitizedProductName}/${image.filename}.webp`
       );
     }) : [];
     await Promise.all(insertProductCover);

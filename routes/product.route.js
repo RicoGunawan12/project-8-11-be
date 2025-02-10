@@ -10,6 +10,7 @@ import { updateActiveStatusProductsSchema } from '../schema/product/updateActive
 import { updateInactiveStatusProductsSchema } from '../schema/product/updateInactiveStatusProducts.schema.js';
 import { productMultipleDeleteSchema } from '../schema/product/multipleDelete.schema.js';
 import { deletePhotoByProductId } from '../controllers/productCover.controller.js';
+import { processImage } from '../utils/imageconverter.js';
 
 
 const ProductRoute = express.Router();
@@ -45,6 +46,7 @@ ProductRoute.put('/:id',
         { name: 'defaultImage', maxCount: 20 }
     ]), 
     // validateProduct,
+    processImage,
     updateProduct
     );
 
