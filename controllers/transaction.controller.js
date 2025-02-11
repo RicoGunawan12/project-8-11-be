@@ -620,6 +620,7 @@ export const refundTransaction = async (req, res) => {
         const gatewayResponse = JSON.parse(transaction.gatewayResponse);
 
         const refundRequest = await refundXendit(transactionId, gatewayResponse, transaction.totalPrice);
+        await updateTransactionService(transactionId, "Return");
         return res.status(200).json({ message: "Transaction refunded!" })
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -627,7 +628,10 @@ export const refundTransaction = async (req, res) => {
 }
 
 export const refundTransactionCallback = async (req, res) => {
-    const { data } = req.body;
+    const { event, data } = req.body;
+    if (event != "ewallet.refund") {
+        return res.status("400").json({ message: "Not Refund!" });
+    }
     if (data.status === "SUCCEEDED") {   
         try {
             const transaction = await getTransactionsByIdService(data.reference_id);
@@ -662,6 +666,7 @@ export const cancelPaidTransaction = async (req, res) => {
         const gatewayResponse = JSON.parse(transaction.gatewayResponse);
         if (transaction.paymentMethod !== "COD") {
             const refundRequest = await refundXendit(transactionId, gatewayResponse, transaction.totalPrice);
+            // await updateTransactionService(transactionId, "Refund On Progress");
         }
 
         // const cancelledKomshipOrder = await cancelOrderKomship(transaction.komshipOrderNumber);
