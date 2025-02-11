@@ -384,18 +384,20 @@ export const createProduct = async (req, res) => {
       }
 
       // Process images only if we have variants and images
+      const sanitizedProductName = req.body.productName.replace(/\//g, "");
+      
       if (images && images.length > 0) {
         const hash = new Map();
         for (let i = 0; i < images.length; i++) {
           const image = images[i];
-          const filename = `${timestamp}-${productName} - ${variants[i].productColor}.webp`;
+          const sanitizedProductColor = variants[i].productColor.replace(/\//g, "");
+          const filename = `${timestamp}-${sanitizedProductName} - ${sanitizedProductColor}.webp`;
 
           console.log(productName + " - " + variants[i].productColor)
 
-          const sanitizedProductName = req.body.productName.replace(/\//g, "");
           hash.set(
             productName + " - " + variants[i].productColor,
-            `/${sanitizedProductName}/${filename}`
+            `${filename}`
           );
         }
 
@@ -648,7 +650,8 @@ export const updateProduct = async (req, res) => {
     const variants = JSON.parse(productVariants);
     variants.forEach((variant) => {
       const sanitizedProductName = req.body.productName.replace(/\//g, "");
-      const filename = `/${timestamp}-${sanitizedProductName} - ${variant.productColor}.webp`;
+      const sanitizedProductColor = variant.productColor.replace(/\//g, "");
+      const filename = `/${timestamp}-${sanitizedProductName} - ${sanitizedProductColor}.webp`;
 
       variant.productImage = filename
     });
@@ -669,7 +672,7 @@ export const updateProduct = async (req, res) => {
       const sanitizedProductName = req.body.productName.replace(/\//g, "");
       await createProductCoverService(
         productId,
-        `/${UPLOAD_FOLDER}product/${sanitizedProductName}/${image.filename}.webp`
+        `/${UPLOAD_FOLDER}product/${sanitizedProductName}/${image.filename}`
       );
     }) : [];
     await Promise.all(insertProductCover);

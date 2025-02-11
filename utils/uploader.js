@@ -16,13 +16,14 @@ export const UPLOAD_FOLDER = process.env.FOLDER_PATH || 'assets/';
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     try {
+      // Sanitize productName to remove slashes
       const sanitizedProductName = req.body.productName.replace(/\//g, "");
       const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + "product/" + sanitizedProductName);
 
       if (!fs.existsSync(uploadPath)) {
         fs.mkdirSync(uploadPath, { recursive: true });
       }
-      
+
       // Store the upload path in the request object for later use
       req.uploadPath = uploadPath;
       cb(null, uploadPath);
@@ -36,10 +37,16 @@ const storage = multer.diskStorage({
         req.timestamp = Date.now();
       }
 
-      // Generate filename but always use .webp extension
+      // Sanitize the filename to remove slashes and ensure a safe format
+      const sanitizedFilename = path.parse(file.originalname).name.replace(/\//g, "");
+
+      console.log("san: ",sanitizedFilename)
+      console.log("ori: ", file.originalname)
+
+      // Generate filename with .webp extension
       const filename = file.fieldname === "defaultImage"
-        ? `${path.parse(file.originalname).name}`
-        : `${req.timestamp}-${path.parse(file.originalname).name}`;
+        ? `${sanitizedFilename}.webp`
+        : `${req.timestamp}-${sanitizedFilename}.webp`;
 
       // Store the full path for Sharp processing
       const fullPath = path.join(req.uploadPath, filename);
@@ -51,6 +58,7 @@ const storage = multer.diskStorage({
     }
   }
 });
+
 
 const storageBlog = multer.diskStorage({
   destination: async function (req, file, cb) {
