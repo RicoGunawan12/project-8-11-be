@@ -620,11 +620,23 @@ export const refundTransaction = async (req, res) => {
         const gatewayResponse = JSON.parse(transaction.gatewayResponse);
 
         const refundRequest = await refundXendit(transactionId, gatewayResponse, transaction.totalPrice);
-        await updateTransactionService(transactionId, "Return");
-
         return res.status(200).json({ message: "Transaction refunded!" })
     } catch (error) {
         return res.status(500).json({ message: error.message });
+    }
+}
+
+export const refundTransactionCallback = async (req, res) => {
+    const { data } = req.body;
+    if (data.status === "SUCCEEDED") {   
+        try {
+            await updateTransactionService(data.reference_id, "Return");
+        } catch (error) {
+            return res.status(500).json({ message: error.message });
+        }
+    }
+    else {
+        return res.status(500).json({ message: "Refund failed" });
     }
 }
 
