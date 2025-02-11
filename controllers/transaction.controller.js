@@ -630,7 +630,13 @@ export const refundTransactionCallback = async (req, res) => {
     const { data } = req.body;
     if (data.status === "SUCCEEDED") {   
         try {
-            await updateTransactionService(data.reference_id, "Return");
+            const transaction = await getTransactionsByIdService(data.reference_id);
+            if (transaction.status === "On Review Cancel") {
+                await updateTransactionService(data.reference_id, "Cancelled");
+            }
+            else if (transaction.status === "On Review Return") {
+                await updateTransactionService(data.reference_id, "Return");
+            }
         } catch (error) {
             return res.status(500).json({ message: error.message });
         }
