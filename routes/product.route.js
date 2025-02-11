@@ -34,6 +34,7 @@ ProductRoute.post('/',
         { name: 'defaultImage', maxCount: 20 }
     ]), 
     // validateProduct,
+    processImage,
     createProduct
     );
 

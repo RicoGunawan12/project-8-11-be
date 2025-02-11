@@ -139,7 +139,7 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
             payment_method: transaction.paymentMethod === "COD" ? "COD" : "BANK TRANSFER",
             shipping_cost: transaction.deliveryFee, // ambil dari transaction
             shipping_cashback: transaction.deliveryCashback,
-            service_fee: transaction.paymentMethod === "COD" ? transaction.totalPrice * 2.8 / 100 : 0,
+            service_fee: transaction.paymentMethod === "COD" ? Math.round(transaction.totalPrice * 2.8 / 100) : 0,
             additional_cost: 0,
             grand_total: transaction.totalPrice,
             cod_value: transaction.paymentMethod === "COD" ? transaction.totalPrice : 0,
