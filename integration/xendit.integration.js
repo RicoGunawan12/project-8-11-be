@@ -337,7 +337,20 @@ export const refundXendit = async (transactionId, gatewayResponse, amount) => {
             return result;
         }
         else if (gatewayResponse.payment_method === "CREDIT_CARD") {
-
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                redirect: 'follow',
+                body: JSON.stringify(body)
+            }
+    
+            const xenditResponse = await fetch(`${process.env.XENDIT_URL}/credit_card_charges/${gatewayResponse.payment_id}/refunds`, requestOptions);
+                 
+            if (!xenditResponse.ok) {
+                throw new Error(`Error: ${xenditResponse.statusText}`);
+            }
+            const result = await xenditResponse.json();
+            return result;
         }
         else {
             
