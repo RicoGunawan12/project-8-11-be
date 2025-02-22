@@ -38,51 +38,37 @@ export const getCartItemsByUserService = async (userId) => {
         include: [
           {
             model: ProductModel,
-            attributes: [
-              "productId",
-              "productName",
-              "productWeight",
-              "productSize",
-            ],
+            attributes: ["productId", "productName", "productWeight", "productSize"],
             include: [
               {
                 model: PromoDetailModel,
                 attributes: ["promoDetailId"],
                 include: [
-                    {
-                        model: ProductModel,
-                        attributes: ['productId', 'productName', 'productWeight', 'productSize'],
-                        include: [
-                            {
-                                model: PromoDetailModel,
-                                attributes: ['promoDetailId'],
-                                separate: true,
-                                include: [
-                                    {
-                                        model: PromoModel,
-                                        where: {
-                                            startDate: {
-                                                [Op.lte]: new Date(), // Start of the day
-                                            },
-                                            endDate: {
-                                                [Op.gte]: new Date().setHours(0, 0, 0, 0), // End of the day
-                                            },
-                                        },
-                                        order: [["created_at", "DESC"]],
-                                    },
-                                ]
-                            },{
-                                include: BogoModel
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]}],
-        attributes: ['cartItemId', 'productVariantId', 'quantity']
-        }
-    ]});
+                  {
+                    model: PromoModel,
+                    where: {
+                      startDate: { [Op.lte]: new Date() },
+                      endDate: { [Op.gte]: new Date().setHours(0, 0, 0, 0) },
+                    },
+                    order: [["created_at", "DESC"]],
+                  },
+                ],
+              },
+              {
+                model: BogoModel, // Include BogoModel here
+                attributes: ["bogoId", "bogoName", "variant","startDate"], // Add necessary attributes
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    attributes: ["cartItemId", "productVariantId", "quantity"],
+  });
+  
     
+  console.log("cartttt2");
+
     const filteredCartItems = await Promise.all(
         cartItem.map(async (cartItem) => {
             // console.log(item.product_variant.product.promo_details[0].promo.promoId);

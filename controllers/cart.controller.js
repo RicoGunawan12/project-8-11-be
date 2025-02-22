@@ -5,15 +5,11 @@ import { addCartItemService, getCartItemsByUserService, removeCartItemService, u
 export const getCartItemsByUser = async (req, res) => {
     const user = req.user;
 
-    try {
         console.log("getting cart")
         const cartItems = await getCartItemsByUserService(user.userId);
         console.log("here in controller")
         console.log(cartItems)
         return res.status(200).json(cartItems);
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
 }
 
 export const addCartItem = async (req, res) => {

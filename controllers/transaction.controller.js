@@ -1,281 +1,407 @@
+import { ProductVariantModel } from "../association/association.js";
 import sequelize from "../config/database.js";
 import { cancelOrderKomship } from "../integration/komship.integration.js";
-import { createQrisTransactionXendit, refundXendit } from "../integration/xendit.integration.js";
-import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
+import {
+  createQrisTransactionXendit,
+  refundXendit,
+} from "../integration/xendit.integration.js";
+import {
+  getCartItemsByUserService,
+  removeAllCartItemInUserService,
+} from "../services/cart.service.js";
 import { getFreeOngkirService } from "../services/freeOngkir.service.js";
-import { checkPromoService, createPromoHistoryService } from "../services/promo.service.js";
-import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, getTransactionXenditService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, rollbackTransaction, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
+import {
+  checkPromoService,
+  createPromoHistoryService,
+} from "../services/promo.service.js";
+import {
+  allMonthSalesAnalyticService,
+  cancelTransactionService,
+  checkOutCreditTransactionService,
+  checkOutQrisTransactionService,
+  checkOutVATransactionService,
+  checkTransactionWithVoucher,
+  countTransactionsService,
+  createKomshipOrderService,
+  createTransactionDetailService,
+  createTransactionService,
+  deliveryDetailService,
+  fetchSalesByCategoryService,
+  getAllTransactionsService,
+  getTransactionsByIdService,
+  getTransactionsByUserService,
+  getTransactionXenditService,
+  monthlySalesReportService,
+  onReviewReturnTransactionService,
+  onReviewTransactionService,
+  payTransactionService,
+  printLabelService,
+  requestPickupTransactionService,
+  returnTransactionService,
+  rollbackTransaction,
+  updatePaymentLinkService,
+  updateTransactionDeliveryService,
+  updateTransactionService,
+  updateTransactionStatusService,
+} from "../services/transaction.service.js";
 import { applyVoucherService } from "../services/voucher.service.js";
 
-
 export const getAllTransactions = async (req, res) => {
-    var { status, startDate, endDate, offset, limit } = req.query
-    if (status === undefined) {
-        status = ""
-    }
-    try {
-        const transactions = await getAllTransactionsService(status, startDate, endDate, offset, limit);
-        return res.status(200).json({ message: "Transaction fetched successfully", transactions })
-    } catch (error) {
-        return res.status(500).json({ message: error.message })
-    }
-}
+  var { status, startDate, endDate, offset, limit } = req.query;
+  if (status === undefined) {
+    status = "";
+  }
+  try {
+    const transactions = await getAllTransactionsService(
+      status,
+      startDate,
+      endDate,
+      offset,
+      limit
+    );
+    return res
+      .status(200)
+      .json({ message: "Transaction fetched successfully", transactions });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const getTransactionCount = async (req, res) => {
-    try {
-        const { status, startDate, endDate } = req.query;
+  try {
+    const { status, startDate, endDate } = req.query;
 
-        const transactionCount = await countTransactionsService(status, startDate, endDate);
+    const transactionCount = await countTransactionsService(
+      status,
+      startDate,
+      endDate
+    );
 
-        res.status(200).json({ count: transactionCount });
-    } catch (error) {
-        console.error("Error fetching transaction count:", error);
-        res.status(500).json({ message: "Failed to fetch transaction count." });
-    }
+    res.status(200).json({ count: transactionCount });
+  } catch (error) {
+    console.error("Error fetching transaction count:", error);
+    res.status(500).json({ message: "Failed to fetch transaction count." });
+  }
 };
 
 export const getTransactionsByUser = async (req, res) => {
-    var { status } = req.query
-    const userId = req.user.userId;
-    if (status === undefined) {
-        status = ""
-    }
-    try {
-        const transactions = await getTransactionsByUserService(userId, status);
-        return res.status(200).json({ message: "Transaction fetched successfully", transactions })
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
+  var { status } = req.query;
+  const userId = req.user.userId;
+  if (status === undefined) {
+    status = "";
+  }
+  try {
+    const transactions = await getTransactionsByUserService(userId, status);
+    return res
+      .status(200)
+      .json({ message: "Transaction fetched successfully", transactions });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const getTransactionById = async (req, res) => {
-    const transactionId = req.params.id;
-    if (!transactionId) {
-        return res.status(400).json({ message: "Transaction id is required" })
-    }
-    try {
-        const transaction = await getTransactionsByIdService(transactionId);
-        return res.status(200).json({ message: "Transaction fetched successfully", transaction })
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
+  const transactionId = req.params.id;
+  if (!transactionId) {
+    return res.status(400).json({ message: "Transaction id is required" });
+  }
+  try {
+    const transaction = await getTransactionsByIdService(transactionId);
+    return res
+      .status(200)
+      .json({ message: "Transaction fetched successfully", transaction });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const createTransaction = async (req, res) => {
-    const {
-        addressId,
-        paymentMethod,
+  const {
+    addressId,
+    paymentMethod,
+    voucherCode,
+    expedition,
+    shippingType,
+    deliveryFee,
+    deliveryCashback,
+    notes,
+    customerNotes,
+    productNotes,
+    bogo,
+  } = req.body;
+  const userId = req.user.userId;
+
+  if (!addressId) {
+    return res.status(400).json({ message: "address id must be filled" });
+  } else if (paymentMethod.length <= 0) {
+    return res.status(400).json({ message: "Payment method must be filled" });
+  }
+
+  const seqTransaction = await sequelize.transaction();
+  try {
+    // get all item from user cart
+    const userCart = await getCartItemsByUserService(userId);
+    if (userCart.length === 0) {
+      return res.status(400).json({ message: "There is no items in cart!" });
+    }
+    const productsInCart = userCart;
+
+    // calculate the total price
+    // calculate the total weight
+    var totalPrice = deliveryFee;
+    var totalWeight = 0;
+    await Promise.all(
+      productsInCart.map(async (product) => {
+        if (product.quantity === 1) {
+          const promoDetails = await checkPromoService(
+            product.product_variant.ref_product_id,
+            userId
+          );
+          if (promoDetails) {
+            product.product_variant.productPrice =
+              product.product_variant.productPrice -
+                promoDetails.promo.promoAmount <=
+              0
+                ? 0
+                : product.product_variant.productPrice -
+                  promoDetails.promo.promoAmount;
+            product.product_variant.realizedPromo =
+              promoDetails.promo.promoAmount;
+
+            const promoHistory = await createPromoHistoryService(
+              promoDetails.promo.promoId,
+              userId,
+              product.product_variant.ref_product_id
+            );
+          }
+        }
+
+        const itemTotal =
+          product.product_variant.productPrice * product.quantity;
+        totalPrice += itemTotal;
+        totalWeight += product.product_variant.productWeight;
+      })
+    );
+    // console.log(totalWeight);
+    var freeOngkir = 0;
+    const freeOngkirData = await getFreeOngkirService();
+    if (
+      freeOngkirData.status === "Active" &&
+      totalPrice - deliveryFee >= freeOngkirData.minimumPaymentAmount
+    ) {
+      freeOngkir =
+        deliveryFee - freeOngkirData.maximumFreeOngkir <= 0
+          ? deliveryFee
+          : deliveryFee - freeOngkirData.maximumFreeOngkir;
+      totalPrice -= freeOngkir;
+    }
+
+    var disc = 0;
+    if (voucherCode) {
+      // minus the totalprice
+      const voucherHasUsed = await checkTransactionWithVoucher(
         voucherCode,
-        expedition,
-        shippingType,
-        deliveryFee,
-        deliveryCashback,
-        notes,
-        customerNotes,
-        productNotes,
-    } = req.body;
-    const userId = req.user.userId;
-
-    if (!addressId) {
-        return res.status(400).json({ message: "address id must be filled" });
-    }
-    else if (paymentMethod.length <= 0) {
-        return res.status(400).json({ message: "Payment method must be filled" });
+        userId
+      );
+      if (voucherHasUsed) {
+        return res.status(400).json({ message: "Voucher has been used!" });
+      } else {
+        const discount = await applyVoucherService(
+          voucherCode,
+          totalPrice - deliveryFee + freeOngkir
+        );
+        totalPrice -= discount;
+        disc = discount;
+      }
     }
 
-    const seqTransaction = await sequelize.transaction();
-    try {
-        // get all item from user cart
-        const userCart = await getCartItemsByUserService(userId);
-        if (userCart.length === 0) {
-            return res.status(400).json({ message: "There is no items in cart!" });
-        }
-        const productsInCart = userCart;
+    // if(bogs && bogos.length() > 1){
+        
+    // }
 
-        // calculate the total price
-        // calculate the total weight
-        var totalPrice = deliveryFee;
-        var totalWeight = 0;
-        await Promise.all(
-            productsInCart.map(async (product) => {
-                if (product.quantity === 1) {
-                    const promoDetails = await checkPromoService(product.product_variant.ref_product_id, userId);
-                    if (promoDetails) {
-                        product.product_variant.productPrice =
-                        product.product_variant.productPrice - promoDetails.promo.promoAmount <= 0 ? 0 :
-                        product.product_variant.productPrice - promoDetails.promo.promoAmount;
-                        product.product_variant.realizedPromo = promoDetails.promo.promoAmount;
-                        
-                        const promoHistory = await createPromoHistoryService(promoDetails.promo.promoId, userId, product.product_variant.ref_product_id);
-                    }
-                }
+    // set transaction date to now
+    // set gateway response to null
+    // set status to Wait for payment
+    // set payment deadline to now + 1 day
+    // insert transaction header and get the id
+    const transaction = await createTransactionService(
+      userId,
+      addressId,
+      voucherCode.length === 0 ? null : voucherCode,
+      // null,
+      new Date(),
+      paymentMethod,
+      null,
+      paymentMethod === "COD" || totalPrice < 1000
+        ? "Waiting for shipping"
+        : "Unpaid",
+      expedition,
+      shippingType,
+      deliveryFee,
+      deliveryCashback,
+      new Date(Date.now() + 1 * 60 * 60 * 1000),
+      notes,
+      totalPrice,
+      totalWeight,
+      customerNotes,
+      freeOngkir
+    );
 
-                const itemTotal = product.product_variant.productPrice * product.quantity;
-                totalPrice += itemTotal;
-                totalWeight += product.product_variant.productWeight;
-            })
-        );
-        // console.log(totalWeight);
-        var freeOngkir = 0;
-        const freeOngkirData = await getFreeOngkirService();
-        if (freeOngkirData.status === "Active" && totalPrice - deliveryFee >= freeOngkirData.minimumPaymentAmount) {
-            freeOngkir = deliveryFee - freeOngkirData.maximumFreeOngkir <= 0 ? 
-                        deliveryFee : 
-                        deliveryFee - freeOngkirData.maximumFreeOngkir;
-            totalPrice -= freeOngkir;
-        }
+    // insert transaction detail
+    const transactionDetails = productsInCart.map((product, index) => {
+      const currentDate = new Date();
 
+      // const isPromoActive =
+      //     product.isPromo &&
+      //     new Date(product.startDate) <= currentDate &&
+      //     currentDate <= new Date(product.endDate);
+      return {
+        transactionId: transaction.transactionId,
+        productVariantId: product.product_variant.productVariantId,
+        quantity: product.quantity,
+        paidProductPrice: product.product_variant.productPrice,
+        realizedPromo: product.product_variant.realizedPromo,
+        customerNotes: productNotes[index] || "",
+      };
+    });
+    
+    console.log(bogo)
 
-        var disc = 0;
-        if (voucherCode) {
-            // minus the totalprice
-            const voucherHasUsed = await checkTransactionWithVoucher(voucherCode, userId);
-            if (voucherHasUsed) {
-                return res.status(400).json({ message: "Voucher has been used!" });
-            }
-            else {
-                const discount = await applyVoucherService(voucherCode, totalPrice - deliveryFee + freeOngkir);
-                totalPrice -= discount;
-                disc = discount;
-                
-            }
-        }
+    const bogoDetails = await Promise.all(
+      Object.entries(bogo).map(async ([bogoKey, bogoValue]) => {
 
-
-        // set transaction date to now 
-        // set gateway response to null
-        // set status to Wait for payment
-        // set payment deadline to now + 1 day 
-        // insert transaction header and get the id
-        const transaction = await createTransactionService(
-            userId,
-            addressId,
-            voucherCode.length === 0 ? null : voucherCode,
-            // null, 
-            new Date(),
-            paymentMethod,
-            null,
-            paymentMethod === "COD" || totalPrice < 1000 ? "Waiting for shipping" : "Unpaid",
-            expedition,
-            shippingType,
-            deliveryFee,
-            deliveryCashback,
-            new Date(Date.now() + 1 * 60 * 60 * 1000),
-            notes,
-            totalPrice,
-            totalWeight,
-            customerNotes,
-            freeOngkir
-        );
-
-        // insert transaction detail
-        const transactionDetails = productsInCart.map((product, index) => {
-            const currentDate = new Date();
-
-            // const isPromoActive =
-            //     product.isPromo &&
-            //     new Date(product.startDate) <= currentDate &&
-            //     currentDate <= new Date(product.endDate);
-            return {
-                transactionId: transaction.transactionId,
-                productVariantId: product.product_variant.productVariantId,
-                quantity: product.quantity,
-                paidProductPrice: product.product_variant.productPrice,
-                realizedPromo: product.product_variant.realizedPromo,
-                customerNotes: productNotes[index] || ""
-            };
+        console.log("Key:", bogoKey); 
+        console.log("Value:", bogoValue); 
+        const productVariant = await ProductVariantModel.findOne({
+          where: { productVariantId : bogoValue }
         });
-        const insertedTransactionDetails = await createTransactionDetailService(transactionDetails);
-        const deletedCartItem = await removeAllCartItemInUserService(userId);
         
-        if (paymentMethod !== "COD" && totalPrice >= 1000) {
-            const payTransactionResponse = await payTransactionService(transaction, req.user.customerId, productsInCart, disc, freeOngkir)
-            console.log(payTransactionResponse);
-            const updatePaymentLink = await updatePaymentLinkService(transaction, payTransactionResponse.actions[0].url);
-            await seqTransaction.commit();
-            return res.status(200).json({ message: "Transaction created!", payTransactionResponse, transaction, insertedTransactionDetails });
-            
+        if (!productVariant) {
+          throw new Error(`Product variant not found for key: ${bogoValue}`);
         }
-        else {
-            await seqTransaction.commit();
-            return res.status(200).json({ message: "Transaction created!", transaction, insertedTransactionDetails });
-        }
-        
 
-    } catch (error) {
+        return {
+          transactionId: transaction.transactionId,
+          productVariantId: productVariant.productVariantId,
+          quantity: 1,
+          paidProductPrice: 0,
+          realizedPromo: 'BOGO',
+          customerNotes: "",
+        };
+      })
+    );
 
-        await seqTransaction.rollback();
-        return res.status(500).json({ message: error.message });
+    console.log("Bogo Details:", bogoDetails);
+
+    const insertedTransactionDetails = await createTransactionDetailService(
+      transactionDetails,
+      bogoDetails
+    );
+    const deletedCartItem = await removeAllCartItemInUserService(userId);
+
+    if (paymentMethod !== "COD" && totalPrice >= 1000) {
+      const payTransactionResponse = await payTransactionService(
+        transaction,
+        req.user.customerId,
+        productsInCart,
+        disc,
+        freeOngkir
+      );
+      console.log(payTransactionResponse);
+      const updatePaymentLink = await updatePaymentLinkService(
+        transaction,
+        payTransactionResponse.actions[0].url
+      );
+      await seqTransaction.commit();
+      return res
+        .status(200)
+        .json({
+          message: "Transaction created!",
+          payTransactionResponse,
+          transaction,
+          insertedTransactionDetails,
+        });
+    } else {
+      await seqTransaction.commit();
+      return res
+        .status(200)
+        .json({
+          message: "Transaction created!",
+          transaction,
+          insertedTransactionDetails,
+        });
     }
-}
-
+  } catch (error) {
+    await seqTransaction.rollback();
+    console.log(error)
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const checkOutCreditTransaction = async (req, res) => {
-    const {
-        transactionId,
-        amount,
-        card_number,
-        card_exp_month,
-        card_exp_year,
-        card_cvn,
-        is_multiple_use,
-        should_authenticate,
-        card_holder_email,
-        card_holder_first_name,
-        card_holder_last_name,
-        card_holder_phone_number,
-    } = req.body;
+  const {
+    transactionId,
+    amount,
+    card_number,
+    card_exp_month,
+    card_exp_year,
+    card_cvn,
+    is_multiple_use,
+    should_authenticate,
+    card_holder_email,
+    card_holder_first_name,
+    card_holder_last_name,
+    card_holder_phone_number,
+  } = req.body;
 
-    try {
-        const response = await checkOutCreditTransactionService(
-            transactionId,
-            amount,
-            card_number,
-            card_exp_month,
-            card_exp_year,
-            card_cvn,
-            is_multiple_use,
-            should_authenticate,
-            card_holder_email,
-            card_holder_first_name,
-            card_holder_last_name,
-            card_holder_phone_number
-        );
-        return res.status(200).json({ message: "Transaction paid!", response })
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
+  try {
+    const response = await checkOutCreditTransactionService(
+      transactionId,
+      amount,
+      card_number,
+      card_exp_month,
+      card_exp_year,
+      card_cvn,
+      is_multiple_use,
+      should_authenticate,
+      card_holder_email,
+      card_holder_first_name,
+      card_holder_last_name,
+      card_holder_phone_number
+    );
+    return res.status(200).json({ message: "Transaction paid!", response });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const checkOutQrisTransaction = async (req, res) => {
-    const {
-        transactionId,
-        amount,
-    } = req.body;
-    try {
-        const response = await checkOutQrisTransactionService(transactionId, amount);
-        return res.status(200).json({ message: "Fetch QRIS Success!", response })
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
+  const { transactionId, amount } = req.body;
+  try {
+    const response = await checkOutQrisTransactionService(
+      transactionId,
+      amount
+    );
+    return res.status(200).json({ message: "Fetch QRIS Success!", response });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const checkOutVATransaction = async (req, res) => {
+  const { transactionId, amount, bank } = req.body;
 
-    const {
-        transactionId,
-        amount,
-        bank
-    } = req.body
-
-    try {
-        const response = await checkOutVATransactionService(transactionId, amount, bank);
-        return res.status(200).json({ message: "VA Created!", response })
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
-
+  try {
+    const response = await checkOutVATransactionService(
+      transactionId,
+      amount,
+      bank
+    );
+    return res.status(200).json({ message: "VA Created!", response });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 // Req body
 // {
@@ -350,293 +476,305 @@ export const checkOutVATransaction = async (req, res) => {
 //     "api_version": null
 // }
 export const updateTransactionStatus = async (req, res) => {
-    const {
-        reference_id,
-        status,
-        attempt_details
-    } = req.body.data;
+  const { reference_id, status, attempt_details } = req.body.data;
 
-    if (status != "SUCCEEDED") {
-        return res.status(400).json({ message: "Transaction not succeeded" });
-    }
+  if (status != "SUCCEEDED") {
+    return res.status(400).json({ message: "Transaction not succeeded" });
+  }
 
-    try {
-        const transaction = await getTransactionXenditService(attempt_details[0].action_id)
-        const updatedTransaction = await updateTransactionStatusService(reference_id, req.body, transaction.payment_method.type);
-        // const getTransactionById = await getTransactionsByIdService(reference_id);
-        // const response = await createKomshipOrderService(getTransactionById);
-        return res.status(200).json({ message: "Transaction updated!" });
-        // return res.redirect('/');
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-
-}
+  try {
+    const transaction = await getTransactionXenditService(
+      attempt_details[0].action_id
+    );
+    const updatedTransaction = await updateTransactionStatusService(
+      reference_id,
+      req.body,
+      transaction.payment_method.type
+    );
+    // const getTransactionById = await getTransactionsByIdService(reference_id);
+    // const response = await createKomshipOrderService(getTransactionById);
+    return res.status(200).json({ message: "Transaction updated!" });
+    // return res.redirect('/');
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const requestPickupTransaction = async (req, res) => {
-    const { transactionId } = req.body;
-    try {
-        const getTransactionById = await getTransactionsByIdService(transactionId);
-        const createKomshipOrder = await createKomshipOrderService(getTransactionById);
-        const getTransactionByIdAfter = await getTransactionsByIdService(transactionId);
-        const response = await requestPickupTransactionService(getTransactionByIdAfter);
-        return res.status(200).json({ message: "Success!", response });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
+  const { transactionId } = req.body;
+  try {
+    const getTransactionById = await getTransactionsByIdService(transactionId);
+    const createKomshipOrder = await createKomshipOrderService(
+      getTransactionById
+    );
+    const getTransactionByIdAfter = await getTransactionsByIdService(
+      transactionId
+    );
+    const response = await requestPickupTransactionService(
+      getTransactionByIdAfter
+    );
+    return res.status(200).json({ message: "Success!", response });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const deliveryDetail = async (req, res) => {
-    const { orderNumber } = req.body;
+  const { orderNumber } = req.body;
 
-    try {
-        const detail = await deliveryDetailService(orderNumber);
-        return res.status(200).json({ message: "Success!", detail });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
+  try {
+    const detail = await deliveryDetailService(orderNumber);
+    return res.status(200).json({ message: "Success!", detail });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const printLabel = async (req, res) => {
-    const { komshipOrderNumbers } = req.body;
+  const { komshipOrderNumbers } = req.body;
 
-    try {
-        const label = await printLabelService(komshipOrderNumbers);
+  try {
+    const label = await printLabelService(komshipOrderNumbers);
 
-        return res.status(200).json({ message: "Success!", label });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
+    return res.status(200).json({ message: "Success!", label });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const monthlySalesReport = async (req, res) => {
-    const { year, month } = req.body;
+  const { year, month } = req.body;
 
-    if (year <= 0) {
-        return res.status(400).json({ message: "Invalid Year" });
-    }
-    else if (month <= 0) {
-        return res.status(400).json({ message: "Invalid Month" });
-    }
+  if (year <= 0) {
+    return res.status(400).json({ message: "Invalid Year" });
+  } else if (month <= 0) {
+    return res.status(400).json({ message: "Invalid Month" });
+  }
 
-    try {
-        const response = await monthlySalesReportService(year, month);
-        return res.status(200).json({ message: "Fetch successfully", response })
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
+  try {
+    const response = await monthlySalesReportService(year, month);
+    return res.status(200).json({ message: "Fetch successfully", response });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const allMonthSalesAnalytic = async (req, res) => {
-    const { year } = req.body;
-    if (year <= 0) {
-        return res.status(400).json({ message: "Invalid Year" });
-    }
+  const { year } = req.body;
+  if (year <= 0) {
+    return res.status(400).json({ message: "Invalid Year" });
+  }
 
-    try {
-        const response = await allMonthSalesAnalyticService(year);
-        return res.status(200).json({ message: "Fetch successfully", response })
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
+  try {
+    const response = await allMonthSalesAnalyticService(year);
+    return res.status(200).json({ message: "Fetch successfully", response });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const fetchSalesByCategory = async (req, res) => {
-    const { year, month } = req.body;
+  const { year, month } = req.body;
 
-    if (year <= 0) {
-        return res.status(400).json({ message: "Invalid Year" });
-    }
-    else if (month <= 0) {
-        return res.status(400).json({ message: "Invalid Month" });
-    }
+  if (year <= 0) {
+    return res.status(400).json({ message: "Invalid Year" });
+  } else if (month <= 0) {
+    return res.status(400).json({ message: "Invalid Month" });
+  }
 
-    try {
-        const response = await fetchSalesByCategoryService(year, month);
-        return res.status(200).json({ message: "Fetch successfully", response })
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
+  try {
+    const response = await fetchSalesByCategoryService(year, month);
+    return res.status(200).json({ message: "Fetch successfully", response });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const updateTransactionDelivery = async (req, res) => {
-    const { order_no, cnote, status } = req.body;
-    if (!order_no || !cnote || !status) {
-        return res.status(400).json({ message: "Invalid input" });
-    }
+  const { order_no, cnote, status } = req.body;
+  if (!order_no || !cnote || !status) {
+    return res.status(400).json({ message: "Invalid input" });
+  }
 
-    if (status != "Diterima") {
-        return res.status(200).json({ message: status })
-    }
+  if (status != "Diterima") {
+    return res.status(200).json({ message: status });
+  }
 
-    try {
-        const response = updateTransactionDeliveryService(order_no, status);
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
+  try {
+    const response = updateTransactionDeliveryService(order_no, status);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const cancelTransaction = async (req, res) => {
-    const transactionId = req.params.id;
+  const transactionId = req.params.id;
 
-    if (!transactionId) {
-        return res.status(400).json({ message: "Transaction is required!" });
-    }
+  if (!transactionId) {
+    return res.status(400).json({ message: "Transaction is required!" });
+  }
 
-    try {
-        await rollbackTransaction(transactionId);
-        const cancelledTransaction = await cancelTransactionService(transactionId);
+  try {
+    await rollbackTransaction(transactionId);
+    const cancelledTransaction = await cancelTransactionService(transactionId);
 
-        return res.status(200).json({ message: "Transaction cancelled!" })
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
+    return res.status(200).json({ message: "Transaction cancelled!" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const onReviewTransaction = async (req, res) => {
-    const transactionId = req.params.id;
-    const { reason } = req.body;
+  const transactionId = req.params.id;
+  const { reason } = req.body;
 
-    if (!transactionId) {
-        return res.status(400).json({ message: "Transaction is required!" });
-    }
+  if (!transactionId) {
+    return res.status(400).json({ message: "Transaction is required!" });
+  }
 
-    if (
-        !reason ||
-        typeof reason !== "string" ||
-        reason.trim() === ""
-    ) {
-        return res.status(400).json({ message: "Reason is required!" });
-    }
+  if (!reason || typeof reason !== "string" || reason.trim() === "") {
+    return res.status(400).json({ message: "Reason is required!" });
+  }
 
-    try {
-        const onReviewTransaction = await onReviewTransactionService(transactionId, reason);
-        return res.status(200).json({ message: "Cancel reason on review!" })
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
+  try {
+    const onReviewTransaction = await onReviewTransactionService(
+      transactionId,
+      reason
+    );
+    return res.status(200).json({ message: "Cancel reason on review!" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const onReviewReturnTransaction = async (req, res) => {
-    const transactionId = req.params.id;
-    const { reason } = req.body;
+  const transactionId = req.params.id;
+  const { reason } = req.body;
 
-    if (!transactionId) {
-        return res.status(400).json({ message: "Transaction is required!" });
-    }
+  if (!transactionId) {
+    return res.status(400).json({ message: "Transaction is required!" });
+  }
 
-    if (
-        !reason ||
-        typeof reason !== "string" ||
-        reason.trim() === ""
-    ) {
-        return res.status(400).json({ message: "Reason is required!" });
-    }
+  if (!reason || typeof reason !== "string" || reason.trim() === "") {
+    return res.status(400).json({ message: "Reason is required!" });
+  }
 
-    try {
-        const onReviewTransaction = await onReviewReturnTransactionService(transactionId, reason);
-        return res.status(200).json({ message: "Cancel reason on review!" })
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
+  try {
+    const onReviewTransaction = await onReviewReturnTransactionService(
+      transactionId,
+      reason
+    );
+    return res.status(200).json({ message: "Cancel reason on review!" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const payTransaction = async (req, res) => {
-    const user = req.user;
-    const { transactionId } = req.body;
+  const user = req.user;
+  const { transactionId } = req.body;
 
-    if (!transactionId) {
-        return res.status(400).json({ message: "Transaction ID is required!" });
-    }
+  if (!transactionId) {
+    return res.status(400).json({ message: "Transaction ID is required!" });
+  }
 
-    try {
-        const transactionPlan = await payTransactionService(transactionId, user);
-        return res.status(200).json({ message: "Plan created!" });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-
-}
+  try {
+    const transactionPlan = await payTransactionService(transactionId, user);
+    return res.status(200).json({ message: "Plan created!" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const returnTransaction = async (req, res) => {
-    const { transactionId } = req.body;
+  const { transactionId } = req.body;
 
-    if (!transactionId) {
-        return res.status(400).json({ message: "Transaction ID is required!" });
-    }
+  if (!transactionId) {
+    return res.status(400).json({ message: "Transaction ID is required!" });
+  }
 
-    try {
-        const transaction = await getTransactionsByIdService(transactionId);
-        const returnedTransaction = await returnTransactionService(transactionId);
+  try {
+    const transaction = await getTransactionsByIdService(transactionId);
+    const returnedTransaction = await returnTransactionService(transactionId);
 
-        return res.status(200).json({ message: "Transaction updated to waiting for return. Ask customer to return the poduct" });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
+    return res
+      .status(200)
+      .json({
+        message:
+          "Transaction updated to waiting for return. Ask customer to return the poduct",
+      });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const refundTransaction = async (req, res) => {
-    const { transactionId } = req.body;
+  const { transactionId } = req.body;
 
-    if (!transactionId) {
-        return res.status(400).json({ message: "Transaction ID is required!" });
-    }
+  if (!transactionId) {
+    return res.status(400).json({ message: "Transaction ID is required!" });
+  }
 
-    try {
-        const transaction = await getTransactionsByIdService(transactionId);
-        const gatewayResponse = JSON.parse(transaction.gatewayResponse);
+  try {
+    const transaction = await getTransactionsByIdService(transactionId);
+    const gatewayResponse = JSON.parse(transaction.gatewayResponse);
 
-        const refundRequest = await refundXendit(transactionId, gatewayResponse.data.attempt_details[0].action_id, transaction.totalPrice);
-        await updateTransactionService(transactionId, "Return");
+    const refundRequest = await refundXendit(
+      transactionId,
+      gatewayResponse.data.attempt_details[0].action_id,
+      transaction.totalPrice
+    );
+    await updateTransactionService(transactionId, "Return");
 
-        return res.status(200).json({ message: "Transaction refunded!" })
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
+    return res.status(200).json({ message: "Transaction refunded!" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const cancelPaidTransaction = async (req, res) => {
-    const transactionId = req.params.id;
+  const transactionId = req.params.id;
 
-    if (!transactionId) {
-        return res.status(400).json({ message: "Transaction is required!" });
-    }
+  if (!transactionId) {
+    return res.status(400).json({ message: "Transaction is required!" });
+  }
 
-    try {
-        const transaction = await getTransactionsByIdService(transactionId);
+  try {
+    const transaction = await getTransactionsByIdService(transactionId);
 
-        await rollbackTransaction(transactionId);
-        const cancelledTransaction = await cancelTransactionService(transactionId);
+    await rollbackTransaction(transactionId);
+    const cancelledTransaction = await cancelTransactionService(transactionId);
 
-        const gatewayResponse = JSON.parse(transaction.gatewayResponse);
-        const refundRequest = await refundXendit(transactionId, gatewayResponse.data.attempt_details[0].action_id, transaction.totalPrice);
+    const gatewayResponse = JSON.parse(transaction.gatewayResponse);
+    const refundRequest = await refundXendit(
+      transactionId,
+      gatewayResponse.data.attempt_details[0].action_id,
+      transaction.totalPrice
+    );
 
-        // const cancelledKomshipOrder = await cancelOrderKomship(transaction.komshipOrderNumber);
+    // const cancelledKomshipOrder = await cancelOrderKomship(transaction.komshipOrderNumber);
 
-        return res.status(200).json({ message: "Transaction cancelled!" })
-    } catch (error) {
-
-        return res.status(500).json({ message: error.message });
-    }
-}
+    return res.status(200).json({ message: "Transaction cancelled!" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const rejectReviewTransaction = async (req, res) => {
-    const transactionId = req.params.id;
+  const transactionId = req.params.id;
 
-    try {
-        const transaction = await getTransactionsByIdService(transactionId);
-        if (transaction.status === "On Review Cancel") {
-            await updateTransactionService(transactionId, "Waiting for shipping");
-            return res.status(200).json({ message: "Cancel rejected!" })
-        }
-        else if (transaction.status === "On Review Return") {
-            await updateTransactionService(transactionId, "Done");
-            return res.status(200).json({ message: "Return rejected!" });
-        }
-        else {
-            return res.status(400).json({ message: "Cannot reject transaction" });
-        }
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
+  try {
+    const transaction = await getTransactionsByIdService(transactionId);
+    if (transaction.status === "On Review Cancel") {
+      await updateTransactionService(transactionId, "Waiting for shipping");
+      return res.status(200).json({ message: "Cancel rejected!" });
+    } else if (transaction.status === "On Review Return") {
+      await updateTransactionService(transactionId, "Done");
+      return res.status(200).json({ message: "Return rejected!" });
+    } else {
+      return res.status(400).json({ message: "Cannot reject transaction" });
     }
-}
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};

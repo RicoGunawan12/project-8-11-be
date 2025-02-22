@@ -184,7 +184,7 @@ export const createCustomerXendit = async (userId, fullName, email, phone) => {
 export const createPlanXendit = async (transaction, customerId, productsInCart, disc, freeOngkir) => {
     
     const items = productsInCart.map((product) => {
- 
+        
         return {
             type: "PHYSICAL_PRODUCT",
             name: product.product_variant.product.productName + " - " + product.product_variant.productColor,
@@ -277,7 +277,7 @@ export const createPlanXendit = async (transaction, customerId, productsInCart, 
         return result;
     } catch (error) {
  
-        throw new Error(error.message);
+        throw new Error(error);
     }
 }
 

@@ -179,7 +179,8 @@ export const createTransactionService = async (
     totalPrice,
     totalWeight,
     customerNotes,
-    freeOngkir
+    freeOngkir,
+    bogos
 ) => {
     const transaction = await TransactionHeaderModel.create({
         readableId: generateReadableId(),
@@ -204,7 +205,7 @@ export const createTransactionService = async (
     return transaction;
 }
 
-export const createTransactionDetailService = async (products) => {
+export const createTransactionDetailService = async (products,bogos) => {
     for (const product of products) {
         const { productVariantId, quantity } = product;
 
@@ -223,9 +224,47 @@ export const createTransactionDetailService = async (products) => {
             );
         }
     }
+    for (const product of products) {
+        const { productVariantId, quantity } = product;
 
-    const transactionDetails = await TransactionDetailModel.bulkCreate(products);
+        const productVariant = await ProductVariantModel.findOne({
+            where: { productVariantId },
+            attributes: ['productStock']
+        });
 
+        if (!productVariant) {
+            throw new Error(`Product variant not found.`);
+        }
+
+        if (productVariant.productStock - quantity < 0) {
+            throw new Error(
+                `Insufficient stock. Available: ${productVariant.productStock}, Requested: ${quantity}.`
+            );
+        }
+    }
+    for (const bogo of bogos) {
+        const { productVariantId, quantity } = bogo;
+
+        const productVariant = await ProductVariantModel.findOne({
+            where: { productVariantId },
+            attributes: ['productStock']
+        });
+
+        if (!productVariant) {
+            throw new Error(`Product variant not found.`);
+        }
+
+        if (productVariant.productStock - quantity < 0) {
+            throw new Error(
+                `Insufficient stock. Available: ${productVariant.productStock}, Requested: ${quantity}.`
+            );
+        }
+    }
+    const allItems = [...products, ...bogos];
+    const transactionDetails = await TransactionDetailModel.bulkCreate(allItems);
+
+    console.log(transactionDetails)
+    console.log(allItems)
     for (const product of products) {
         const { productVariantId, quantity } = product;
 
@@ -235,7 +274,16 @@ export const createTransactionDetailService = async (products) => {
         );
     }
 
-    return transactionDetails;
+    for (const bogo of bogos) {
+        const { productVariantId, quantity } = bogo;
+
+        await ProductVariantModel.update(
+            { productStock: sequelize.literal(`product_stock - ${quantity}`) },
+            { where: { productVariantId } }
+        );
+    }
+
+    return allItems;
 }
 
 export const checkOutCreditTransactionService = async (
