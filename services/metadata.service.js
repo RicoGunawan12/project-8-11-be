@@ -14,9 +14,9 @@ export const getMetadataService = async (slug) => {
 
   return {
     ...metadata.dataValues,
-    alternates: JSON.parse(metadata.alternates),
-    icons: JSON.parse(metadata.icons),
-    openGraph: JSON.parse(metadata.openGraph),
+    alternates: metadata.alternates,
+    icons: metadata.icons,
+    openGraph: metadata.openGraph,
     keywords: metadata.keywords, 
   };
 };
