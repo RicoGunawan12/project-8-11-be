@@ -23,8 +23,7 @@ export const getMetadataService = async (slug) => {
     ...metadata.dataValues,
     alternates: metadata.alternates,
     icons: metadata.icons,
-    openGraph: metadata.openGraph,
-    keywords: metadata.keywords, 
+    openGraph: metadata.openGraph, 
   };
 };
 
