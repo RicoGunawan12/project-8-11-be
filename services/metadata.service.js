@@ -18,3 +18,15 @@ export const getMetadataService = async (slug) => {
     keywords: metadata.keywords, 
   };
 };
+
+export const getAllMetadataService = async () => {
+  const metadataList = await MetadataModel.findAll();
+  
+  return metadataList.map(metadata => ({
+    ...metadata.dataValues,
+    alternates: metadata.alternates,
+    icons: metadata.icons,
+    openGraph: metadata.openGraph,
+    keywords: metadata.keywords,
+  }));
+};
