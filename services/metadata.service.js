@@ -36,7 +36,7 @@ export const insertMetadataService = async (newData) => {
     metadataBase: 'https://tyesoindonesia.id/',
     alternates: {"canonical": "https://tyesoindonesia.id/"},
     icons: {},
-    openGraph: {"title": "TYESO", "description": "TYESO", "url": "https://tyesoindonesia.id/", "siteName": "TYESO", "images": [{"url": "https://tyesoindonesia.id/_next/image?url=%2Flogo.png&w=96&q=75", "width": 800, "height": 600}, {"url": "https://tyesoindonesia.id/_next/image?url=%2Flogo.png&w=96&q=75", "width": 1800, "height": 1600, "alt": "img"}], "locale": "en_US", "type": "website"},
+    openGraph: {"title": newData.title, "description": newData.description, "url": "https://tyesoindonesia.id/", "siteName": "TYESO Indonesia", "images": [{"url": "https://tyesoindonesia.id/_next/image?url=%2Flogo.png&w=96&q=75", "width": 800, "height": 600}, {"url": "https://tyesoindonesia.id/_next/image?url=%2Flogo.png&w=96&q=75", "width": 1800, "height": 1600, "alt": "img"}], "locale": "en_US", "type": "website"},
     keywords: newData.keywords
   });
 
@@ -55,7 +55,8 @@ export const updateMetadataService = async (slug, newData) => {
   const result = await MetadataModel.update({
     title: newData.title,
     description: newData.description,
-    keywords: newData.keywords
+    keywords: newData.keywords,
+    openGraph: {"title": newData.title, "description": newData.description, "url": "https://tyesoindonesia.id/", "siteName": "TYESO Indonesia", "images": [{"url": "https://tyesoindonesia.id/_next/image?url=%2Flogo.png&w=96&q=75", "width": 800, "height": 600}, {"url": "https://tyesoindonesia.id/_next/image?url=%2Flogo.png&w=96&q=75", "width": 1800, "height": 1600, "alt": "img"}], "locale": "en_US", "type": "website"},
   }, { where: { slug: slug } });
 
   return result;
