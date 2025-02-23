@@ -204,17 +204,12 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
 
 export const requestPickUpKomship = async (orderNumber) => {
     const now = new Date();
-    const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-    const currentHour = localDate.getHours();
-    const currentMinute = localDate.getMinutes();
-    if (currentHour > 12 || (currentHour === 12 && currentMinute > 0)) {
-        localDate.setDate(localDate.getDate() + 1);
-    }
+    const localDate = new Date(now.getTime() + (7 * 60 - now.getTimezoneOffset()) * 60000);
 
-    console.log(
-        localDate.toISOString().slice(0, 10)
-    );
-    
+    localDate.setMinutes(localDate.getMinutes() + 35);
+    const pickupHour = localDate.getHours().toString().padStart(2, "0");
+    const pickupMinute = localDate.getMinutes().toString().padStart(2, "0");
+    const pickupTime = `${pickupHour}:${pickupMinute}`;
     
     const requestOptions = {
         method: 'POST',
@@ -223,7 +218,7 @@ export const requestPickUpKomship = async (orderNumber) => {
         body: JSON.stringify(
             {
                 pickup_date: localDate.toISOString().slice(0, 10),
-                pickup_time: "20:00",
+                pickup_time: pickupTime,
                 pickup_vehicle: "Motor",
                 orders: [
                     {
