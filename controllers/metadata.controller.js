@@ -1,4 +1,4 @@
-import { getAllMetadataService, getMetadataService, insertMetadataService, updateMetadataService } from "../services/metadata.service.js"
+import { deleteMetadataService, getAllMetadataService, getMetadataService, insertMetadataService, updateMetadataService } from "../services/metadata.service.js"
 
 export const getAllMetadata = async (req, res) =>  {
   try {
@@ -64,6 +64,21 @@ export const updateMetadata = async (req, res) => {
       message: "Metadata updated successfully",
       metadata
     });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Internal server error, please inquire this issue to developer");
+  }
+}
+
+export const deleteMetadata = async (req, res) => {
+  const slug = req.params.slug;
+
+  try {
+    const result = await deleteMetadataService(slug);
+
+    return res.status(200).json({
+      message: "Metadata deleted successfully"
+    })
   } catch (error) {
     console.error(error);
     return res.status(500).send("Internal server error, please inquire this issue to developer");

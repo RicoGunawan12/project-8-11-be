@@ -61,3 +61,17 @@ export const updateMetadataService = async (slug, newData) => {
 
   return result;
 }
+
+export const deleteMetadataService = async (slug) => {
+  const metadata = await MetadataModel.findOne({
+    where: { slug: slug }
+  });
+
+  if (metadata === null || metadata === undefined) {
+    throw new Error("Internal server error, metadata not found");
+  }
+
+  metadata.destroy();
+
+  return metadata;
+}
