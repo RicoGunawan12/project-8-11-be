@@ -51,6 +51,10 @@ app.use(
     credentials: true, // Set to false if cookies are not needed
   })
 );
+app.get('/robots.txt', function (req, res) {
+  res.type('text/plain');
+  res.send("User-agent: *\nDisallow: /");
+});
 // app.use(express.json());
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
