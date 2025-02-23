@@ -56,7 +56,7 @@ export const updateMetadataService = async (slug, newData) => {
     title: newData.title,
     description: newData.description,
     keywords: newData.keywords
-  }, { where: { metadataId: id } });
+  }, { where: { slug: slug } });
 
   return result;
 }
