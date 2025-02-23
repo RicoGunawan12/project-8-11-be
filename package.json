@@ -8,7 +8,26 @@
     "start": "nodemon index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": {
+    "name": "Rico Gunawan"
+  },
+  "contributors": [
+    {
+      "name": "Zenli Huangtara"
+    },
+    {
+      "name": "Vionny Audry Sen",
+      "email": "senvionny@gmail.com"
+    },
+    {
+      "name": "Christopher Limawan",
+      "email": "christopherlimawan@gmail.com",
+      "url": "https://climawan.com"
+    },
+    {
+      "name": "Antoni Wijaya"
+    }
+  ],
   "license": "ISC",
   "description": "",
   "dependencies": {

@@ -11,7 +11,7 @@ const Metadata = sequelize.define("metadatas", {
   slug: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
+    unique: 'slug',
   },
   title: {
     type: DataTypes.STRING,
