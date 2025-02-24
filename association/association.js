@@ -1,4 +1,5 @@
 
+import Metadata from "../models/metadata.model.js";
 import { Bogo } from "./bogo.association.js";
 import { Cart, CartItem } from "./cart.association.js";
 import { ContentDetail, ContentHeader, Page } from "./content.association.js";
@@ -33,6 +34,8 @@ const PageModel = Page
 const ProductCoverModel = ProductCover
 const BogoModel = Bogo
 
+const MetadataModel = Metadata
+
 export { 
     PaymentMethodModel, 
     TransactionDetailModel, 
@@ -53,4 +56,5 @@ export {
     ProductCoverModel,
     PromoHistoryModel,
     BogoModel,
+    MetadataModel
 };

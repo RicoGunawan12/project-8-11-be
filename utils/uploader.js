@@ -305,6 +305,30 @@ const storageCarousel = multer.diskStorage({
 });
 
 
+const storageExcel = multer.diskStorage({
+  destination: async function (req, file, cb) {
+    const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'excel/update');
+
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+
+    cb(null, uploadPath);
+  },
+  filename: function (req, file, cb) {
+    try {
+      const uploadPath = path.join(__dirname, "../" + UPLOAD_FOLDER + 'excel/update/');
+      // if (fs.existsSync(uploadPath)) {
+      //   fs.unlinkSync(uploadPath); // Deletes the file
+      // }
+      cb(null, `${Date.now()}.xlsx`);
+    } catch (error) {
+      cb(error)
+    }
+  }
+})
+
+
 export const upload = multer({ storage: storage });
 export const uploadBlog = multer({ storage: storageBlog });
 export const uploadContact = multer({ storage: storageContact });
@@ -313,7 +337,7 @@ export const uploadCategory = multer({ storage: storageCategory });
 export const uploadBackground = multer({ storage: storageBackground });
 export const uploadWhyPhoto = multer({ storage: storageWhyPhoto });
 export const uploadCarousel = multer({ storage: storageCarousel });
-
+export const uploadExcel = multer({ storage: storageExcel })
 
 export const deleteDirectory = (productName) => {
   const dirPath = path.join(__dirname, "../", UPLOAD_FOLDER + productName);

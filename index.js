@@ -35,6 +35,7 @@ import { migrateCODDataService } from './services/codData.service.js';
 import CODRoute from './routes/codData.route.js';
 import EmailTemplateRoute from './routes/emailTemplate.route.js';
 import BogoRoute from './routes/bogo.route.js';
+import MetadataRoute from './routes/metadata.route.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,6 +51,10 @@ app.use(
     credentials: true, // Set to false if cookies are not needed
   })
 );
+app.get('/robots.txt', function (req, res) {
+  res.type('text/plain');
+  res.send("User-agent: *\nDisallow: /");
+});
 // app.use(express.json());
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
@@ -79,6 +84,7 @@ app.use('/api/free/ongkir', FreeOngkirRoute);
 app.use('/api/cod', CODRoute);
 app.use('/api/email-templates', EmailTemplateRoute);
 app.use('/api/bogos', BogoRoute);
+app.use('/api/metadatas', MetadataRoute);
 
 (async () => {
   try {

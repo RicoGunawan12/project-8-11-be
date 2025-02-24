@@ -308,27 +308,20 @@ export const refundXendit = async (transactionId, gatewayResponse, amount) => {
             return result;
         }
         else if (
-            [
-             "BCA", 
-             "BNI", 
-             "BSI", 
-             "BRI", 
-             "MANDIRI", 
-             "PERMATA", 
-             "SAHABAT_SAMPOERNA", 
-             "BNC", 
-             "DD_BRI", 
-             "DD_BCA_KLIKPAY"].includes(gatewayResponse.payment_channel)
+            gatewayResponse.payment_method === "DIRECT_DEBIT"
         ) {
+            const debitBody = {
+                reason: "REQUESTED_BY_CUSTOMER"
+            }
             console.log("IN DEBIT OR CREDIT REFUND");
             const requestOptions = {
                 method: 'POST',
                 headers: headers,
                 redirect: 'follow',
-                body: JSON.stringify(body)
+                body: JSON.stringify(debitBody)
             }
     
-            const xenditResponse = await fetch(`${process.env.XENDIT_URL}/cards/charges/${gatewayResponse.payment_id}/refunds`, requestOptions);
+            const xenditResponse = await fetch(`${process.env.XENDIT_URL}/direct_debits/${gatewayResponse.payment_id}/refunds`, requestOptions);
                  
             if (!xenditResponse.ok) {
                 throw new Error(`Error: ${xenditResponse.statusText}`);
@@ -337,7 +330,24 @@ export const refundXendit = async (transactionId, gatewayResponse, amount) => {
             return result;
         }
         else if (gatewayResponse.payment_method === "CREDIT_CARD") {
-
+            const creditBody = {
+                amount: amount,
+                external_id: transactionId
+            }
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                redirect: 'follow',
+                body: JSON.stringify(creditBody)
+            }
+    
+            const xenditResponse = await fetch(`${process.env.XENDIT_URL}/credit_card_charges/${gatewayResponse.credit_card_charge_id}/refunds`, requestOptions);
+                 
+            if (!xenditResponse.ok) {
+                throw new Error(`Error: ${xenditResponse.statusText}`);
+            }
+            const result = await xenditResponse.json();
+            return result;
         }
         else {
             

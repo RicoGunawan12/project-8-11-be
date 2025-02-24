@@ -21,7 +21,7 @@ export const registerUser = async (req, res) => {
   }
   
   try {
-    // await sendEmailPostRegister(email, fullName, "id");
+    await sendEmailPostRegister(email, fullName, "id");
     const user = await registerUserService(fullName, email, password, phoneNumber);
     return res.status(201).json({ message: 'User registered successfully', user: user.fullName });
   } catch (error) {
