@@ -25,6 +25,7 @@ export const getPromoService = async () => {
                 ],
             },
         ],
+        order: [['created_at', 'DESC']]
     });
     return promos;
 };

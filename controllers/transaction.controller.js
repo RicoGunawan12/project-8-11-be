@@ -112,7 +112,7 @@ export const createTransaction = async (req, res) => {
 
                 const itemTotal = product.product_variant.productPrice * product.quantity;
                 totalPrice += itemTotal;
-                totalWeight += product.product_variant.productWeight;
+                totalWeight += product.productWeight;
             })
         );
         // console.log(totalWeight);

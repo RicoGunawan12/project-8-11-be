@@ -35,7 +35,6 @@ const TransactionDetail = sequelize.define('transaction_details', {
     type: DataTypes.FLOAT,
     defaultValue: 0,
     allowNull: false,
-    length: 100
   },
   customerNotes: {
     field: "customer_notes",
