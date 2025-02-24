@@ -391,7 +391,7 @@ export const monthlySalesReportService = async (year, month) => {
                 [Op.between]: [prevStartDate, prevEndDate],
             },
             status: {
-                [Op.notIn]: ["Unpaid", "Cancelled"],
+                [Op.notIn]: ["Unpaid", "Cancelled", "Failed", "Return"],
             },
         },
     })
@@ -402,7 +402,7 @@ export const monthlySalesReportService = async (year, month) => {
                 [Op.between]: [startDate, endDate],
             },
             status: {
-                [Op.notIn]: ["Unpaid", "Cancelled"],
+                [Op.notIn]: ["Unpaid", "Cancelled", "Failed", "Return"],
             },
         },
     })
@@ -445,7 +445,7 @@ export const allMonthSalesAnalyticService = async (year) => {
                 ],
             },
             status: {
-                [Op.notIn]: ["Unpaid", "Cancelled"],
+                [Op.notIn]: ["Unpaid", "Cancelled", "Failed", "Return"],
             },
         },
         group: [Sequelize.fn("MONTH", Sequelize.col("transaction_date"))],
@@ -477,7 +477,7 @@ export const fetchSalesByCategoryService = async (year, month) => {
                     [Op.between]: [startDate, endDate],
                 },
                 status: {
-                    [Op.notIn]: ["Unpaid", "Cancelled"],
+                    [Op.notIn]: ["Unpaid", "Cancelled", "Failed", "Return"],
                 },
             },
             include: [
