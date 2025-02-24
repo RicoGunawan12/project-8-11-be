@@ -121,7 +121,7 @@ export const createTransaction = async (req, res) => {
         if (freeOngkirData.status === "Active" && totalPrice - deliveryFee >= freeOngkirData.minimumPaymentAmount) {
             freeOngkir = deliveryFee - freeOngkirData.maximumFreeOngkir <= 0 ? 
                         deliveryFee : 
-                        deliveryFee - freeOngkirData.maximumFreeOngkir;
+                        freeOngkirData.maximumFreeOngkir;
             totalPrice -= freeOngkir;
         }
 
