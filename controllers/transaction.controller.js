@@ -501,9 +501,10 @@ export const updateTransactionDelivery = async (req, res) => {
     if (status != "Diterima") {
         return res.status(200).json({ message: status })
     }
-
+    
     try {
         const response = updateTransactionDeliveryService(order_no, status);
+        return res.status(200).json({ message: status })
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
