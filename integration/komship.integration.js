@@ -206,7 +206,7 @@ export const requestPickUpKomship = async (orderNumber) => {
     const now = new Date();
     const localDate = new Date(now.getTime() + (7 * 60 - now.getTimezoneOffset()) * 60000);
 
-    localDate.setMinutes(localDate.getMinutes() + 35);
+    localDate.setMinutes(localDate.getMinutes() + 95);
     const pickupHour = localDate.getHours().toString().padStart(2, "0");
     const pickupMinute = localDate.getMinutes().toString().padStart(2, "0");
     const pickupTime = `${pickupHour}:${pickupMinute}`;
