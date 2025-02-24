@@ -4,7 +4,9 @@ import { VoucherModel } from "../association/association.js";
 
 // #region GET
 export const getAllVouchersService =  async ()=> {
-  const voucher = await VoucherModel.findAll()
+  const voucher = await VoucherModel.findAll({
+    order: [['voucher_start_date', 'DESC']]
+  })
   return voucher
 }
 
