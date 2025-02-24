@@ -35,7 +35,7 @@ export const readExcelFile = async (filePath, columns) => {
     const rowKeys = Object.keys(row);
     const newArr = new Array()
     columns.forEach((column, index) => {
-      newArr.push({ property : column.name , value: row[rowKeys[index]].toString() });
+      newArr.push({ property : column.name , value: row[rowKeys[index]]?.toString() || '' });
     });
     
     transformedRow.push(newArr)
