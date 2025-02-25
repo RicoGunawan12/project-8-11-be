@@ -43,7 +43,7 @@ const Product = sequelize.define('products', {
   },
   productWeight: {
     field: "product_weight",
-    type: DataTypes.FLOAT,
+    type: DataTypes.INTEGER,
     allowNull: false
   },
   productWidth: {
