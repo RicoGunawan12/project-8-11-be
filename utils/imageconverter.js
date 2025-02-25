@@ -48,7 +48,7 @@ export const processImage = async (req, res, next) => {
   
         // Convert to WebP
         await sharp(inputPath)
-          .webp({ quality: 80 })
+          .webp()
           .toFile(outputPath);
   
         // Delete the original file after conversion

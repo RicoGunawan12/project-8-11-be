@@ -106,7 +106,10 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
             product_variant_name:
                 (det.product_variant.productSize ?? "") +
                 " - " +
-                (det.product_variant.productColor ?? ""),
+                (det.product_variant.productColor ?? "") +
+                " - " +
+                (det.product_variant.sku ?? "")
+                ,
             product_price: det.product_variant.productPrice,
             product_width: Math.ceil(det.product_variant.product.productWidth / 100),
             product_height: Math.ceil(det.product_variant.product.productHeight / 100),
@@ -184,10 +187,10 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
         // })
     };
     
-    // console.log(requestOptions);
+    console.log("request options: ", requestOptions);
     try {
         const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/store`, requestOptions);
-        // console.log(komshipResponse);
+        console.log("Komship Response: ", komshipResponse);
 
         if (!komshipResponse.ok) {
             throw new Error("Failed to store order: " + komshipResponse.statusText);
@@ -196,6 +199,7 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
         const result = await komshipResponse.json();
         return { response: "Order created successfully", komshipResponse: result };
     } catch (error) {
+	console.error("Komship Error: ", error)
         throw new Error(error.message);
     }
 
@@ -273,6 +277,9 @@ export const printLabelKomship = async (orderNumber) => {
         headers: myHeaders,
         redirect: 'follow'
     }
+    console.log("ordernumbers: ", orderNumber)
+	console.log("request options", requestOptions)
+	console.log("url: ", `${process.env.KOMSHIP_URL}/order/api/v1/orders/print-label?order_no=${orderNumber}&page=page_4`)
 
     try {
         const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/print-label?order_no=${orderNumber}&page=page_4`, requestOptions);
