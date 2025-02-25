@@ -372,7 +372,7 @@ export const deliveryDetailService = async (orderNumber) => {
 }
 
 export const printLabelService = async (komshipOrderNumbers) => {
-    const formattedString = komshipOrderNumbers.join('%2C%20');
+    const formattedString = komshipOrderNumbers.join(',');
     const komshipLabel = await printLabelKomship(formattedString);
     return komshipLabel;
 }
