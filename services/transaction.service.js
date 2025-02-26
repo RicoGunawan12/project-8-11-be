@@ -19,11 +19,11 @@ export const getAllTransactionsService = async (status, startDate, endDate, sear
                     [Op.like]: `%${search}%`
                 }
             },
-            {
-                '$user.full_name$': {
-                    [Op.like]: `%${search}%`
-                }
-            }
+            // {
+            //     '$user.full_name$': {
+            //         [Op.like]: `%${search}%`
+            //     }
+            // }
         ],
     };
 
