@@ -163,7 +163,9 @@ export const getTransactionsByIdService = async (transactionId) => {
     return transactions;
 }
 
-export const getSearchTransaction = async(search) => {
+export const getSearchTransaction = async(req, res) => {
+    // console.log(req);
+    // console.log(req.params);
     const transactions = await TransactionHeaderModel.findAll({
         include: [
             {
@@ -177,24 +179,30 @@ export const getSearchTransaction = async(search) => {
             },
             {
                 model: UserModel,
-                attributes: ['userId', 'fullName', 'email'],
+                attributes: ['userId', 'fullName', 'email']
             },
             {
                 model: UserAddressModel
             }
         ],
         where: {
-            [Op.or]: [
+            [Op.or]: 
+            [
                 {
-                readableId: {
-                    [Op.like]: `%${search}%`
+                    readableId: {
+                        [Op.like]: `%${req.query.search}%`
+                    }
+                },
+                {
+                    '$user.full_name$': {
+                        [Op.like]: `%${req.query.search}%`
+                    }
                 }
-            },
-        ]
+            ]
         }
     });
 
-    return transactions;
+    return res.status(200).json(transactions ?? []);
 }
 
 export const createTransactionService = async (
