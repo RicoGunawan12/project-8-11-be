@@ -22,6 +22,8 @@ export const sendEmailService = async (
     },
   });
 
+  console.log(process.env.SEND_TO)
+
   const mailOptions = {
     from: process.env.USER,
     to: process.env.SEND_TO,
@@ -93,13 +95,15 @@ export const sendEmailService = async (
                   <p>Best regards, ${name}<br></p>
               </div>
               <div class="footer">
-                  <p>&copy; 2024 Tyeso. All rights reserved.</p>
+                  <p>&copy; 2025 Tyeso. All rights reserved.</p>
               </div>
           </div>
       </body>
       </html>
       `,
   };
+
+
 
   const result = await transporter.sendMail(mailOptions);
 };

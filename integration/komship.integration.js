@@ -43,19 +43,19 @@ export const calculateDeliveryFeeKomship = async (shipperDestinationId, receiver
 
 
     try {
-        
+
         const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/tariff/api/v1/calculate?shipper_destination_id=${shipperDestinationId}&receiver_destination_id=${receiverDestinationId}&weight=${Math.ceil(weight / 1000)}&item_value=${itemValue}&cod=${cod}`, requestOptions);
         if (!komshipResponse.ok) {
             throw new Error("Failed to calculate delivery fee: " + komshipResponse.statusText);
         }
 
         const calculation = await komshipResponse.json();
-        
-        
+
+
         return calculation
     } catch (error) {
         console.log(error);
-        
+
         throw new Error(error.message);
     }
 
@@ -99,14 +99,19 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
     console.log(transaction);
     console.log(adminAddress);
     console.log(contact);
-    
+
     const transactionDetails = transaction.transaction_details.map((det) => {
         return {
             product_name: det.product_variant.product.productName,
             product_variant_name:
                 (det.product_variant.productSize ?? "") +
                 " - " +
-                (det.product_variant.productColor ?? ""),
+                (det.product_variant.productColor ?? "") +
+                " - " +
+                (det.product_variant.sku ?? "") +
+                " - " +
+                (det.customerNotes)
+            ,
             product_price: det.product_variant.productPrice,
             product_width: Math.ceil(det.product_variant.product.productWidth / 100),
             product_height: Math.ceil(det.product_variant.product.productHeight / 100),
@@ -133,7 +138,7 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
             receiver_name: transaction.user_address.receiverName, //ambil dari transaction
             receiver_phone: transaction.user_address.receiverPhoneNumber.replace('+', ''), //ambil dari transaction
             receiver_destination_id: parseInt(transaction.user_address.komshipAddressId), //ambil dari transaction,
-            receiver_address: transaction.user_address.addressDetail, // ambil dari transaction
+            receiver_address: transaction.user_address.addressDetail.replace(/\s+/g, ' ').trim(), // ambil dari transaction
             shipping: transaction.expedition, // ambil dari transaction,
             shipping_type: transaction.shippingType, // ambil dari transaction
             payment_method: transaction.paymentMethod === "COD" ? "COD" : "BANK TRANSFER",
@@ -183,11 +188,11 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
         //     ]
         // })
     };
-    
-    // console.log(requestOptions);
+
+    console.log("request options: ", requestOptions);
     try {
         const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/store`, requestOptions);
-        // console.log(komshipResponse);
+        console.log("Komship Response: ", komshipResponse);
 
         if (!komshipResponse.ok) {
             throw new Error("Failed to store order: " + komshipResponse.statusText);
@@ -196,6 +201,7 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
         const result = await komshipResponse.json();
         return { response: "Order created successfully", komshipResponse: result };
     } catch (error) {
+        console.error("Komship Error: ", error)
         throw new Error(error.message);
     }
 
@@ -206,11 +212,11 @@ export const requestPickUpKomship = async (orderNumber) => {
     const now = new Date();
     const localDate = new Date(now.getTime() + (7 * 60 - now.getTimezoneOffset()) * 60000);
 
-    localDate.setMinutes(localDate.getMinutes() + 35);
+    localDate.setMinutes(localDate.getMinutes() + 95);
     const pickupHour = localDate.getHours().toString().padStart(2, "0");
     const pickupMinute = localDate.getMinutes().toString().padStart(2, "0");
     const pickupTime = `${pickupHour}:${pickupMinute}`;
-    
+
     const requestOptions = {
         method: 'POST',
         headers: myHeaders,
@@ -228,7 +234,7 @@ export const requestPickUpKomship = async (orderNumber) => {
             }
         )
     }
-    
+
 
     try {
         const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/pickup/request`, requestOptions);
@@ -240,7 +246,7 @@ export const requestPickUpKomship = async (orderNumber) => {
         return result;
     } catch (error) {
         console.log(error);
-        
+
         throw new Error(error.message);
     }
 }
@@ -273,9 +279,12 @@ export const printLabelKomship = async (orderNumber) => {
         headers: myHeaders,
         redirect: 'follow'
     }
+    console.log("ordernumbers: ", orderNumber)
+    console.log("request options", requestOptions)
+    console.log("url: ", `${process.env.KOMSHIP_URL}/order/api/v1/orders/print-label?order_no=${orderNumber}&page=page_6`)
 
     try {
-        const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/print-label?order_no=${orderNumber}&page=page_4`, requestOptions);
+        const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/print-label?order_no=${orderNumber}&page=page_6`, requestOptions);
 
         if (!komshipResponse.ok) {
             throw new Error(`Error: ${komshipResponse.statusText}`);

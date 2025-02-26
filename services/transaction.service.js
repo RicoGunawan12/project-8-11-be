@@ -6,6 +6,7 @@ import { generateReadableId } from "../utils/utility.js";
 import { getPickUpPointService } from "./address.service.js";
 import sequelize from "../config/database.js";
 import { getContactToSendService } from "./contact.service.js";
+import { read } from "fs";
 
 export const getAllTransactionsService = async (status, startDate, endDate, offset, limit) => {
     const whereConditions = {
@@ -160,6 +161,48 @@ export const getTransactionsByIdService = async (transactionId) => {
         where: { transactionId: transactionId }
     })
     return transactions;
+}
+
+export const getSearchTransactionService = async(search) => {
+    // console.log(req);
+    // console.log(req.params);
+    const transactions = await TransactionHeaderModel.findAll({
+        include: [
+            {
+                model: TransactionDetailModel,
+                include : {
+                    model: ProductVariantModel,
+                    include: {
+                        model: ProductModel
+                    }
+                }
+            },
+            {
+                model: UserModel,
+                attributes: ['userId', 'fullName', 'email']
+            },
+            {
+                model: UserAddressModel
+            }
+        ],
+        where: {
+            [Op.or]: 
+            [
+                {
+                    readableId: {
+                        [Op.like]: `%${search}%`
+                    }
+                },
+                {
+                    '$user.full_name$': {
+                        [Op.like]: `%${search}%`
+                    }
+                }
+            ]
+        },
+    });
+
+    return transactions
 }
 
 export const createTransactionService = async (
@@ -391,7 +434,7 @@ export const monthlySalesReportService = async (year, month) => {
                 [Op.between]: [prevStartDate, prevEndDate],
             },
             status: {
-                [Op.notIn]: ["Unpaid", "Cancelled"],
+                [Op.notIn]: ["Unpaid", "Cancelled", "Failed", "Return"],
             },
         },
     })
@@ -402,7 +445,7 @@ export const monthlySalesReportService = async (year, month) => {
                 [Op.between]: [startDate, endDate],
             },
             status: {
-                [Op.notIn]: ["Unpaid", "Cancelled"],
+                [Op.notIn]: ["Unpaid", "Cancelled", "Failed", "Return"],
             },
         },
     })
@@ -445,7 +488,7 @@ export const allMonthSalesAnalyticService = async (year) => {
                 ],
             },
             status: {
-                [Op.notIn]: ["Unpaid", "Cancelled"],
+                [Op.notIn]: ["Unpaid", "Cancelled", "Failed", "Return"],
             },
         },
         group: [Sequelize.fn("MONTH", Sequelize.col("transaction_date"))],
@@ -477,7 +520,7 @@ export const fetchSalesByCategoryService = async (year, month) => {
                     [Op.between]: [startDate, endDate],
                 },
                 status: {
-                    [Op.notIn]: ["Unpaid", "Cancelled"],
+                    [Op.notIn]: ["Unpaid", "Cancelled", "Failed", "Return"],
                 },
             },
             include: [

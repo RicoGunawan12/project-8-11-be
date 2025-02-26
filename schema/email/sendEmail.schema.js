@@ -45,10 +45,6 @@ export const sendEmailSchema = {
     },
     notEmpty: {
       errorMessage: 'Message is required',
-    },
-    isLength: {
-      options: { min: 10, max: 500 },
-      errorMessage: 'Message should be between 10 to 500 characters',
-    },
+    }
   },
 };

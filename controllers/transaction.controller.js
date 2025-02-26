@@ -4,7 +4,7 @@ import { createQrisTransactionXendit, refundXendit } from "../integration/xendit
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
 import { getFreeOngkirService } from "../services/freeOngkir.service.js";
 import { checkPromoService, createPromoHistoryService } from "../services/promo.service.js";
-import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, getTransactionXenditService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, rollbackTransaction, trackDeliveryService, updateExpiredTransaction, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
+import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getSearchTransactionService, getTransactionsByIdService, getTransactionsByUserService, getTransactionXenditService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, rollbackTransaction, trackDeliveryService, updateExpiredTransaction, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
 import { applyVoucherService } from "../services/voucher.service.js";
 
 
@@ -58,6 +58,17 @@ export const getTransactionById = async (req, res) => {
         return res.status(200).json({ message: "Transaction fetched successfully", transaction })
     } catch (error) {
         return res.status(500).json({ message: error.message });
+    }
+}
+
+export const getSearchTransaction = async(req, res) => {
+    const {search} = req.query
+
+    try {
+        const transaction = await getSearchTransactionService(search);
+        return res.status(200).json({message: "Search transaction fetched successfully", transaction})
+    } catch (error) {
+        return res.status(500).json({message: error.message})
     }
 }
 
@@ -121,7 +132,7 @@ export const createTransaction = async (req, res) => {
         if (freeOngkirData.status === "Active" && totalPrice - deliveryFee >= freeOngkirData.minimumPaymentAmount) {
             freeOngkir = deliveryFee - freeOngkirData.maximumFreeOngkir <= 0 ? 
                         deliveryFee : 
-                        deliveryFee - freeOngkirData.maximumFreeOngkir;
+                        freeOngkirData.maximumFreeOngkir;
             totalPrice -= freeOngkir;
         }
 
@@ -501,9 +512,10 @@ export const updateTransactionDelivery = async (req, res) => {
     if (status != "Diterima") {
         return res.status(200).json({ message: status })
     }
-
+    
     try {
         const response = updateTransactionDeliveryService(order_no, status);
+        return res.status(200).json({ message: status })
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

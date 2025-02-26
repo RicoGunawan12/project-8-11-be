@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  mysql:
+    container_name: "tyeso-db"
+    image: mysql:latest
+    command: --max_allowed_packet=67108864 # 64 MB max
+    environment:
+      MYSQL_ROOT_PASSWORD: tyesoDjiwa123!
+      MYSQL_DATABASE: tyeso
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      retries: 5
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  backend:
+    container_name: "tyeso_backend-app"
+    build: .
+    ports:
+      - "127.0.0.1:5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+    depends_on:
+      - "mysql"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - backend_data:/app/assets
+    networks:
+      - app-network
+
+volumes:
+  mysql_data:
+    external: true
+  backend_data:
+    external: true
+
+networks:
+  app-network:
+    name: tyeso_env-network
+    driver: bridge

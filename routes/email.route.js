@@ -6,5 +6,6 @@ import { validateSchema } from '../validator/validate.js';
 
 const EmailRoute = express.Router();
 
-EmailRoute.post('/',generalValidator(sendEmailSchema),validateSchema, sendEmail);
+EmailRoute.post('/',generalValidator(sendEmailSchema),sendEmail);
+// EmailRoute.post('/',generalValidator(sendEmailSchema),validateSchema, sendEmail);
 export default EmailRoute;
