@@ -56,11 +56,23 @@ export const getTransactionById = async (req, res) => {
     try {
         const transaction = await getTransactionsByIdService(transactionId);
 
-        // const delivery = transaction.awb
-        //     ? await trackDeliveryService(transaction.awb, transaction.expedition)
-        //     : { data: null };
+        let delivery = { data: null };
 
-        return res.status(200).json({ message: "Transaction fetched successfully", transaction })
+        if (transaction.awb) {
+            try {
+                const response = await trackDeliveryService(transaction.awb, transaction.expedition);
+
+                if (response.meta?.status === "error") {
+                    delivery = { data: null };
+                } else {
+                    delivery = response;
+                }
+            } catch (error) {
+                delivery = { data: null };
+            }
+        }
+
+        return res.status(200).json({ message: "Transaction fetched successfully", transaction, delivery: delivery.data })
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
