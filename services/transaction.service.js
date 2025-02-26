@@ -6,6 +6,7 @@ import { generateReadableId } from "../utils/utility.js";
 import { getPickUpPointService } from "./address.service.js";
 import sequelize from "../config/database.js";
 import { getContactToSendService } from "./contact.service.js";
+import { read } from "fs";
 
 export const getAllTransactionsService = async (status, startDate, endDate, offset, limit) => {
     const whereConditions = {
@@ -163,7 +164,7 @@ export const getTransactionsByIdService = async (transactionId) => {
 }
 
 export const getSearchTransaction = async(search) => {
-    const transactions = await TransactionHeaderModel.findOne({
+    const transactions = await TransactionHeaderModel.findAll({
         include: [
             {
                 model: TransactionDetailModel,
@@ -177,11 +178,6 @@ export const getSearchTransaction = async(search) => {
             {
                 model: UserModel,
                 attributes: ['userId', 'fullName', 'email'],
-                where:{
-                    fullName: {
-                        [Op.like]: `%${search}%`
-                    }
-                }
             },
             {
                 model: UserAddressModel
@@ -190,18 +186,15 @@ export const getSearchTransaction = async(search) => {
         where: {
             [Op.or]: [
                 {
-                    readableId: {
-                        [Op.like]: `%${search}%`
-                    }
-                },
-                { 
-                    '$UserModel.fullName$': { [Op.like]: `%${search}%` } 
+                readableId: {
+                    [Op.like]: `%${search}%`
                 }
-            ]
+            },
+        ]
         }
-    })
+    });
 
-    return transactions
+    return transactions;
 }
 
 export const createTransactionService = async (
