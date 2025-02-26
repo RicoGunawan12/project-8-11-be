@@ -13,18 +13,6 @@ export const getAllTransactionsService = async (status, startDate, endDate, sear
         status: status
             ? { [Op.and]: [{ [Op.eq]: status }, { [Op.ne]: 'Unpaid' }] }
             : { [Op.ne]: 'Unpaid' },
-        [Op.or]: [
-            {
-                readableId: {
-                    [Op.like]: `%${search}%`
-                }
-            },
-            // {
-            //     '$user.full_name$': {
-            //         [Op.like]: `%${search}%`
-            //     }
-            // }
-        ],
     };
 
     if (startDate && endDate && startDate === endDate) {
@@ -71,7 +59,23 @@ export const getAllTransactionsService = async (status, startDate, endDate, sear
                 model: UserAddressModel
             }
         ],
-        where: whereConditions,
+        where: {
+            [Op.or]: [
+                {
+                    readableId: {
+                        [Op.like]: `%${search}%`
+                    }
+                },
+                {
+                    userId: {
+                        [Op.in]: sequelize.literal(`
+                            (SELECT user_id FROM users WHERE full_name like '%${search}%')
+                        `)
+                    }
+                }
+            ],
+            ...whereConditions
+        },
         order: [["transactionDate", "DESC"]],
         offset: parseInt(offset, 10),
         limit: parseInt(limit, 10),

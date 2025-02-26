@@ -22,6 +22,7 @@ export const getAllTransactions = async (req, res) => {
         const transactions = await getAllTransactionsService(status, startDate, endDate, search, offset, limit);
         return res.status(200).json({ message: "Transaction fetched successfully", transactions })
     } catch (error) {
+        console.log(error);
         return res.status(500).json({ message: error.message })
     }
 }
