@@ -163,7 +163,7 @@ export const getTransactionsByIdService = async (transactionId) => {
     return transactions;
 }
 
-export const getSearchTransaction = async(req, res) => {
+export const getSearchTransactionService = async(search) => {
     // console.log(req);
     // console.log(req.params);
     const transactions = await TransactionHeaderModel.findAll({
@@ -190,19 +190,19 @@ export const getSearchTransaction = async(req, res) => {
             [
                 {
                     readableId: {
-                        [Op.like]: `%${req.query.search}%`
+                        [Op.like]: `%${search}%`
                     }
                 },
                 {
                     '$user.full_name$': {
-                        [Op.like]: `%${req.query.search}%`
+                        [Op.like]: `%${search}%`
                     }
                 }
             ]
-        }
+        },
     });
 
-    return res.status(200).json(transactions ?? []);
+    return transactions
 }
 
 export const createTransactionService = async (
