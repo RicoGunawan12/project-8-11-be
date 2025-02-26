@@ -12,7 +12,19 @@ export const getAllTransactionsService = async (status, startDate, endDate, offs
     const whereConditions = {
         status: status
             ? { [Op.and]: [{ [Op.eq]: status }, { [Op.ne]: 'Unpaid' }] }
-            : { [Op.ne]: 'Unpaid' }
+            : { [Op.ne]: 'Unpaid' },
+        [Op.or]: [
+            {
+                readableId: {
+                    [Op.like]: `%${search}%`
+                }
+            },
+            {
+                '$user.full_name$': {
+                    [Op.like]: `%${search}%`
+                }
+            }
+        ],
     };
 
     if (startDate && endDate && startDate === endDate) {
@@ -163,9 +175,21 @@ export const getTransactionsByIdService = async (transactionId) => {
     return transactions;
 }
 
-export const getSearchTransactionService = async(search) => {
-    // console.log(req);
-    // console.log(req.params);
+export const getSearchTransactionService = async(search, startDate, endDate) => {
+    let currentTransactionDateCondition = {}
+
+    if (startDate !== null && startDate !== undefined && startDate !== "") 
+        currentTransactionDateCondition = {
+            ...currentTransactionDateCondition,
+            [Op.gte]: new Date(startDate)
+        }
+
+    if (endDate !== null && endDate !== undefined && endDate !== "")
+        currentTransactionDateCondition = {
+            ...currentTransactionDateCondition,
+            [Op.lte]: new Date(endDate)
+        }
+
     const transactions = await TransactionHeaderModel.findAll({
         include: [
             {
@@ -186,8 +210,7 @@ export const getSearchTransactionService = async(search) => {
             }
         ],
         where: {
-            [Op.or]: 
-            [
+            [Op.or]: [
                 {
                     readableId: {
                         [Op.like]: `%${search}%`
@@ -197,8 +220,17 @@ export const getSearchTransactionService = async(search) => {
                     '$user.full_name$': {
                         [Op.like]: `%${search}%`
                     }
+                },
+                {
+                    status: {
+                        [Op.like]: `%${search}%`
+                    }
                 }
-            ]
+            ],
+            status: {
+                [Op.ne]: 'Unpaid'
+            },
+            transactionDate: currentTransactionDateCondition
         },
     });
 
