@@ -13,6 +13,11 @@ export const getAllTransactions = async (req, res) => {
     if (status === undefined) {
         status = ""
     }
+
+    if (search === undefined) {
+        search = "";
+    }
+
     try {
         const transactions = await getAllTransactionsService(status, startDate, endDate, search, offset, limit);
         return res.status(200).json({ message: "Transaction fetched successfully", transactions })
