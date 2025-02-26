@@ -1,5 +1,5 @@
 import { ProductCategoryModel, ProductModel, ProductVariantModel, TransactionDetailModel, TransactionHeaderModel, UserAddressModel, UserModel } from "../association/association.js"
-import { createOrderKomship, deliveryDetailKomship, printLabelKomship, requestPickUpKomship } from "../integration/komship.integration.js";
+import { createOrderKomship, deliveryDetailKomship, historyAWB, printLabelKomship, requestPickUpKomship } from "../integration/komship.integration.js";
 import { checkOutVATransactionXendit, createCreditCardTransactionXendit, createPlanXendit, createQrisTransactionXendit, getTransactionXendit } from "../integration/xendit.integration.js";
 import { Op, Sequelize } from "sequelize";
 import { generateReadableId } from "../utils/utility.js";
@@ -702,3 +702,9 @@ export const rollbackTransaction = async (transactionId) => {
       throw new Error(error.message);
     }
   };
+
+
+export const trackDeliveryService = async (awb, shipping) => {
+    const historyAwb = await historyAWB(awb, shipping);
+    return historyAwb;
+}

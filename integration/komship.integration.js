@@ -312,3 +312,25 @@ export const cancelOrderKomship = async (orderNumber) => {
         throw new Error(error.message);
     }
 }
+
+export const historyAWB = async (awb, shipping) => {
+    const requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+    }
+
+    try {
+        const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/history-airway-bill?shipping=${shipping}&airway_bill=${awb}`, requestOptions);
+        // console.log(komshipResponse);
+
+        if (!komshipResponse.ok) {
+            throw new Error(`Error: ${komshipResponse.statusText}`);
+        }
+
+        const result = await komshipResponse.json();
+        return result;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}

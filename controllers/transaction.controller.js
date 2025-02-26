@@ -4,7 +4,7 @@ import { createQrisTransactionXendit, refundXendit } from "../integration/xendit
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
 import { getFreeOngkirService } from "../services/freeOngkir.service.js";
 import { checkPromoService, createPromoHistoryService } from "../services/promo.service.js";
-import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, getTransactionXenditService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, rollbackTransaction, updateExpiredTransaction, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
+import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getTransactionsByIdService, getTransactionsByUserService, getTransactionXenditService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, rollbackTransaction, trackDeliveryService, updateExpiredTransaction, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
 import { applyVoucherService } from "../services/voucher.service.js";
 
 
@@ -706,6 +706,22 @@ export const changeTransactionStatus = async (req, res) => {
     try {
         await updateTransactionService(transactionId, status);
         return res.status(200).json({ message: "Transaction status changed!" });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+
+export const trackDelivery = async () => {
+    const { awb, shipping } = req.body;
+
+    if (!awb || !shipping) {
+        return res.status(400).json({ message: "Bad Request" });
+    }
+
+    try {
+        const track = await trackDeliveryService(awb, shipping);
+        return res.status(200).json({ message: "Track success", track: track.data });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
