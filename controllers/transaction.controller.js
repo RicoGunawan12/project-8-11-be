@@ -55,7 +55,10 @@ export const getTransactionById = async (req, res) => {
     }
     try {
         const transaction = await getTransactionsByIdService(transactionId);
-        return res.status(200).json({ message: "Transaction fetched successfully", transaction })
+
+        const delivery = await trackDeliveryService(transaction.awb, transaction.expedition)
+
+        return res.status(200).json({ message: "Transaction fetched successfully", transaction, delivery: delivery.data })
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
