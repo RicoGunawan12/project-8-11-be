@@ -279,7 +279,7 @@ export const printLabelKomship = async (orderNumber) => {
     }
     console.log("ordernumbers: ", orderNumber)
 	console.log("request options", requestOptions)
-	console.log("url: ", `${process.env.KOMSHIP_URL}/order/api/v1/orders/print-label?order_no=${orderNumber}&page=page_4`)
+	console.log("url: ", `${process.env.KOMSHIP_URL}/order/api/v1/orders/print-label?order_no=${orderNumber}&page=page_6`)
 
     try {
         const komshipResponse = await fetch(`${process.env.KOMSHIP_URL}/order/api/v1/orders/print-label?order_no=${orderNumber}&page=page_4`, requestOptions);
