@@ -8,7 +8,7 @@ import sequelize from "../config/database.js";
 import { getContactToSendService } from "./contact.service.js";
 import { read } from "fs";
 
-export const getAllTransactionsService = async (status, startDate, endDate, offset, limit) => {
+export const getAllTransactionsService = async (status, startDate, endDate, search, offset, limit) => {
     const whereConditions = {
         status: status
             ? { [Op.and]: [{ [Op.eq]: status }, { [Op.ne]: 'Unpaid' }] }
@@ -19,11 +19,11 @@ export const getAllTransactionsService = async (status, startDate, endDate, offs
                     [Op.like]: `%${search}%`
                 }
             },
-            {
-                '$user.full_name$': {
-                    [Op.like]: `%${search}%`
-                }
-            }
+            // {
+            //     '$user.full_name$': {
+            //         [Op.like]: `%${search}%`
+            //     }
+            // }
         ],
     };
 
