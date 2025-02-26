@@ -9,12 +9,12 @@ import { applyVoucherService } from "../services/voucher.service.js";
 
 
 export const getAllTransactions = async (req, res) => {
-    var { status, startDate, endDate, offset, limit } = req.query
+    var { status, startDate, endDate, search, offset, limit } = req.query
     if (status === undefined) {
         status = ""
     }
     try {
-        const transactions = await getAllTransactionsService(status, startDate, endDate, offset, limit);
+        const transactions = await getAllTransactionsService(status, startDate, endDate, search, offset, limit);
         return res.status(200).json({ message: "Transaction fetched successfully", transactions })
     } catch (error) {
         return res.status(500).json({ message: error.message })
@@ -67,12 +67,13 @@ export const getTransactionById = async (req, res) => {
 }
 
 export const getSearchTransaction = async(req, res) => {
-    const {search} = req.query
+    const {search, startDate, endDate} = req.query
 
     try {
-        const transaction = await getSearchTransactionService(search);
+        const transaction = await getSearchTransactionService(search, startDate, endDate);
         return res.status(200).json({message: "Search transaction fetched successfully", transaction})
     } catch (error) {
+        console.error(error);
         return res.status(500).json({message: error.message})
     }
 }
