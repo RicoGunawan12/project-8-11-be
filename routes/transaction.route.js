@@ -9,6 +9,7 @@ import { updateStatusValidator } from './../validator/transaction/updateStatus.v
 import { transactionIdSchema } from '../schema/general/transactionId.schema.js';
 import { allMonthSalesAnalytic, cancelPaidTransaction, cancelTransaction, changeTransactionStatus, checkOutCreditTransaction, checkOutQrisTransaction, checkOutVATransaction, createTransaction, deliveryDetail, fetchSalesByCategory, getAllTransactions, getTransactionById, getTransactionCount, getTransactionsByUser, monthlySalesReport, onReviewReturnTransaction, onReviewTransaction, payTransaction, printLabel, refundTransaction, refundTransactionCallback, rejectReviewTransaction, requestPickupTransaction, returnTransaction, updateQRTransactionStatus, updateTransactionDelivery, updateTransactionStatus } from '../controllers/transaction.controller.js';
 import { adminMiddleware, generalMiddleware, userMiddleware } from '../middleware/auth.middleware.js';
+import { getSearchTransaction } from '../services/transaction.service.js';
 
 const TransactionRoute = express.Router();
 
@@ -24,6 +25,8 @@ TransactionRoute.get('/', adminMiddleware, getAllTransactions);
 TransactionRoute.get('/count', adminMiddleware, getTransactionCount);
 
 TransactionRoute.get('/user', userMiddleware, getTransactionsByUser);
+
+TransactionRoute.get('/searchTransaction', adminMiddleware, getSearchTransaction)
 
 TransactionRoute.get('/:id', userMiddleware, getTransactionById);
 

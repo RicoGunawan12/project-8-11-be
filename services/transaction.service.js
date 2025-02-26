@@ -162,6 +162,48 @@ export const getTransactionsByIdService = async (transactionId) => {
     return transactions;
 }
 
+export const getSearchTransaction = async(search) => {
+    const transactions = await TransactionHeaderModel.findOne({
+        include: [
+            {
+                model: TransactionDetailModel,
+                include : {
+                    model: ProductVariantModel,
+                    include: {
+                        model: ProductModel
+                    }
+                }
+            },
+            {
+                model: UserModel,
+                attributes: ['userId', 'fullName', 'email'],
+                where:{
+                    fullName: {
+                        [Op.like]: `%${search}%`
+                    }
+                }
+            },
+            {
+                model: UserAddressModel
+            }
+        ],
+        where: {
+            [Op.or]: [
+                {
+                    readableId: {
+                        [Op.like]: `%${search}%`
+                    }
+                },
+                { 
+                    '$UserModel.fullName$': { [Op.like]: `%${search}%` } 
+                }
+            ]
+        }
+    })
+
+    return transactions
+}
+
 export const createTransactionService = async (
     userId,
     addressId,
