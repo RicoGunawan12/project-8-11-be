@@ -648,7 +648,10 @@ export const createProductService = async (
     throw new Error("There is no " + productCategoryName + " category");
   }
   const insertedProduct = await ProductModel.findOne({
-    where: { productName },
+    where: { 
+      productName,
+      isDeleted: false
+    },
   });
 
   if (insertedProduct && mode == "upload")  {
