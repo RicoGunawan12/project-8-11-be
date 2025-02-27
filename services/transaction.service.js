@@ -1,4 +1,4 @@
-import { ProductCategoryModel, ProductModel, ProductVariantModel, TransactionDetailModel, TransactionHeaderModel, UserAddressModel, UserModel } from "../association/association.js"
+import { ProductCategoryModel, ProductCoverModel, ProductModel, ProductVariantModel, TransactionDetailModel, TransactionHeaderModel, UserAddressModel, UserModel } from "../association/association.js"
 import { createOrderKomship, deliveryDetailKomship, historyAWB, printLabelKomship, requestPickUpKomship } from "../integration/komship.integration.js";
 import { checkOutVATransactionXendit, createCreditCardTransactionXendit, createPlanXendit, createQrisTransactionXendit, getTransactionXendit } from "../integration/xendit.integration.js";
 import { Op, Sequelize, where } from "sequelize";
@@ -798,6 +798,9 @@ export const sendInvoiceByEmailService = async (id) => {
                     model: ProductVariantModel,
                     include: {
                         model: ProductModel,
+                        include: {
+                            model: ProductCoverModel
+                        }
                     },
                 },
             },
