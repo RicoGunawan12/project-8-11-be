@@ -775,3 +775,22 @@ export const sendInvoiceByEmail = async (req, res) => {
         return res.status(500).json({ message: "Internal server error, please inquire this issue to developer" });
     }
 }
+
+export const sendInvoicesbyEmailAsync = async (req, res) => {
+    const { ids } = req.body;
+
+    try {
+        for (const id of ids) {
+            sendInvoiceByEmailService(id).then(_ => {
+                console.log("Send invoice " + id + " success.");
+            }).catch(err => {
+                console.error("Error for Order ID " + id, err);
+            });
+        }
+
+        return res.status(200).json({ message: "Sending invoices to users by email..." })
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error, please inquire this issue to developer" })
+    }
+}
