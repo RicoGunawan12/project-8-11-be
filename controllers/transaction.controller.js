@@ -534,7 +534,7 @@ export const updateTransactionDelivery = async (req, res) => {
         return res.status(400).json({ message: "Invalid input" });
     }
 
-    if (status.toLowerCase() != "diterima" && status.toLowerCase() != "received" && status.toLowerCase() != "delivered") {
+    if (status != "Received") {
         return res.status(200).json({ message: status })
     }
     
