@@ -265,6 +265,7 @@ export const createProduct = async (req, res) => {
       productLength,
       productWidth,
       productHeight,
+      mode
     } = req.body;
 
     // Input validation (keeping existing validation)
@@ -424,7 +425,8 @@ export const createProduct = async (req, res) => {
       productWeight,
       productLength,
       productWidth,
-      productHeight
+      productHeight,
+      mode
     );
 
     if (!product) {

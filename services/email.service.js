@@ -255,3 +255,139 @@ export const sendEmailPostRegister = async (email, name, lang) => {
 
   const result = await transporter.sendMail(mailOptions);
 };
+
+export const sendEmailPostPayment = async (email, name, lang, transaction) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    secure: false,
+    auth: {
+      user: process.env.USER,
+      pass: process.env.PASS,
+    },
+  });
+
+  const postPaymentEmailTemplate = await getEmailTemplateService(
+    "post-payment"
+  );
+
+  const productHtmlTemplate = `
+    <tr>
+      <td style="display: flex; flex-direction: row; align-items: center; padding: 0.5rem; gap: 1rem">
+        <div style="border: 1px solid black;">
+          <img src="{{ productimageurl }}" alt="" width="120" height="120">
+        </div>
+        <div>
+          <div>
+            {{ productname }}
+          </div>
+          <div style="font-style: italic;">
+            {{ productvariant }}
+          </div>
+        </div>
+      </td>
+      <td class="align-middle" style="text-align: center;">
+        <div>
+          {{ productprice }}
+        </div>
+      </td>
+    </tr>
+  `;
+
+  let title =
+    (lang === "id"
+      ? postPaymentEmailTemplate.titleIndo
+      : postPaymentEmailTemplate.titleEng) ??
+    `Order #${transaction.readableId}: Terima Kasih Sudah Berbelanja di TYESO Indonesia`;
+
+  title = title.replaceAll("{{ Order ID }}", transaction.readableId);
+
+  const orderDate = new Date(transaction.transactionDate);
+  const printedDate = `${orderDate.getDate().toString().padStart(2, "0")}-${(orderDate.getMonth() + 1).toString().padStart(2, "0")}-${orderDate.getFullYear()} ${orderDate.getHours().toString().padStart(2, "0")}:${orderDate.getMinutes().toString().padStart(2,"0")}`;
+  
+  let content =
+    (lang === "id"
+      ? postPaymentEmailTemplate.contentIndo
+      : postPaymentEmailTemplate.contentEng) ?? "";
+  content = content.replaceAll("{{ nama }}", name);
+  content = content.replaceAll("{{ Order ID }}", transaction.readableId);
+  content = content.replaceAll("{{ Tanggal dan waktu pemesanan }}", printedDate);
+  content = content.replaceAll("{{ Harga total transaksi }}", transaction.totalPrice);
+  content = content.replaceAll("{{ Jasa ekspedisi yang dipakai }}", `${transaction.expedition} - ${transaction.shippingType}`);
+
+  let printedProductsHtml = '';
+  for (const detail of transaction.transaction_details) {
+    let printedProductHtml = '';
+    printedProductHtml = productHtmlTemplate;
+    printedProductHtml = printedProductHtml.replaceAll("{{ productimageurl }}", `${process.env.BASE_URL}/assets/product/${encodeURIComponent(detail.product_variant.product.productName)}/${encodeURIComponent(detail.product_variant.productImage) ?? ""}`);
+    printedProductHtml = printedProductHtml.replaceAll("{{ productname }}", detail.product_variant.product.productName);
+    printedProductHtml = printedProductHtml.replaceAll("{{ productvariant }}", `${detail.product_variant.productVariantCode} - ${detail.product_variant.productColor}`);
+    printedProductHtml = printedProductHtml.replaceAll("{{ productprice }}", detail.paidProductPrice);
+    printedProductsHtml = printedProductsHtml + printedProductHtml;
+  }
+
+  content = content.replaceAll("{{ products }}", printedProductsHtml);
+  content = content.replaceAll("{{ link }}", `${process.env.PRODUCTION_WEB}/transactions/${transaction.transactionId}`);
+
+  const mailOptions = {
+    from: process.env.USER,
+    to: email,
+    subject: title,
+    html: `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>${title}</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    line-height: 1.6;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #f9f9f9;
+                    color: #000000;
+                }
+                .container {
+                    width: 100%;
+                    max-width: 600px;
+                    margin: 20px auto;
+                    padding: 20px;
+                    background-color: #fff;
+                    border-radius: 8px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 20px;
+                }
+                .header h1 {
+                    margin: 0;
+                    color:#000000;
+                }
+                .content {
+                    text-align: left;
+                }
+                .footer {
+                    margin-top: 20px;
+                    text-align: center;
+                    font-size: 0.9em;
+                    color: #000000;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="content">
+                ${content}
+            </div>
+            <hr>
+            <div class="footer">
+                <p style="text-align:center;">Email ini dibuat secara otomatis. Mohon untuk tidak mengirimkan balasan ke email ini.</p>
+            </div>
+        </body>
+        </html>
+        `,
+  };
+
+  const result = await transporter.sendMail(mailOptions);
+}

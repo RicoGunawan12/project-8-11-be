@@ -1,18 +1,19 @@
-import { ProductCategoryModel, ProductModel, ProductVariantModel, TransactionDetailModel, TransactionHeaderModel, UserAddressModel, UserModel } from "../association/association.js"
+import { ProductCategoryModel, ProductCoverModel, ProductModel, ProductVariantModel, TransactionDetailModel, TransactionHeaderModel, UserAddressModel, UserModel } from "../association/association.js"
 import { createOrderKomship, deliveryDetailKomship, historyAWB, printLabelKomship, requestPickUpKomship } from "../integration/komship.integration.js";
 import { checkOutVATransactionXendit, createCreditCardTransactionXendit, createPlanXendit, createQrisTransactionXendit, getTransactionXendit } from "../integration/xendit.integration.js";
-import { Op, Sequelize } from "sequelize";
+import { Op, Sequelize, where } from "sequelize";
 import { generateReadableId } from "../utils/utility.js";
 import { getPickUpPointService } from "./address.service.js";
 import sequelize from "../config/database.js";
 import { getContactToSendService } from "./contact.service.js";
 import { read } from "fs";
+import { getEmailTemplateService, sendEmailPostPayment } from "./email.service.js";
 
-export const getAllTransactionsService = async (status, startDate, endDate, offset, limit) => {
+export const getAllTransactionsService = async (status, startDate, endDate, search, offset, limit) => {
     const whereConditions = {
         status: status
             ? { [Op.and]: [{ [Op.eq]: status }, { [Op.ne]: 'Unpaid' }] }
-            : { [Op.ne]: 'Unpaid' }
+            : { [Op.ne]: 'Unpaid' },
     };
 
     if (startDate && endDate && startDate === endDate) {
@@ -59,7 +60,23 @@ export const getAllTransactionsService = async (status, startDate, endDate, offs
                 model: UserAddressModel
             }
         ],
-        where: whereConditions,
+        where: {
+            [Op.or]: [
+                {
+                    readableId: {
+                        [Op.like]: `%${search}%`
+                    }
+                },
+                {
+                    userId: {
+                        [Op.in]: sequelize.literal(`
+                            (SELECT user_id FROM users WHERE full_name like '%${search}%')
+                        `)
+                    }
+                }
+            ],
+            ...whereConditions
+        },
         order: [["transactionDate", "DESC"]],
         offset: parseInt(offset, 10),
         limit: parseInt(limit, 10),
@@ -163,9 +180,21 @@ export const getTransactionsByIdService = async (transactionId) => {
     return transactions;
 }
 
-export const getSearchTransactionService = async(search) => {
-    // console.log(req);
-    // console.log(req.params);
+export const getSearchTransactionService = async(search, startDate, endDate) => {
+    let currentTransactionDateCondition = {}
+
+    if (startDate !== null && startDate !== undefined && startDate !== "") 
+        currentTransactionDateCondition = {
+            ...currentTransactionDateCondition,
+            [Op.gte]: new Date(startDate)
+        }
+
+    if (endDate !== null && endDate !== undefined && endDate !== "")
+        currentTransactionDateCondition = {
+            ...currentTransactionDateCondition,
+            [Op.lte]: new Date(endDate)
+        }
+
     const transactions = await TransactionHeaderModel.findAll({
         include: [
             {
@@ -186,8 +215,7 @@ export const getSearchTransactionService = async(search) => {
             }
         ],
         where: {
-            [Op.or]: 
-            [
+            [Op.or]: [
                 {
                     readableId: {
                         [Op.like]: `%${search}%`
@@ -197,8 +225,17 @@ export const getSearchTransactionService = async(search) => {
                     '$user.full_name$': {
                         [Op.like]: `%${search}%`
                     }
+                },
+                {
+                    status: {
+                        [Op.like]: `%${search}%`
+                    }
                 }
-            ]
+            ],
+            status: {
+                [Op.ne]: 'Unpaid'
+            },
+            transactionDate: currentTransactionDateCondition
         },
     });
 
@@ -750,4 +787,33 @@ export const rollbackTransaction = async (transactionId) => {
 export const trackDeliveryService = async (awb, shipping) => {
     const historyAwb = await historyAWB(awb, shipping);
     return historyAwb;
+}
+
+export const sendInvoiceByEmailService = async (id) => {
+    const transaction = await TransactionHeaderModel.findOne({
+        include: [
+            {
+                model: TransactionDetailModel,
+                include: {
+                    model: ProductVariantModel,
+                    include: {
+                        model: ProductModel,
+                        include: {
+                            model: ProductCoverModel
+                        }
+                    },
+                },
+            },
+            {
+                model: UserModel
+            }
+        ],
+        where: {
+            transactionId: id
+        }
+    });
+
+    await sendEmailPostPayment(transaction.user.email, transaction.user.fullName, "id", transaction);
+
+    return transaction;
 }

@@ -639,7 +639,8 @@ export const createProductService = async (
   productWeight,
   productLength,
   productWidth,
-  productHeight
+  productHeight,
+  mode
 ) => {
   console.log("checking category");
   const category = await ProductCategoryModel.findOne({ where: { productCategoryName } });
@@ -650,8 +651,11 @@ export const createProductService = async (
     where: { productName },
   });
 
-  if (insertedProduct) {
-    throw new Error("Product name already exists");
+  if (insertedProduct && mode == "upload")  {
+    return insertedProduct
+  }
+  else if (insertedProduct){
+    throw new Error("Product already exists")
   }
 
   const productCategoryId = category.productCategoryId;

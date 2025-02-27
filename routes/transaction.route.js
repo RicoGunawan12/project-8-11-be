@@ -7,7 +7,7 @@ import { checkoutQrisSchema } from '../schema/transaction/checkout/checkoutQris.
 import { checkoutVASchema } from './../schema/transaction/checkout/checkoutVA.schema.js';
 import { updateStatusValidator } from './../validator/transaction/updateStatus.validator.js';
 import { transactionIdSchema } from '../schema/general/transactionId.schema.js';
-import { allMonthSalesAnalytic, cancelPaidTransaction, cancelTransaction, changeTransactionStatus, checkOutCreditTransaction, checkOutQrisTransaction, checkOutVATransaction, createTransaction, deliveryDetail, fetchSalesByCategory, getAllTransactions, getSearchTransaction, getTransactionById, getTransactionCount, getTransactionsByUser, monthlySalesReport, onReviewReturnTransaction, onReviewTransaction, payTransaction, printLabel, refundTransaction, refundTransactionCallback, rejectReviewTransaction, requestPickupTransaction, returnTransaction, trackDelivery, updateQRTransactionStatus, updateTransactionDelivery, updateTransactionStatus } from '../controllers/transaction.controller.js';
+import { allMonthSalesAnalytic, cancelPaidTransaction, cancelTransaction, changeTransactionStatus, checkOutCreditTransaction, checkOutQrisTransaction, checkOutVATransaction, createTransaction, deliveryDetail, fetchSalesByCategory, getAllTransactions, getSearchTransaction, getTransactionById, getTransactionCount, getTransactionsByUser, monthlySalesReport, onReviewReturnTransaction, onReviewTransaction, payTransaction, printLabel, refundTransaction, refundTransactionCallback, rejectReviewTransaction, requestPickupTransaction, returnTransaction, sendInvoiceByEmail, trackDelivery, updateQRTransactionStatus, updateTransactionDelivery, updateTransactionStatus } from '../controllers/transaction.controller.js';
 import { adminMiddleware, generalMiddleware, userMiddleware } from '../middleware/auth.middleware.js';
 
 const TransactionRoute = express.Router();
@@ -26,6 +26,8 @@ TransactionRoute.get('/count', adminMiddleware, getTransactionCount);
 TransactionRoute.get('/user', userMiddleware, getTransactionsByUser);
 
 TransactionRoute.get('/searchTransaction', adminMiddleware, getSearchTransaction)
+
+TransactionRoute.get('/invoice/email/:id', userMiddleware, sendInvoiceByEmail);
 
 TransactionRoute.get('/:id', userMiddleware, getTransactionById);
 

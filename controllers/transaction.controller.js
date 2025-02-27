@@ -4,19 +4,25 @@ import { createQrisTransactionXendit, refundXendit } from "../integration/xendit
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
 import { getFreeOngkirService } from "../services/freeOngkir.service.js";
 import { checkPromoService, createPromoHistoryService } from "../services/promo.service.js";
-import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getSearchTransactionService, getTransactionsByIdService, getTransactionsByUserService, getTransactionXenditService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, rollbackTransaction, trackDeliveryService, updateExpiredTransaction, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
+import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getSearchTransactionService, getTransactionsByIdService, getTransactionsByUserService, getTransactionXenditService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, rollbackTransaction, sendInvoiceByEmailService, trackDeliveryService, updateExpiredTransaction, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
 import { applyVoucherService } from "../services/voucher.service.js";
 
 
 export const getAllTransactions = async (req, res) => {
-    var { status, startDate, endDate, offset, limit } = req.query
+    var { status, startDate, endDate, search, offset, limit } = req.query
     if (status === undefined) {
         status = ""
     }
+
+    if (search === undefined) {
+        search = "";
+    }
+
     try {
-        const transactions = await getAllTransactionsService(status, startDate, endDate, offset, limit);
+        const transactions = await getAllTransactionsService(status, startDate, endDate, search, offset, limit);
         return res.status(200).json({ message: "Transaction fetched successfully", transactions })
     } catch (error) {
+        console.log(error);
         return res.status(500).json({ message: error.message })
     }
 }
@@ -55,19 +61,37 @@ export const getTransactionById = async (req, res) => {
     }
     try {
         const transaction = await getTransactionsByIdService(transactionId);
-        return res.status(200).json({ message: "Transaction fetched successfully", transaction })
+
+        let delivery = { data: null };
+
+        if (transaction.awb) {
+            try {
+                const response = await trackDeliveryService(transaction.awb, transaction.expedition);
+
+                if (response.meta?.status === "error") {
+                    delivery = { data: null };
+                } else {
+                    delivery = response;
+                }
+            } catch (error) {
+                delivery = { data: null };
+            }
+        }
+
+        return res.status(200).json({ message: "Transaction fetched successfully", transaction, delivery: delivery.data })
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
 }
 
 export const getSearchTransaction = async(req, res) => {
-    const {search} = req.query
+    const {search, startDate, endDate} = req.query
 
     try {
-        const transaction = await getSearchTransactionService(search);
+        const transaction = await getSearchTransactionService(search, startDate, endDate);
         return res.status(200).json({message: "Search transaction fetched successfully", transaction})
     } catch (error) {
+        console.error(error);
         return res.status(500).json({message: error.message})
     }
 }
@@ -736,5 +760,17 @@ export const trackDelivery = async () => {
         return res.status(200).json({ message: "Track success", track: track.data });
     } catch (error) {
         return res.status(500).json({ message: error.message });
+    }
+}
+
+export const sendInvoiceByEmail = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await sendInvoiceByEmailService(id);
+        return res.status(200).json({ message: "Email has been sent successfully!" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error, please inquire this issue to developer" });
     }
 }
