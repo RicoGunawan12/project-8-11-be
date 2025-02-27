@@ -95,7 +95,8 @@ export const getCategoryWithProductService = async () => {
             const products = await ProductModel.findAll({
                 where: {
                     productCategoryId: category.productCategoryId,
-                    productActivityStatus: "active"
+                    productActivityStatus: "active",
+                    isDeleted: false
                 },
                 attributes: [
                     "productId",
@@ -121,7 +122,8 @@ export const getCategoryWithProductService = async () => {
                             "productPrice",
                             "productStock",
                             "productImage",
-                        ]
+                        ],
+                        where: { isDeleted: false }
                     },
                     {
                         model: PromoDetailModel,
@@ -192,7 +194,8 @@ export const getCategoryWithProductService = async () => {
                     "productPrice",
                     "productStock",
                     "productImage",
-                ]
+                ],
+                where: { isDeleted: false }
             },
             {
                 model: PromoDetailModel,
@@ -226,6 +229,7 @@ export const getCategoryWithProductService = async () => {
             //     attributes: ['rating', 'comment'],
             // }
         ],
+        where: { isDeleted: false },
         // group: ["products.product_id"],
         limit: 8
     });

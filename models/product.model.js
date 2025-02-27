@@ -67,6 +67,11 @@ const Product = sequelize.define('products', {
     defaultValue: "active",
     allowNull: false,
   },
+  isDeleted: {
+    field: "is_deleted",
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
   createdAt: {
     field: "created_at",
     type: DataTypes.DATE

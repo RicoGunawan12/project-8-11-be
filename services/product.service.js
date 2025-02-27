@@ -19,7 +19,9 @@ export const getProductsService = async (
   limit,
   status = "active"
 ) => {
-  const whereCondition = {};
+  const whereCondition = {
+    isDeleted: false,
+  };
   whereCondition.productName = { [Op.like]: `%${search}%` };
 
   if (status !== "all") whereCondition.productActivityStatus = status;
@@ -66,6 +68,7 @@ export const getProductsService = async (
           "productStock",
           "productImage",
         ],
+        where: { isDeleted: false }
       },
       {
         model: PromoDetailModel,
@@ -148,6 +151,7 @@ export const getNewestProductsService = async () => {
           "productStock",
           "productImage",
         ],
+        where: { isDeleted: false }
       },
       {
         model: PromoDetailModel,
@@ -183,6 +187,7 @@ export const getNewestProductsService = async () => {
     // group: ["products.product_id"],
     where: {
       productActivityStatus: "active",
+      isDeleted: false
     },
     limit: 3,
     order: [["createdAt", "DESC"]],
@@ -196,7 +201,9 @@ export const getProductPaginationService = async (
   search,
   category
 ) => {
-  const whereCondition = {};
+  const whereCondition = {
+    isDeleted: false,
+  };
   whereCondition.productName = {
     [Op.like]: `%${search}%`,
   };
@@ -245,6 +252,7 @@ export const getProductPaginationService = async (
           "productStock",
           "productImage",
         ],
+        where: { isDeleted: false }
       },
       {
         model: PromoDetailModel,
@@ -291,7 +299,9 @@ export const getProductPaginationService = async (
 };
 
 export const getProductCountService = async (search, category) => {
-  const whereCondition = {};
+  const whereCondition = {
+    isDeleted: false,
+  };
   whereCondition.productName = {
     [Op.like]: `%${search}%`,
   };
@@ -354,6 +364,7 @@ export const getProductByIdService = async (productId) => {
           "productStock",
           "productImage",
         ],
+        where: { isDeleted: false }
       },
       {
         model: PromoDetailModel,
@@ -386,7 +397,7 @@ export const getProductByIdService = async (productId) => {
       //   // attributes: ['rating', 'comment'],
       // }
     ],
-    where: { productId, productActivityStatus: "active" },
+    where: { productId, productActivityStatus: "active", isDeleted: false },
     // group: ["products.product_id"],
   });
 
@@ -437,6 +448,7 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
           "productStock",
           "productImage",
         ],
+        where: { isDeleted: false }
       },
       {
         model: PromoDetailModel,
@@ -472,7 +484,7 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
         order: [["productCover", "ASC"]],
       },
     ],
-    where: { productId, productActivityStatus: "active" },
+    where: { productId, productActivityStatus: "active", isDeleted: false },
     group: [
       "productId",
       "productName",
@@ -560,6 +572,7 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
           "productStock",
           "productImage",
         ],
+        where: { isDeleted: false }
       },
       {
         model: PromoDetailModel,
@@ -595,6 +608,7 @@ export const getProductByIdWithRelatedProductService = async (productId) => {
     where: {
       productId: { [Op.ne]: productId },
       productActivityStatus: "active",
+      isDeleted: false
     },
     // group: [
     //   "productId",
@@ -719,10 +733,13 @@ export const updateProductService = async (
 
     // Delete removed variants
     if (variantsToDelete.length > 0) {
-      await ProductVariantModel.destroy({
-        where: { productVariantId: variantsToDelete },
-        transaction,
-      });
+      await ProductVariantModel.update(
+        { isDeleted: true },
+        {
+          where: { productVariantId: variantsToSoftDelete },
+          transaction,
+        }
+      );
     }
 
     // Update existing variants
@@ -772,9 +789,11 @@ export const updateProductService = async (
 
 export const deleteProductService = async (productId) => {
   const product = await ProductModel.findOne({ where: { productId } });
-  deleteDirectory(`assets/product/${product.productName}`);
+  // deleteDirectory(`assets/product/${product.productName}`);
 
-  const deletedProduct = await ProductModel.destroy({
+  const deletedProduct = await ProductModel.update(
+    { isDeleted: true },
+    {
     where: { productId: productId },
   });
   return deletedProduct;
@@ -846,6 +865,7 @@ export const getBestSellerService = async () => {
           "productStock",
           "productImage",
         ],
+        where: { isDeleted: false }
       },
       {
         model: PromoDetailModel,
@@ -877,6 +897,7 @@ export const getBestSellerService = async () => {
       //   attributes: [],
       // }
     ],
+    where: { isDeleted: false }
     // group: ["products.product_id"],
   });
  
@@ -928,7 +949,9 @@ export const generateUpdateStockExcelService = async () => {
 };
 
 export const getAllVariantService = async() => {
-  const variants = await ProductVariantModel.findAll()
+  const variants = await ProductVariantModel.findAll({
+    where: { isDeleted: false }
+  })
 
   return variants
 }

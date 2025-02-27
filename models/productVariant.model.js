@@ -56,6 +56,11 @@ const ProductVariant = sequelize.define('product_variants', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
+  isDeleted: {
+    field: "is_deleted",
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
 },{
   timestamps: false,
   indexes: [
