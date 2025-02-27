@@ -409,6 +409,7 @@ export const updateTransactionStatus = async (req, res) => {
         const updatedTransaction = await updateTransactionStatusService(external_id, req.body, payment_channel);
         // const getTransactionById = await getTransactionsByIdService(external_id);
         // const response = await createKomshipOrderService(getTransactionById);
+        await sendInvoiceByEmailService(external_id)
         return res.status(200).json({ message: "Transaction updated!" });
         // return res.redirect('/');
     } catch (error) {
@@ -533,7 +534,7 @@ export const updateTransactionDelivery = async (req, res) => {
         return res.status(400).json({ message: "Invalid input" });
     }
 
-    if (status != "Diterima") {
+    if (status.toLowerCase() != "diterima" && status.toLowerCase() != "received" && status.toLowerCase() != "delivered") {
         return res.status(200).json({ message: status })
     }
     
