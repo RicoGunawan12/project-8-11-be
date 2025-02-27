@@ -280,8 +280,8 @@ export const sendEmailPostPayment = async (email, name, lang, transaction) => {
           {{ productname }} - {{ productvariant }}
         </div>
       </td>
-      <td>{{ productqty }}</td>
-      <td>{{ productprice }}</td>
+      <td style="text-align: center;">{{ productqty }}</td>
+      <td style="text-align: center;">{{ productprice }}</td>
     </tr>
   `;
 
