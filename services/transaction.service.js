@@ -1,12 +1,13 @@
 import { ProductCategoryModel, ProductModel, ProductVariantModel, TransactionDetailModel, TransactionHeaderModel, UserAddressModel, UserModel } from "../association/association.js"
 import { createOrderKomship, deliveryDetailKomship, historyAWB, printLabelKomship, requestPickUpKomship } from "../integration/komship.integration.js";
 import { checkOutVATransactionXendit, createCreditCardTransactionXendit, createPlanXendit, createQrisTransactionXendit, getTransactionXendit } from "../integration/xendit.integration.js";
-import { Op, Sequelize } from "sequelize";
+import { Op, Sequelize, where } from "sequelize";
 import { generateReadableId } from "../utils/utility.js";
 import { getPickUpPointService } from "./address.service.js";
 import sequelize from "../config/database.js";
 import { getContactToSendService } from "./contact.service.js";
 import { read } from "fs";
+import { getEmailTemplateService, sendEmailPostPayment } from "./email.service.js";
 
 export const getAllTransactionsService = async (status, startDate, endDate, search, offset, limit) => {
     const whereConditions = {
@@ -786,4 +787,30 @@ export const rollbackTransaction = async (transactionId) => {
 export const trackDeliveryService = async (awb, shipping) => {
     const historyAwb = await historyAWB(awb, shipping);
     return historyAwb;
+}
+
+export const sendInvoiceByEmailService = async (id) => {
+    const transaction = await TransactionHeaderModel.findOne({
+        include: [
+            {
+                model: TransactionDetailModel,
+                include: {
+                    model: ProductVariantModel,
+                    include: {
+                        model: ProductModel,
+                    },
+                },
+            },
+            {
+                model: UserModel
+            }
+        ],
+        where: {
+            transactionId: id
+        }
+    });
+
+    await sendEmailPostPayment("christopherlimawan@gmail.com", transaction.user.fullName, "id", transaction);
+
+    return transaction;
 }

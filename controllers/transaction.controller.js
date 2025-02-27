@@ -4,7 +4,7 @@ import { createQrisTransactionXendit, refundXendit } from "../integration/xendit
 import { getCartItemsByUserService, removeAllCartItemInUserService } from "../services/cart.service.js";
 import { getFreeOngkirService } from "../services/freeOngkir.service.js";
 import { checkPromoService, createPromoHistoryService } from "../services/promo.service.js";
-import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getSearchTransactionService, getTransactionsByIdService, getTransactionsByUserService, getTransactionXenditService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, rollbackTransaction, trackDeliveryService, updateExpiredTransaction, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
+import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getSearchTransactionService, getTransactionsByIdService, getTransactionsByUserService, getTransactionXenditService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, rollbackTransaction, sendInvoiceByEmailService, trackDeliveryService, updateExpiredTransaction, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
 import { applyVoucherService } from "../services/voucher.service.js";
 
 
@@ -760,5 +760,17 @@ export const trackDelivery = async () => {
         return res.status(200).json({ message: "Track success", track: track.data });
     } catch (error) {
         return res.status(500).json({ message: error.message });
+    }
+}
+
+export const sendInvoiceByEmail = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await sendInvoiceByEmailService(id);
+        return res.status(200).json({ message: "Email has been sent successfully!" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error, please inquire this issue to developer" });
     }
 }
