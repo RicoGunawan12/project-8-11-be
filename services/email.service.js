@@ -304,8 +304,8 @@ export const sendEmailPostPayment = async (email, name, lang, transaction) => {
     printedProductHtml = productHtmlTemplate;
     printedProductHtml = printedProductHtml.replaceAll("{{ productimageurl }}", `${process.env.BASE_URL}/assets/product/${encodeURIComponent(detail.product_variant.product.productName)}/${encodeURIComponent(detail.product_variant.productImage) ?? ""}`);
     printedProductHtml = printedProductHtml.replaceAll("{{ productname }}", detail.product_variant.product.productName);
-    printedProductHtml = printedProductHtml.replaceAll("{{ productvariant }}", `${detail.product_variant.productVariantCode} - ${detail.product_variant.productColor}`);
-    printedProductHtml = printedProductHtml.replaceAll("{{ productprice }}", detail.paidProductPrice);
+    printedProductHtml = printedProductHtml.replaceAll("{{ productvariant }}", `${detail.product_variant.productColor}`);
+    printedProductHtml = printedProductHtml.replaceAll("{{ productprice }}", `Rp. ${detail.paidProductPrice}`);
     printedProductsHtml = printedProductsHtml + printedProductHtml;
   }
 
