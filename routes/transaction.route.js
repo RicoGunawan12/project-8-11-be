@@ -27,7 +27,7 @@ TransactionRoute.get('/user', userMiddleware, getTransactionsByUser);
 
 TransactionRoute.get('/searchTransaction', adminMiddleware, getSearchTransaction)
 
-TransactionRoute.post('/invoice/email/mass/:id', adminMiddleware, sendInvoicesbyEmailAsync);
+TransactionRoute.post('/invoice/email/mass', adminMiddleware, sendInvoicesbyEmailAsync);
 
 TransactionRoute.get('/invoice/email/:id', userMiddleware, sendInvoiceByEmail);
 
