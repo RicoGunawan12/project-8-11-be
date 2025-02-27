@@ -272,7 +272,15 @@ export const sendEmailPostPayment = async (email, name, lang, transaction) => {
 
   const productHtmlTemplate = `
     <tr>
-      <td>{{ productname }} - {{ productvariant }}</td>
+      <td>
+        <div style="display: inline-block; margin: 8px; margin-right: 20px; border: 1px solid black;">
+          <img src="{{ productimageurl }}" alt="{{ productname }}" width="120" height="120" />
+        </div>
+        <div style="display: inline-block;">
+          {{ productname }} - {{ productvariant }}
+        </div>
+      </td>
+      <td>{{ productqty }}</td>
       <td>{{ productprice }}</td>
     </tr>
   `;
@@ -305,6 +313,7 @@ export const sendEmailPostPayment = async (email, name, lang, transaction) => {
     printedProductHtml = printedProductHtml.replaceAll("{{ productimageurl }}", `${process.env.BASE_URL}/assets/product/${encodeURIComponent(detail.product_variant.product.productName)}/${encodeURIComponent(detail.product_variant.productImage) ?? ""}`);
     printedProductHtml = printedProductHtml.replaceAll("{{ productname }}", detail.product_variant.product.productName);
     printedProductHtml = printedProductHtml.replaceAll("{{ productvariant }}", `${detail.product_variant.productColor}`);
+    printedProductHtml = printedProductHtml.replaceAll("{{ productqty }}", `${detail.quantity}`);
     printedProductHtml = printedProductHtml.replaceAll("{{ productprice }}", `Rp. ${detail.paidProductPrice}`);
     printedProductsHtml = printedProductsHtml + printedProductHtml;
   }
