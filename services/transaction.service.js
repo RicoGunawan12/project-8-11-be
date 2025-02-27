@@ -810,7 +810,7 @@ export const sendInvoiceByEmailService = async (id) => {
         }
     });
 
-    await sendEmailPostPayment("christopherlimawan@gmail.com", transaction.user.fullName, "id", transaction);
+    await sendEmailPostPayment(transaction.user.email, transaction.user.fullName, "id", transaction);
 
     return transaction;
 }
