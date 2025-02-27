@@ -798,9 +798,6 @@ export const sendInvoiceByEmailService = async (id) => {
                     model: ProductVariantModel,
                     include: {
                         model: ProductModel,
-                        include: {
-                            model: ProductCoverModel
-                        }
                     },
                 },
             },
