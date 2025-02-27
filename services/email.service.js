@@ -318,7 +318,7 @@ export const sendEmailPostPayment = async (email, name, lang, transaction) => {
   for (const detail of transaction.transaction_details) {
     let printedProductHtml = '';
     printedProductHtml = productHtmlTemplate;
-    printedProductHtml = printedProductHtml.replaceAll("{{ productimageurl }}", `${process.env.BASE_URL}/assets/product/${detail.product_variant.product.productName}/${detail.product_variant.productImage ?? ""}`);
+    printedProductHtml = printedProductHtml.replaceAll("{{ productimageurl }}", `${process.env.BASE_URL}/assets/product/${detail.product_variant.product.productName.replaceAll(" ", "%20")}/${detail.product_variant.productImage.replaceAll(" ", "%20") ?? ""}`);
     printedProductHtml = printedProductHtml.replaceAll("{{ productname }}", detail.product_variant.product.productName);
     printedProductHtml = printedProductHtml.replaceAll("{{ productvariant }}", `${detail.product_variant.productVariantCode} - ${detail.product_variant.productColor}`);
     printedProductHtml = printedProductHtml.replaceAll("{{ productprice }}", detail.paidProductPrice);
