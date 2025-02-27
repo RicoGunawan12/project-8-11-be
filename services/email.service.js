@@ -272,24 +272,8 @@ export const sendEmailPostPayment = async (email, name, lang, transaction) => {
 
   const productHtmlTemplate = `
     <tr>
-      <td style="display: flex; flex-direction: row; align-items: center; padding: 0.5rem; gap: 1rem">
-        <div style="border: 1px solid black;">
-          <img src="{{ productimageurl }}" alt="" width="120" height="120">
-        </div>
-        <div>
-          <div>
-            {{ productname }}
-          </div>
-          <div style="font-style: italic;">
-            {{ productvariant }}
-          </div>
-        </div>
-      </td>
-      <td class="align-middle" style="text-align: center;">
-        <div>
-          {{ productprice }}
-        </div>
-      </td>
+      <td>{{ productname }} - {{ productvariant }}</td>
+      <td>{{ productprice }}</td>
     </tr>
   `;
 
@@ -339,44 +323,15 @@ export const sendEmailPostPayment = async (email, name, lang, transaction) => {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>${title}</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    line-height: 1.6;
-                    margin: 0;
-                    padding: 0;
-                    background-color: #f9f9f9;
-                    color: #000000;
-                }
-                .container {
-                    width: 100%;
-                    max-width: 600px;
-                    margin: 20px auto;
-                    padding: 20px;
-                    background-color: #fff;
-                    border-radius: 8px;
-                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                }
-                .header {
-                    text-align: center;
-                    margin-bottom: 20px;
-                }
-                .header h1 {
-                    margin: 0;
-                    color:#000000;
-                }
-                .content {
-                    text-align: left;
-                }
-                .footer {
-                    margin-top: 20px;
-                    text-align: center;
-                    font-size: 0.9em;
-                    color: #000000;
-                }
-            </style>
         </head>
-        <body>
+        <body
+          style="
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+          "
+        >
             <div class="content">
                 ${content}
             </div>
