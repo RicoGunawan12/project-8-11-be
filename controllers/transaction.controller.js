@@ -780,17 +780,35 @@ export const sendInvoicesbyEmailAsync = async (req, res) => {
     const { ids } = req.body;
 
     try {
-        for (const id of ids) {
-            sendInvoiceByEmailService(id).then(_ => {
-                console.log("Send invoice " + id + " success.");
-            }).catch(err => {
-                console.error("Error for Order ID " + id, err);
-            });
-        }
+        promiseAllInBatches(sendInvoiceByEmailService, ids, 10);
 
         return res.status(200).json({ message: "Sending invoices to users by email..." })
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Internal server error, please inquire this issue to developer" })
     }
+}
+
+/**
+ * Same as Promise.all(items.map(item => task(item))), but it waits for
+ * the first {batchSize} promises to finish before starting the next batch.
+ * 
+ * References: https://stackoverflow.com/questions/37213316/execute-batch-of-promises-in-series-once-promise-all-is-done-go-to-the-next-bat
+ *
+ * @template A
+ * @template B
+ * @param {function(A): B} task The task to run for each item.
+ * @param {A[]} items Arguments to pass to the task for each call.
+ * @param {int} batchSize
+ * @returns {Promise<B[]>}
+ */
+const promiseAllInBatches = async (task, items, batchSize) => {
+    let position = 0;
+    let results = [];
+    while (position < items.length) {
+        const itemsForBatch = items.slice(position, position + batchSize);
+        results = [...results, ...await Promise.allSettled(itemsForBatch.map(item => task(item)))];
+        position += batchSize;
+    }
+    return results;
 }
