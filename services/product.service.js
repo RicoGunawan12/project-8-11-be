@@ -743,7 +743,7 @@ export const updateProductService = async (
       await ProductVariantModel.update(
         { isDeleted: true },
         {
-          where: { productVariantId: variantsToSoftDelete },
+          where: { productVariantId: variantsToDelete },
           transaction,
         }
       );

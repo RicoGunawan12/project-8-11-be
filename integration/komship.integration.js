@@ -102,23 +102,23 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
 
     const transactionDetails = transaction.transaction_details.map((det) => {
         return {
-            product_name: det.product_variant.product.productName,
+            product_name: (det?.product_variant?.product?.productName ?? "grafir"),
             product_variant_name:
-                (det.product_variant.productSize ?? "") +
+                (det?.product_variant?.productSize ?? "grafir") +
                 " - " +
-                (det.product_variant.productColor ?? "") +
+                (det?.product_variant?.productColor ?? "grafir") +
                 " - " +
-                (det.product_variant.sku ?? "") +
+                (det?.product_variant?.sku ?? "grafir") +
                 " - " +
                 (det.customerNotes)
             ,
-            product_price: det.product_variant.productPrice,
-            product_width: Math.ceil(det.product_variant.product.productWidth / 100),
-            product_height: Math.ceil(det.product_variant.product.productHeight / 100),
-            product_weight: Math.ceil(det.product_variant.product.productWeight / 1000),
-            product_length: Math.ceil(det.product_variant.product.productLength / 100),
+            product_price: det?.product_variant?.productPrice ?? 1,
+            product_width: Math.ceil(det?.product_variant?.product?.productWidth / 100) ?? 1,
+            product_height: Math.ceil(det?.product_variant?.product?.productHeight / 100) ?? 1,
+            product_weight: Math.ceil(det?.product_variant?.product?.productWeight / 1000) ?? 1,
+            product_length: Math.ceil(det?.product_variant?.product?.productLength / 100) ?? 1,
             qty: det.quantity,
-            subtotal: det.quantity * det.product_variant.productPrice
+            subtotal: det.quantity * (det?.product_variant?.productPrice ?? 1)
         };
     });
     // console.log(transactionDetails);
