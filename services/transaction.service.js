@@ -193,7 +193,21 @@ export const getSearchTransactionService = async(search, startDate, endDate) => 
         currentTransactionDateCondition = {
             ...currentTransactionDateCondition,
             [Op.lte]: new Date(endDate)
-        }
+    }
+
+    const whereCondition = {
+        [Op.or]: [
+            { readableId: { [Op.like]: `%${search}%` } },
+            { '$user.full_name$': { [Op.like]: `%${search}%` } },
+            { status: { [Op.like]: `%${search}%` } }
+        ],
+        status: { [Op.ne]: 'Unpaid' }
+    };
+    
+    // Only add transactionDate if it has conditions
+    if (Object.keys(currentTransactionDateCondition).length > 0) {
+        whereCondition.transactionDate = currentTransactionDateCondition;
+    }
 
     const transactions = await TransactionHeaderModel.findAll({
         include: [
@@ -214,29 +228,7 @@ export const getSearchTransactionService = async(search, startDate, endDate) => 
                 model: UserAddressModel
             }
         ],
-        where: {
-            [Op.or]: [
-                {
-                    readableId: {
-                        [Op.like]: `%${search}%`
-                    }
-                },
-                {
-                    '$user.full_name$': {
-                        [Op.like]: `%${search}%`
-                    }
-                },
-                {
-                    status: {
-                        [Op.like]: `%${search}%`
-                    }
-                }
-            ],
-            status: {
-                [Op.ne]: 'Unpaid'
-            },
-            transactionDate: currentTransactionDateCondition
-        },
+        where: whereCondition,
     });
 
     return transactions
