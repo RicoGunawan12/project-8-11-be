@@ -273,8 +273,8 @@ export const sendEmailPostPayment = async (email, name, lang, transaction) => {
   const productHtmlTemplate = `
     <tr>
       <td>
-        <div style="display: inline-block; margin: 8px; margin-right: 20px; border: 1px solid black;">
-          <img src="{{ productimageurl }}" alt="{{ productname }}" width="70" height="70" />
+        <div style="display: inline-block;">
+          <img src="{{ productimageurl }}" alt="{{ productname }}" width="70" height="70" style="display: block; margin: 0 auto;" />
         </div>
       </td>
       <td>
