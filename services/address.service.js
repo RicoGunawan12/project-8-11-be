@@ -10,7 +10,10 @@ import AdminAddress from "../models/adminAddress.model.js";
 export const getAddresByUserIdService = async (ref_user_id) => {
     const userAddresses = await UserAddressModel.findAll(
         { 
-            where: { ref_user_id },
+            where: { 
+                ref_user_id,
+                isDeleted: false
+            },
         }
     );
     return userAddresses;
@@ -49,11 +52,15 @@ export const createAddresService = async (receiverName, receiverPhoneNumber, cit
 }
 
 export const deleteAddressService = async (addressId) => {
-    const deletedAddress = await UserAddressModel.destroy({
+    const deletedAddress = await UserAddressModel.update(
+        {
+            isDeleted: true
+        },
+        {
         where: { addressId }
     })
     
-    if (deletedAddress == 0) {
+    if (deletedAddress[0] == 0) {
         throw new Error("Address not found!");
     }
     return deletedAddress;

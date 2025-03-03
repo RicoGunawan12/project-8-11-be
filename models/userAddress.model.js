@@ -61,6 +61,11 @@ const UserAddress = sequelize.define('user_addresses', {
         field: "address_detail",
         type: DataTypes.STRING,
         allowNull: false
+    },
+    isDeleted: {
+      field: "is_deleted",
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   },{
     timestamps: false
