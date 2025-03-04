@@ -33,7 +33,7 @@ export const checkVoucherByCodeService = async (code, totalPrice) => {
 export const getVoucherByCodeService = async (code) => {
   const voucher =  await VoucherModel.findOne({
     where: {
-      voucherCode: code,
+      voucherId: code,
     }
   })
  
@@ -64,20 +64,40 @@ export const getVoucherByCodeWithVoucherTypeService = async (voucherCode) => {
 // #region CREATE
 
 export const createVouchersService = async (vouchers) => {
-  const voucherCodes = vouchers.map((voucher) => voucher.voucherCode);
-  const duplicatedData = await VoucherModel.findAll({
-    where: {
-      voucherCode: voucherCodes,
-    },
-    attributes: ['voucherCode'],
-  });
 
-  if (duplicatedData.length > 0) {
-    throw new Error(`Duplicated voucher code: ${duplicatedData[0].get('voucherCode')}`);
+  // console.log(vouchers)
+  // console.log(vouchers[0])
+  const voucher = vouchers[0]
+  if(voucher.voucherType == "product"){
+    for(const variant of voucher.variantId){
+      const newVoucher = await VoucherModel.create({
+        voucherCode: voucher.voucherCode,
+        voucherName: voucher.voucherName,
+        voucherType: voucher.voucherType,
+        voucherEndDate: voucher.voucherEndDate,
+        voucherStartDate: voucher.voucherStartDate,
+        maxDiscount: voucher.maxDiscount,
+        discount: voucher.discount,
+        minimumPayment: voucher.minimumPayment,
+        quota: voucher.quota,
+        variantsId: variant.variantsId
+      })
+    }
   }
-  await VoucherModel.bulkCreate(vouchers, {
-    returning: true, 
-  });
+  else{
+    const newVoucher = await VoucherModel.create({
+      voucherCode: voucher.voucherCode,
+      voucherName: voucher.voucherName,
+      voucherType: voucher.voucherType,
+      voucherEndDate: voucher.voucherEndDate,
+      voucherStartDate: voucher.voucherStartDate,
+      maxDiscount: voucher.maxDiscount,
+      discount: voucher.discount,
+      minimumPayment: voucher.minimumPayment,
+      quota: voucher.quota,
+      variantsId: null
+    })
+  }
 
   return;
 };
@@ -145,11 +165,11 @@ export const updateVouchersService = async (req) => {
 export const deleteVoucherByCodeService = async (code) =>{
   
   const voucher = await getVoucherByCodeService(code)
-  if (!voucher) throw new Error(`Voucher with Code ${code} not found`)
+  if (!voucher) throw new Error(`Voucher with Id ${code} not found`)
 
   const result = await VoucherModel.destroy({
     where: {
-      voucherCode: code,
+      voucherId: code,
     },
   });
 

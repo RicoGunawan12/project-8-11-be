@@ -15,7 +15,7 @@ VoucherRoute.get('/getByCode',userMiddleware, generalValidator(getByCode),valida
 VoucherRoute.get('/getByCodeV2', generalValidator(getByCode),validateSchema, getByCodeNonUser)
 VoucherRoute.post('/', vouchersValidator,validateSchema, createVouchers)
 VoucherRoute.put('/', vouchersValidator,validateSchema, updateVouchers)
-VoucherRoute.delete('/',generalValidator(getByCode),validateSchema,deleteVoucherByCode)
+VoucherRoute.delete('/', deleteVoucherByCode)
 
 VoucherRoute.post('/applyVoucher',generalValidator(applyVoucherSchema),validateSchema, applyVoucher)
 VoucherRoute.post('/delete/multiple', adminMiddleware, generalValidator(voucherMultipleDeleteSchema), validateSchema, deleteVouchersByCode)

@@ -21,15 +21,6 @@ TransactionHeader.belongsTo(User, { foreignKey: 'ref_user_id' });
 User.hasMany(UserAddress, { foreignKey: "ref_user_id" });
 UserAddress.belongsTo(User, { foreignKey: "ref_user_id" });
 
-Wishlist.belongsTo(User, { foreignKey: 'ref_user_id' });
-User.belongsTo(Wishlist, { foreignKey: 'ref_user_id' });
-
-Wishlist.hasMany(WishlistItem, { foreignKey: 'ref_wishlist_id' });
-WishlistItem.belongsTo(Wishlist, { foreignKey: 'ref_wishlist_id' });
-
-ProductVariant.hasMany(WishlistItem, { foreignKey: 'ref_product_variant_id' });
-WishlistItem.belongsTo(ProductVariant, { foreignKey: 'ref_product_variant_id' });
-
 ProductVariant.hasMany(TransactionDetail, { foreignKey: 'ref_product_variant_id' });
 TransactionDetail.belongsTo(ProductVariant, { foreignKey: 'ref_product_variant_id' });
 
