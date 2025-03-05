@@ -131,6 +131,25 @@ export const createTransaction = async (req, res) => {
         // calculate the total price
         // calculate the total weight
         var totalPrice = deliveryFee;
+                
+        await Promise.all(
+            productsInCart.map(async (product) => {
+                if (product.quantity === 1) {
+                    const promoDetails = await checkPromoService(product.product_variant.ref_product_id, userId);
+                    if (promoDetails) {
+                        product.product_variant.productPrice =
+                        product.product_variant.productPrice - promoDetails.promo.promoAmount <= 0 ? 0 :
+                        product.product_variant.productPrice - promoDetails.promo.promoAmount;
+                        product.product_variant.realizedPromo = promoDetails.promo.promoAmount;
+                        
+                        const promoHistory = await createPromoHistoryService(promoDetails.promo.promoId, userId, product.product_variant.ref_product_id);
+                    }
+                }
+
+                const itemTotal = product.product_variant.productPrice * product.quantity;
+                totalPrice += itemTotal;
+            })
+        );
 
         // console.log(totalWeight);
         var freeOngkir = 0;

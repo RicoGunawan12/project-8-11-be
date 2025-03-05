@@ -763,6 +763,7 @@ export const updateProductService = async (
           productPrice: variant.productPrice,
           productStock: variant.productStock,
           productImage: variant.productImage,
+          sku: variant.sku
         },
         { transaction }
       );
