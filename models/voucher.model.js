@@ -63,10 +63,16 @@ const Voucher = sequelize.define('vouchers', {
     field: "voucher_visibility",
     type: DataTypes.BOOLEAN,
     allowNull: false,
-    defaultValue: false
+    defaultValue: true
   },
   voucherSpecialEvent:{
     field: "voucher_special_event",
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
+  },
+  isDeleted: {
+    field: "is_deleted",
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: false

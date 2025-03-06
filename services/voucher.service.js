@@ -5,6 +5,7 @@ import { VoucherModel } from "../association/association.js";
 // #region GET
 export const getAllVouchersService =  async ()=> {
   const voucher = await VoucherModel.findAll({
+    where: { isDeleted: false },
     order: [['voucher_start_date', 'DESC']]
   })
   return voucher
@@ -13,6 +14,7 @@ export const getAllVouchersService =  async ()=> {
 export const checkVoucherByCodeService = async (code, totalPrice) => {
   const voucher =  await VoucherModel.findOne({
     where: {
+      isDeleted: false,
       voucherCode: code,
       voucherStartDate: { [Op.lte]: new Date() },
       voucherEndDate: { [Op.gte]: new Date().setHours(0, 0, 0, 0) },
@@ -33,6 +35,7 @@ export const checkVoucherByCodeService = async (code, totalPrice) => {
 export const getVoucherByCodeService = async (code) => {
   const voucher =  await VoucherModel.findOne({
     where: {
+      isDeleted: false,
       voucherId: code,
     }
   })
@@ -43,6 +46,7 @@ export const getVoucherByCodeService = async (code) => {
 export const getVoucherByCodeListService = async (voucherCodes) => {
   const vouchers = await VoucherModel.findAll({
     where: {
+      isDeleted: false,
       voucherCode: voucherCodes
     }
   });
@@ -53,10 +57,33 @@ export const getVoucherByCodeListService = async (voucherCodes) => {
 export const getVoucherByCodeWithVoucherTypeService = async (voucherCode) => {
   const vouchers = await VoucherModel.findOne({
     where: {
+      isDeleted: false,
       voucherCode: voucherCode
     }
   })
   return vouchers
+}
+
+export const getVoucherByIdService = async (voucherId) => {
+  const vouchers = await VoucherModel.findOne({
+    where: {
+      isDeleted: false,
+      voucherId
+    }
+  })
+  return vouchers
+}
+
+export const getVisibleVoucherService = async () => {
+  const vouchers = await VoucherModel.findAll({ 
+    where: { 
+      voucherVisibility: true, 
+      isDeleted: false,
+      voucherStartDate: { [Op.lte]: new Date() },
+      voucherEndDate: { [Op.gte]: new Date().setHours(0, 0, 0, 0) },
+    }
+  });
+  return vouchers;
 }
 
 // #endregion
@@ -65,8 +92,8 @@ export const getVoucherByCodeWithVoucherTypeService = async (voucherCode) => {
 
 export const createVouchersService = async (vouchers) => {
 
-  // console.log(vouchers)
-  // console.log(vouchers[0])
+  console.log(vouchers)
+  console.log(vouchers[0])
   const voucher = vouchers[0]
   if(voucher.voucherType == "product"){
     for(const variant of voucher.variantId){
@@ -167,21 +194,31 @@ export const deleteVoucherByCodeService = async (code) =>{
   const voucher = await getVoucherByCodeService(code)
   if (!voucher) throw new Error(`Voucher with Id ${code} not found`)
 
-  const result = await VoucherModel.destroy({
-    where: {
-      voucherId: code,
-    },
-  });
+  const result = await VoucherModel.update(
+    {
+      isDeleted: true
+    }, 
+    {
+      where: {
+        voucherId: code,
+      },
+    }
+  );
 
   return result
 }
 
 export const deleteVouchersByCodeService = async (code) =>{
-  const result = await VoucherModel.destroy({
-    where: {
-      voucherCode: code,
+  const result = await VoucherModel.update(
+    {
+      isDeleted: true
     },
-  });
+    {
+      where: {
+        voucherCode: code,
+      },
+    }
+  );
 
   return result
 }
@@ -198,6 +235,9 @@ export const calculateVoucherDiscount = async (voucherTypeCode, amount, discount
     case 'FIXED':
         if(discountAmount > amount) amount
         else return discountAmount
+    case 'ONGKIR':
+        if(discountAmount > amount) amount
+        else return discountAmount
     case 'PERCENTAGE':
         const discountedAmt = amount * (discountAmount/100)
         if(maxDiscount && discountedAmt > maxDiscount){
@@ -209,10 +249,10 @@ export const calculateVoucherDiscount = async (voucherTypeCode, amount, discount
   }
 }
 
-export const applyVoucherService = async (voucherCode, totalAmount) => {
-  const voucher = await getVoucherByCodeWithVoucherTypeService(voucherCode)
+export const applyVoucherService = async (voucherId, totalAmount) => {
+  const voucher = await getVoucherByIdService(voucherId)
   
-  if(!voucher) throw new Error(`Voucher with code ${voucherCode} doesn't exist`)
+  if(!voucher) throw new Error(`Voucher with code ${voucherId} doesn't exist`)
 
   if (voucher.quota <= 0) {
     throw new Error("Voucher quota has reached the limit")
@@ -221,16 +261,17 @@ export const applyVoucherService = async (voucherCode, totalAmount) => {
   if(voucher.voucherEndDate && (voucher.voucherEndDate && new Date(voucher.voucherEndDate) < new Date().setHours(0,0,0,0))){
     throw new Error("Voucher has expired")
   }
+  console.log(totalAmount, voucher.minimumPayment);
 
   if (totalAmount < voucher.minimumPayment) {
     throw new Error(`The total price must be at least Rp ${voucher.minimumPayment.toLocaleString('id-ID')} to use this voucher.`)
   }
-  const totalDiscount = calculateVoucherDiscount(voucher.voucherType,totalAmount,voucher.discount, voucher.maxDiscount)
+  const totalDiscount = await calculateVoucherDiscount(voucher.voucherType,totalAmount,voucher.discount, voucher.maxDiscount)
 
   voucher.quota -= 1;
   await voucher.save();
 
-  return totalDiscount
+  return {totalDiscount: totalDiscount, voucherName: voucher.voucherName}
 }
 
 

@@ -1,5 +1,5 @@
 import express from 'express';
-import { applyVoucher, createVouchers, deleteVoucherByCode, deleteVouchersByCode, getAllVouchers, getByCodeNonUser, getVoucherByCode, updateVouchers } from '../controllers/voucher.controller.js';
+import { applyVoucher, createVouchers, deleteVoucherByCode, deleteVouchersByCode, getAllVouchers, getByCodeNonUser, getVisibleVoucher, getVoucherByCode, updateVouchers } from '../controllers/voucher.controller.js';
 import { validateSchema } from '../validator/validate.js';
 import { vouchersValidator } from '../validator/model/vouchers.validator.js';
 import { generalValidator } from '../validator/general/general.validator.js';
@@ -11,6 +11,7 @@ import { adminMiddleware, userMiddleware } from '../middleware/auth.middleware.j
 const VoucherRoute = express.Router();
 
 VoucherRoute.get('/', getAllVouchers)
+VoucherRoute.get('/visible', userMiddleware, getVisibleVoucher);
 VoucherRoute.get('/getByCode',userMiddleware, generalValidator(getByCode),validateSchema, getVoucherByCode)
 VoucherRoute.get('/getByCodeV2', generalValidator(getByCode),validateSchema, getByCodeNonUser)
 VoucherRoute.post('/', vouchersValidator,validateSchema, createVouchers)

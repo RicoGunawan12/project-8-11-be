@@ -5,7 +5,7 @@ import { getCartItemsByUserService, removeAllCartItemInUserService } from "../se
 import { getFreeOngkirService } from "../services/freeOngkir.service.js";
 import { checkPromoService, createPromoHistoryService } from "../services/promo.service.js";
 import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getSearchTransactionService, getTransactionsByIdService, getTransactionsByUserService, getTransactionXenditService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, rollbackTransaction, sendInvoiceByEmailService, trackDeliveryService, updateExpiredTransaction, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
-import { applyVoucherService } from "../services/voucher.service.js";
+import { applyVoucherService, getVoucherByCodeWithVoucherTypeService } from "../services/voucher.service.js";
 
 
 export const getAllTransactions = async (req, res) => {
@@ -131,6 +131,24 @@ export const createTransaction = async (req, res) => {
         // calculate the total price
         // calculate the total weight
         var totalPrice = deliveryFee;
+        await Promise.all(
+            productsInCart.map(async (product) => {
+                if (product.quantity === 1) {
+                    const promoDetails = await checkPromoService(product.product_variant.ref_product_id, userId);
+                    if (promoDetails) {
+                        product.product_variant.productPrice =
+                        product.product_variant.productPrice - promoDetails.promo.promoAmount <= 0 ? 0 :
+                        product.product_variant.productPrice - promoDetails.promo.promoAmount;
+                        product.product_variant.realizedPromo = promoDetails.promo.promoAmount;
+                        
+                        const promoHistory = await createPromoHistoryService(promoDetails.promo.promoId, userId, product.product_variant.ref_product_id);
+                    }
+                }
+
+                const itemTotal = product.product_variant.productPrice * product.quantity;
+                totalPrice += itemTotal;
+            })
+        );
 
         // console.log(totalWeight);
         var freeOngkir = 0;
@@ -143,19 +161,44 @@ export const createTransaction = async (req, res) => {
         }
 
 
-        var disc = 0;
+        var disc = [];
+        var voucherToInsert = "";
         if (voucherCode) {
             // minus the totalprice
-            const voucherHasUsed = await checkTransactionWithVoucher(voucherCode, userId);
-            if (voucherHasUsed) {
-                return res.status(400).json({ message: "Voucher has been used!" });
-            }
-            else {
-                const discount = await applyVoucherService(voucherCode, totalPrice - deliveryFee + freeOngkir);
-                totalPrice -= discount;
-                disc = discount;
+            const checkVoucher = voucherCode.map(async (voucher, index) => {
+                if (voucher === "0") {
+                    
+                }
+                else {
+                    voucherToInsert+= voucher; // Fix: Use push instead of concat
                 
-            }
+                    if (index === voucherCode.length - 1) {
+                        if (voucher !== "0") {
+                            const temp = voucher;
+                            const getVoucherByCode = await getVoucherByCodeWithVoucherTypeService(voucher);
+                            voucher = getVoucherByCode.voucherId;
+                        }
+                    } else {
+                        voucherToInsert += ";" // Fix: Properly append the separator
+                    }
+                
+                    const voucherHasUsed = await checkTransactionWithVoucher(voucher, userId);
+                    if (voucherHasUsed) {
+                        return res.status(400).json({ message: "Voucher has been used!" });
+                    }
+                    console.log("before: ", totalPrice, deliveryFee, freeOngkir);
+                    
+                    const discount = await applyVoucherService(voucher, totalPrice - deliveryFee + freeOngkir);
+                    totalPrice -= discount.totalDiscount;
+                    console.log("after: ", totalPrice, discount.totalDiscount);
+                
+                    disc.push({
+                        discount: discount.totalDiscount,
+                        name: discount.voucherName,
+                    });
+                }
+            })
+            await Promise.all(checkVoucher)
         }
 
 
@@ -167,7 +210,7 @@ export const createTransaction = async (req, res) => {
         const transaction = await createTransactionService(
             userId,
             addressId,
-            voucherCode.length === 0 ? null : voucherCode,
+            voucherToInsert.length === 0 ? null : voucherToInsert,
             // null, 
             new Date(),
             paymentMethod,
@@ -204,8 +247,11 @@ export const createTransaction = async (req, res) => {
         });
         const insertedTransactionDetails = await createTransactionDetailService(transactionDetails);
         const deletedCartItem = await removeAllCartItemInUserService(userId);
+        console.log(paymentMethod, totalPrice);
         
         if (paymentMethod !== "COD" && totalPrice >= 1000) {
+            console.log("testing masuk");
+            
             const payTransactionResponse = await payTransactionService(transaction, productsInCart, disc, freeOngkir)
             console.log(payTransactionResponse);
             const updatePaymentLink = await updatePaymentLinkService(transaction, payTransactionResponse.invoice_url);
@@ -214,6 +260,7 @@ export const createTransaction = async (req, res) => {
             
         }
         else {
+            console.log("testing masuk");
             await seqTransaction.commit();
             return res.status(200).json({ message: "Transaction created!", transaction, insertedTransactionDetails });
         }

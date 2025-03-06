@@ -12,6 +12,7 @@ import {
   deleteVoucherByCodeService,
   deleteVouchersByCodeService,
   getAllVouchersService,
+  getVisibleVoucherService,
   getVoucherByCodeService,
   updateVouchersService,
 } from "../services/voucher.service.js";
@@ -55,6 +56,16 @@ export const getByCodeNonUser = async (req, res) => {
   }
   return res.status(400).json({ message: "Voucher not found!" });
 }
+
+export const getVisibleVoucher = async (req, res) => {
+  try {
+    const vouchers = await getVisibleVoucherService();
+    return res.status(200).json({ message: "Voucher fetched!", vouchers });
+  } catch (error) {
+    return res.status(500).json({ message: error.message })
+  }
+}
+
 // #endregion
 
 // #region CREATE

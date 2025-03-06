@@ -685,11 +685,13 @@ export const payTransactionService = async (transaction, productsInCart, disc, f
     return response
 }
 
-export const checkTransactionWithVoucher = async (voucherCode, userId) => {
+export const checkTransactionWithVoucher = async (voucherId, userId) => {
     try {
         const transaction = await TransactionHeaderModel.findOne({
             where: {
-                voucherCode,
+                voucherCode: {
+                    [Op.like]: `%${voucherId}%`
+                },
                 userId,
                 status: {
                     [Op.not]: "Cancelled"

@@ -24,19 +24,19 @@ UserAddress.belongsTo(User, { foreignKey: "ref_user_id" });
 ProductVariant.hasMany(TransactionDetail, { foreignKey: 'ref_product_variant_id' });
 TransactionDetail.belongsTo(ProductVariant, { foreignKey: 'ref_product_variant_id' });
 
-TransactionHeader.belongsTo(Voucher, { 
-  foreignKey: 'ref_voucher_code', // Foreign key in TransactionHeader
-  targetKey: 'voucherCode',       // Correct model attribute in Voucher
-  onDelete: 'SET NULL',
-  onUpdate: 'CASCADE',
-});
+// TransactionHeader.belongsTo(Voucher, { 
+//   foreignKey: 'ref_voucher_code', // Foreign key in TransactionHeader
+//   targetKey: 'voucherCode',       // Correct model attribute in Voucher
+//   onDelete: 'SET NULL',
+//   onUpdate: 'CASCADE',
+// });
 
-Voucher.hasMany(TransactionHeader, { 
-  foreignKey: 'ref_voucher_code', // Foreign key in TransactionHeader
-  sourceKey: 'voucherCode',       // Correct model attribute in Voucher
-  onDelete: 'SET NULL',
-  onUpdate: 'CASCADE',
-});
+// Voucher.hasMany(TransactionHeader, { 
+//   foreignKey: 'ref_voucher_code', // Foreign key in TransactionHeader
+//   sourceKey: 'voucherCode',       // Correct model attribute in Voucher
+//   onDelete: 'SET NULL',
+//   onUpdate: 'CASCADE',
+// });
 
 UserAddress.hasOne(TransactionHeader, { foreignKey: 'ref_address_id' });
 TransactionHeader.belongsTo(UserAddress, { foreignKey: 'ref_address_id' });
