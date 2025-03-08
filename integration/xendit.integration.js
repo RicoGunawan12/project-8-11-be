@@ -160,7 +160,7 @@ export const createCustomerXendit = async (userId, fullName, email, phone) => {
         email: email,
         mobile_number: phone
     }
-    console.log(body);
+    
     
     const requestOptions = {
         method: 'POST',
@@ -232,7 +232,7 @@ export const createPlanXendit = async (transaction, productsInCart, disc, freeOn
         })
     } 
     body.items = items; 
-    console.log(body);
+    
     
     body.fees = fees;
 
@@ -291,7 +291,7 @@ export const refundXendit = async (transactionId, gatewayResponse, amount) => {
             gatewayResponse.payment_channel != "OVO" &&
             gatewayResponse.payment_channel != "JENIUSPAY"
         ) {
-            console.log("IN EWALLET REFUND");
+            
             
             const requestOptions = {
                 method: 'POST',
@@ -315,7 +315,7 @@ export const refundXendit = async (transactionId, gatewayResponse, amount) => {
             const debitBody = {
                 reason: "REQUESTED_BY_CUSTOMER"
             }
-            console.log("IN DEBIT OR CREDIT REFUND");
+            
             const requestOptions = {
                 method: 'POST',
                 headers: headers,

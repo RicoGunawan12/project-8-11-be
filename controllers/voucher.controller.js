@@ -4,7 +4,7 @@ import {
   getProductsService,
 } from "../services/product.service.js";
 import { createProductVariantService } from "../services/productVariantService.js";
-import { checkTransactionWithVoucher } from "../services/transaction.service.js";
+import { checkTransactionWithVoucher, getTransactionsByUserService } from "../services/transaction.service.js";
 import {
   applyVoucherService,
   checkVoucherByCodeService,
@@ -58,17 +58,18 @@ export const getByCodeNonUser = async (req, res) => {
 }
 
 export const getVisibleVoucher = async (req, res) => {
+
+  const userId = req.user.userId;
+
   try {
-    const vouchers = await getVisibleVoucherService();
+
+    const vouchers = await getVisibleVoucherService(userId);
+
     return res.status(200).json({ message: "Voucher fetched!", vouchers });
   } catch (error) {
     return res.status(500).json({ message: error.message })
   }
 }
-
-// #endregion
-
-// #region CREATE
 
 export const createVouchers = async (req, res) => {
   const { vouchers } = req.body;
@@ -80,27 +81,18 @@ export const createVouchers = async (req, res) => {
   }
 };
 
-// #endregion
-
-// #region UPDATE
-
 export const updateVouchers = async (req, res) => {
   try {
- 
-    await updateVouchersService(req.body);
+    const { vouchers } = req.body;
+    await updateVouchersService(vouchers);
     return res.status(200).json({ message: "Voucher updated successfully" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
 
-// #endregion
-
-// #region DELETE
-
 export const deleteVoucherByCode = async (req, res) => {
   const { code } = req.body;
-  console.log(code)
   try {
     const response = await deleteVoucherByCodeService(code);
     return res.status(200).json("Voucher has been deleted successfully");
@@ -118,10 +110,6 @@ export const deleteVouchersByCode = async (req, res) => {
     return res.status(400).json(error.message);
   }
 };
-
-// #endregion
-
-// #region TRANSACTIONS
 
 export const applyVoucher = async (req, res) => {
   const { voucherCode, totalAmount } = req.body;

@@ -181,7 +181,7 @@ export const getTransactionsByIdService = async (transactionId) => {
             },
             {
                 model: UserAddressModel
-            }
+            },
         ],
         where: { transactionId: transactionId }
     })
@@ -689,7 +689,7 @@ export const returnTransactionService = async (transactionId) => {
 
 export const payTransactionService = async (transaction, productsInCart, disc, freeOngkir) => {
     const response = await createPlanXendit(transaction, productsInCart, disc, freeOngkir);
-    // console.log(response);
+
     return response
 }
 

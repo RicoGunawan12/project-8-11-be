@@ -40,8 +40,8 @@ const storage = multer.diskStorage({
       // Sanitize the filename to remove slashes and ensure a safe format
       const sanitizedFilename = path.parse(file.originalname).name.replace(/\//g, "");
 
-      console.log("san: ",sanitizedFilename)
-      console.log("ori: ", file.originalname)
+      
+      
 
       // Generate filename with .webp extension
       const filename = file.fieldname === "defaultImage"
