@@ -204,13 +204,15 @@ export const createPlanXendit = async (transaction, productsInCart, disc, freeOn
         failure_return_url: process.env.PRODUCTION_WEB
     }
     const fees = []
-    if (disc != 0) {
-        fees.push({
-            type: "DISCOUNT",
-            value: disc * -1,
-            // quantity: 1,
-            // url: "https://th.bing.com/th/id/OIP.ULq5QQnJfNFuhcLNBVqzAwHaE7?w=250&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
-        })    
+    if (disc.length != 0) {
+        disc.forEach((d) => {
+            fees.push({
+                type: "DISCOUNT - " + d.name,
+                value: d.discount * -1,
+                // quantity: 1,
+                // url: "https://th.bing.com/th/id/OIP.ULq5QQnJfNFuhcLNBVqzAwHaE7?w=250&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+            })    
+        })
     }
 
     items.push({

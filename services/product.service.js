@@ -958,7 +958,11 @@ export const generateUpdateStockExcelService = async () => {
 
 export const getAllVariantService = async() => {
   const variants = await ProductVariantModel.findAll({
-    where: { isDeleted: false }
+    where: { isDeleted: false },
+    include: {
+      model: ProductModel,
+      attributes: ["productName"],
+    }
   })
 
   return variants

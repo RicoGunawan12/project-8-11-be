@@ -54,9 +54,6 @@ export const getBogoByIdService = async (bogoId) => {
         const bogo = await Bogo.findOne({
             where: { bogoId }
         });
-        
- 
- 
 
         const variants = bogo.variant.split(',');
 

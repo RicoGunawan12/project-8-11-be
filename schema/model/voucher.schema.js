@@ -9,9 +9,7 @@ export const voucherSchema = {
   },
   voucherCode: {
     isString: true,
-    notEmpty: {
-      errorMessage: 'Voucher Code is required',
-    },
+    optional: true,
   },
   voucherEndDate: {
     isISO8601: {
@@ -58,10 +56,19 @@ export const voucherSchema = {
   },
   minimumPayment: {
     isInt: {
-      options: { min: 1 },
+      options: { min: 0 },
       errorMessage: 'Minimum payment must be more than 0',
     },
     optional: true,
     toFloat: true,
+  },
+  voucherName: {
+    isString: true,
+    notEmpty: {
+      errorMessage: 'Voucher Name is required',
+    },
+  },
+  variantId: {
+    optional: true,
   }
 };

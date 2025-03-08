@@ -5,11 +5,8 @@ import { getCartItemsByUserService, removeAllCartItemInUserService } from "../se
 import { getFreeOngkirService } from "../services/freeOngkir.service.js";
 import { checkPromoService, createPromoHistoryService } from "../services/promo.service.js";
 import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getSearchTransactionService, getTransactionsByIdService, getTransactionsByUserService, getTransactionXenditService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, rollbackTransaction, sendInvoiceByEmailService, trackDeliveryService, updateExpiredTransaction, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
-<<<<<<< Updated upstream
-import { applyVoucherService } from "../services/voucher.service.js";
-=======
 import { applyVoucherService, getVoucherByCodeWithVoucherTypeService, getVoucherByIdService } from "../services/voucher.service.js";
->>>>>>> Stashed changes
+import { applyVoucherService, getVoucherByCodeWithVoucherTypeService } from "../services/voucher.service.js";
 
 
 export const getAllTransactions = async (req, res) => {
@@ -150,7 +147,6 @@ export const createTransaction = async (req, res) => {
         // calculate the total price
         // calculate the total weight
         var totalPrice = deliveryFee;
-                
         await Promise.all(
             productsInCart.map(async (product) => {
                 if (product.quantity === 1) {
@@ -180,33 +176,22 @@ export const createTransaction = async (req, res) => {
             totalPrice -= freeOngkir;
         }
 
-
-<<<<<<< Updated upstream
-        var disc = 0;
-=======
         var disc = [];
         var voucherToInsert = "";
-
->>>>>>> Stashed changes
         if (voucherCode) {
             // minus the totalprice
-            const voucherHasUsed = await checkTransactionWithVoucher(voucherCode, userId);
-            if (voucherHasUsed) {
-                return res.status(400).json({ message: "Voucher has been used!" });
-            }
-            else {
-                const discount = await applyVoucherService(voucherCode, totalPrice - deliveryFee + freeOngkir);
-                totalPrice -= discount;
-                disc = discount;
+            const checkVoucher = voucherCode.map(async (voucher, index) => {
+                if (voucher === "0") {
+                    
+                }
+                else {
+                    voucherToInsert+= voucher; // Fix: Use push instead of concat
                 
-<<<<<<< Updated upstream
             }
-=======
                     if (index === voucherCode.length - 1) {
                         if (voucher !== "0") {
                             const temp = voucher;
                             const getVoucherByCode = await getVoucherByCodeWithVoucherTypeService(voucher);
-                            // console.log("Get: ", getVoucherByCode)
                             voucher = getVoucherByCode.voucherId;
                         }
                     } else {
@@ -217,8 +202,6 @@ export const createTransaction = async (req, res) => {
                     if (voucherHasUsed) {
                         return res.status(400).json({ message: "Voucher has been used!" });
                     }
-                    
-                    console.log(voucher)
                     const discount = await applyVoucherService(voucher, totalPrice - deliveryFee + freeOngkir);
                     totalPrice -= discount.totalDiscount;
                     
@@ -230,7 +213,7 @@ export const createTransaction = async (req, res) => {
                 }
             })
             await Promise.all(checkVoucher)
->>>>>>> Stashed changes
+
         }
 
         // set transaction date to now 
@@ -241,7 +224,7 @@ export const createTransaction = async (req, res) => {
         const transaction = await createTransactionService(
             userId,
             addressId,
-            voucherCode.length === 0 ? null : voucherCode,
+            voucherToInsert.length === 0 ? null : voucherToInsert,
             // null, 
             new Date(),
             paymentMethod,
@@ -278,16 +261,12 @@ export const createTransaction = async (req, res) => {
         });
         const insertedTransactionDetails = await createTransactionDetailService(transactionDetails);
         const deletedCartItem = await removeAllCartItemInUserService(userId);
-<<<<<<< Updated upstream
+        
+      
+        console.log(paymentMethod, totalPrice);
         
         if (paymentMethod !== "COD" && totalPrice >= 1000) {
-=======
-        
-        
-        if (paymentMethod !== "COD" && totalPrice >= 1000) {
-            
-            
->>>>>>> Stashed changes
+            console.log("testing masuk")
             const payTransactionResponse = await payTransactionService(transaction, productsInCart, disc, freeOngkir)
             
             const updatePaymentLink = await updatePaymentLinkService(transaction, payTransactionResponse.invoice_url);
@@ -296,10 +275,8 @@ export const createTransaction = async (req, res) => {
             
         }
         else {
-<<<<<<< Updated upstream
-=======
-            
->>>>>>> Stashed changes
+
+            console.log("testing masuk");
             await seqTransaction.commit();
             return res.status(200).json({ message: "Transaction created!", transaction, insertedTransactionDetails });
         }

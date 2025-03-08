@@ -12,6 +12,7 @@ import {
   deleteVoucherByCodeService,
   deleteVouchersByCodeService,
   getAllVouchersService,
+  getVisibleVoucherService,
   getVoucherByCodeService,
   updateVouchersService,
 } from "../services/voucher.service.js";
@@ -55,8 +56,6 @@ export const getByCodeNonUser = async (req, res) => {
   }
   return res.status(400).json({ message: "Voucher not found!" });
 }
-<<<<<<< Updated upstream
-=======
 
 export const getVisibleVoucher = async (req, res) => {
 
@@ -72,11 +71,6 @@ export const getVisibleVoucher = async (req, res) => {
   }
 }
 
->>>>>>> Stashed changes
-// #endregion
-
-// #region CREATE
-
 export const createVouchers = async (req, res) => {
   const { vouchers } = req.body;
   try {
@@ -86,10 +80,6 @@ export const createVouchers = async (req, res) => {
     return res.status(400).json({ message: error.message });
   }
 };
-
-// #endregion
-
-// #region UPDATE
 
 export const updateVouchers = async (req, res) => {
   try {
@@ -101,21 +91,13 @@ export const updateVouchers = async (req, res) => {
   }
 };
 
-// #endregion
-
-// #region DELETE
-
 export const deleteVoucherByCode = async (req, res) => {
   const { code } = req.body;
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
   try {
     const response = await deleteVoucherByCodeService(code);
     return res.status(200).json("Voucher has been deleted successfully");
   } catch (error) {
-    return res.status(404).json(error.message);
+    return res.status(400).json(error.message);
   }
 };
 
@@ -125,13 +107,9 @@ export const deleteVouchersByCode = async (req, res) => {
     const response = await deleteVouchersByCodeService(voucherCode);
     return res.status(200).json("Voucher(s) has been deleted successfully");
   } catch (error) {
-    return res.status(404).json(error.message);
+    return res.status(400).json(error.message);
   }
 };
-
-// #endregion
-
-// #region TRANSACTIONS
 
 export const applyVoucher = async (req, res) => {
   const { voucherCode, totalAmount } = req.body;
@@ -139,7 +117,7 @@ export const applyVoucher = async (req, res) => {
     const totalDiscount = await applyVoucherService(voucherCode, totalAmount);
     return totalDiscount;
   } catch (error) {
-    return res.status(404).json(error.message);
+    return res.status(400).json(error.message);
   }
 };
 
