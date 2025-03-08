@@ -28,7 +28,6 @@ export const getMetadataService = async (slug) => {
 };
 
 export const insertMetadataService = async (newData) => {
-  console.log(newData);
   const metadata = await MetadataModel.create({
     slug: newData.slug,
     title: newData.title,

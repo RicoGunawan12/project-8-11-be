@@ -34,7 +34,7 @@ export const processImage = async (req, res, next) => {
         
         // If the file is already .webp, don't process it
         if (ext === ".webp") {
-          console.log("Skipping already WebP file:", inputPath);
+          
           return;
         }
   
@@ -44,7 +44,7 @@ export const processImage = async (req, res, next) => {
           `${path.basename(inputPath, ext)}.webp`
         );
   
-        console.log("Converting:", inputPath, "->", outputPath);
+        
   
         // Convert to WebP
         await sharp(inputPath)

@@ -1,5 +1,6 @@
-import { Op } from "sequelize";
-import { VoucherModel } from "../association/association.js";
+import { Op, where } from "sequelize";
+import { ProductModel, ProductVariantModel, TransactionHeaderModel, VoucherModel } from "../association/association.js";
+import sequelize from "../config/database.js";
 
 
 // #region GET
@@ -26,7 +27,7 @@ export const checkVoucherByCodeService = async (code, totalPrice) => {
   if (totalPrice < voucher.minimumPayment) {
     throw new Error(`The total price must be at least Rp ${voucher.minimumPayment.toLocaleString('id-ID')} to use this voucher.`)
   }
-  console.log(voucher)
+  
   return voucher
 }
 
@@ -54,14 +55,76 @@ export const getVoucherByCodeWithVoucherTypeService = async (voucherCode) => {
   const vouchers = await VoucherModel.findOne({
     where: {
       voucherCode: voucherCode
+    },
+    include:{
+      model: ProductVariantModel
     }
   })
   return vouchers
 }
 
+<<<<<<< Updated upstream
 // #endregion
 
 // #region CREATE
+=======
+export const getVoucherByIdService = async (voucherId) => {
+  const voucher = await VoucherModel.findOne({
+    where: {
+      isDeleted: false,
+      voucherId
+    }
+  })
+
+  // console.log(voucher)
+
+  if(voucher){
+    const variant = await ProductVariantModel.findOne({
+      where:{
+        productVariantId : voucher.variantsId || ""
+      },
+      include:{
+        model: ProductModel,
+      }
+    })
+    voucher.dataValues.productVariant = variant
+    if(variant){
+      console.log("variant: ", variant)
+      console.log("price: ", variant.dataValues.productPrice)
+      voucher.dataValues.discount = variant.dataValues.productPrice
+    }
+  }
+
+  return voucher
+}
+
+export const getVisibleVoucherService = async (userId) => {
+  const vouchers = await VoucherModel.findAll({ 
+    where: { 
+      voucherVisibility: true, 
+      isDeleted: false,
+      voucherStartDate: { [Op.lte]: new Date() },
+      voucherEndDate: { [Op.gte]: new Date().setHours(0, 0, 0, 0) },
+    }
+  });
+  
+  const transactionHeaders = await TransactionHeaderModel.findAll({
+    attributes: ['ref_voucher_code'],
+    where: {
+      ref_voucher_code: { [Op.ne]: null },
+      ref_user_id: userId
+    }
+  });
+
+  const refVoucherCodes = transactionHeaders.map(transaction => transaction.dataValues.ref_voucher_code);
+
+  const filteredVouchers = vouchers.filter(voucher => {
+    return !refVoucherCodes.some(refCode => refCode.includes(voucher.voucherId.toString()));
+  });
+
+  return filteredVouchers;
+}
+>>>>>>> Stashed changes
 
 export const createVouchersService = async (vouchers) => {
   const voucherCodes = vouchers.map((voucher) => voucher.voucherCode);
@@ -72,8 +135,43 @@ export const createVouchersService = async (vouchers) => {
     attributes: ['voucherCode'],
   });
 
+<<<<<<< Updated upstream
   if (duplicatedData.length > 0) {
     throw new Error(`Duplicated voucher code: ${duplicatedData[0].get('voucherCode')}`);
+=======
+  
+  
+  const voucher = vouchers[0]
+  if(voucher.voucherType == "product"){
+    for(const variant of voucher.variantId){
+      const newVoucher = await VoucherModel.create({
+        voucherCode: voucher.voucherCode,
+        voucherName: voucher.voucherName,
+        voucherType: voucher.voucherType,
+        voucherEndDate: voucher.voucherEndDate,
+        voucherStartDate: voucher.voucherStartDate,
+        maxDiscount: voucher.maxDiscount,
+        discount: voucher.discount,
+        minimumPayment: voucher.minimumPayment,
+        quota: voucher.quota,
+        variantsId: variant.variantsId
+      })
+    }
+  }
+  else{
+    const newVoucher = await VoucherModel.create({
+      voucherCode: voucher.voucherCode,
+      voucherName: voucher.voucherName,
+      voucherType: voucher.voucherType,
+      voucherEndDate: voucher.voucherEndDate,
+      voucherStartDate: voucher.voucherStartDate,
+      maxDiscount: voucher.maxDiscount,
+      discount: voucher.discount,
+      minimumPayment: voucher.minimumPayment,
+      quota: voucher.quota,
+      variantsId: null
+    })
+>>>>>>> Stashed changes
   }
   await VoucherModel.bulkCreate(vouchers, {
     returning: true, 
@@ -82,65 +180,65 @@ export const createVouchersService = async (vouchers) => {
   return;
 };
 
-// #endregion
-
-// #region UPDATE
-
-export const updateVouchersService = async (req) => {
+export const updateVouchersService = async (vouchers) => {
  
-  const { vouchers } = req;
-  const voucherCodes = vouchers.map((code) => code.voucherCode);
+  const voucher = vouchers[0]
+  const existVoucher = await getVoucherByIdService(vouchers[0].voucherId)
 
- 
+  if(voucher.voucherType == "product"){
+    for(const variant of voucher.variantId){
 
-  const isExists = await getVoucherByCodeListService(voucherCodes);
-  if (isExists.length !== vouchers.length) {
-    const notFoundCodes = voucherCodes.filter(v => 
-      !isExists.some(item => item.voucherCode === v)
-    );
 
-    if (notFoundCodes.length > 0) {
-      throw new Error(`Voucher Code ${notFoundCodes[0]} doesn't exist`);
+      const newVoucher = await VoucherModel.create({
+        voucherCode: voucher.voucherCode,
+        voucherName: voucher.voucherName,
+        voucherType: voucher.voucherType,
+        voucherEndDate: voucher.voucherEndDate,
+        voucherStartDate: voucher.voucherStartDate,
+        maxDiscount: voucher.maxDiscount,
+        discount: voucher.discount,
+        minimumPayment: voucher.minimumPayment,
+        quota: voucher.quota,
+        variantsId: variant.productVariantId
+      })
     }
-  }
-
-  for (const voucher of vouchers) {
-
-    try {
- 
-  
-      const [updatedRowCount] = await VoucherModel.update(
-        {
-          voucherEndDate: voucher.voucherEndDate || null,
-          voucherStartDate: voucher.voucherStartDate || null,
-          maxDiscount: voucher.maxDiscount,
-          discount: voucher.discount,
-          minimumPayment: voucher.minimumPayment
-        },
-        {
-          where: {
-            voucherCode: voucher.voucherCode,
-          },
-        }
-      );
-  
- 
-      if (updatedRowCount === 0) {
-        console.warn(`No rows updated for voucher code ${voucher.voucherCode}`);
+    const del = await VoucherModel.update({
+      isDeleted : true
+    },{
+      where: {
+        voucherId : existVoucher.voucherId
       }
-    } catch (err) {
-      console.error(`Error updating voucher ${voucher.voucherCode}:`, err);
     }
+    )
+  }
+  else{
+
+
+
+    const newVoucher = await VoucherModel.update({
+      voucherCode: voucher.voucherCode,
+      voucherName: voucher.voucherName,
+      voucherType: voucher.voucherType,
+      voucherEndDate: voucher.voucherEndDate,
+      voucherStartDate: voucher.voucherStartDate,
+      maxDiscount: voucher.maxDiscount,
+      discount: voucher.discount,
+      minimumPayment: voucher.minimumPayment,
+      quota: voucher.quota,
+      variantsId: null
+    },{
+      where:{
+        voucherId: existVoucher.voucherId
+      }
+    })
+
+
+
   }
 
- 
 
   return;
 };
-
-// #endregion
-
-// #region DELETE
 
 export const deleteVoucherByCodeService = async (code) =>{
   
@@ -166,10 +264,6 @@ export const deleteVouchersByCodeService = async (code) =>{
   return result
 }
 
-// #endregion
-
-// #region TRANSACTIONS
-
 export const calculateVoucherDiscount = async (voucherTypeCode, amount, discountAmount, maxDiscount) => {
   voucherTypeCode = voucherTypeCode.toUpperCase();
  
@@ -184,6 +278,8 @@ export const calculateVoucherDiscount = async (voucherTypeCode, amount, discount
           return maxDiscount
         }
         return amount * (discountAmount/100)
+    case 'PRODUCT':
+          return discountAmount
     default :
         return 0
   }
@@ -192,7 +288,11 @@ export const calculateVoucherDiscount = async (voucherTypeCode, amount, discount
 export const applyVoucherService = async (voucherCode, totalAmount) => {
   const voucher = await getVoucherByCodeWithVoucherTypeService(voucherCode)
   
+<<<<<<< Updated upstream
   if(!voucher) throw new Error(`Voucher with code ${voucherCode} doesn't exist`)
+=======
+  if(!voucher) throw new Error(`Voucher with id ${voucherId} doesn't exist`)
+>>>>>>> Stashed changes
 
   if (voucher.quota <= 0) {
     throw new Error("Voucher quota has reached the limit")
@@ -201,6 +301,17 @@ export const applyVoucherService = async (voucherCode, totalAmount) => {
   if(voucher.voucherEndDate && (voucher.voucherEndDate && new Date(voucher.voucherEndDate) < new Date().setHours(0,0,0,0))){
     throw new Error("Voucher has expired")
   }
+<<<<<<< Updated upstream
+=======
+
+  if(voucher.voucherType == "product"){
+    console.log("product")
+    console.log(voucher)
+    
+
+  }
+  
+>>>>>>> Stashed changes
 
   if (totalAmount < voucher.minimumPayment) {
     throw new Error(`The total price must be at least Rp ${voucher.minimumPayment.toLocaleString('id-ID')} to use this voucher.`)

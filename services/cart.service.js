@@ -24,7 +24,7 @@ export const getCart = async (userId) => {
 };
 
 export const getCartItemsByUserService = async (userId) => {
-  console.log("cartttt");
+  
 
   const cartItem = await CartItemModel.findAll({
     include: [
@@ -73,19 +73,19 @@ export const getCartItemsByUserService = async (userId) => {
 
   const filteredCartItems = await Promise.all(
     cartItem.map(async (cartItem) => {
-      // console.log(item.product_variant.product.promo_details[0].promo.promoId);
+      // 
       const item = cartItem.get({ plain: true });
       const sortedPromo = item?.product_variant?.product?.promo_details.sort((a, b) => new Date(b.promo.createdAt) - new Date(a.promo.createdAt));
-      console.log(sortedPromo);
+      
 
       const promoDetail = sortedPromo[0];
-      console.log("PROMO DETAIL HEREE");
-      console.log(promoDetail);
+      
+      
 
       if (promoDetail) {
-        console.log(promoDetail.promo.promoId);
-        console.log(item.product_variant.product.productId);
-        console.log(userId);
+        
+        
+        
 
         const promoUsed = await PromoHistoryModel.findOne({
           where: {
@@ -97,21 +97,21 @@ export const getCartItemsByUserService = async (userId) => {
 
         if (promoUsed) {
           // Remove the promo if it has been used
-          // console.log(item.product_variant.product.promo_details);
+          // 
 
           // item.product_variant.product.promo_details.pop();
           // delete
           item.product_variant.product.promo_details = [];
         }
       }
-      console.log("this is different", item.product_variant.product.bogos[0])
+      
       const bogo = item.product_variant.product.bogos[0];
 
       if (bogo) {
-        console.log("VARIANT: ", bogo.variant);
+        
 
         const listVariant = bogo.variant.split(",");
-        console.log("list variant: ", listVariant);
+        
 
         const bogoVar = [];
 
@@ -127,14 +127,14 @@ export const getCartItemsByUserService = async (userId) => {
 
         item.product_variant.product.bogo = bogoVar;
       } else {
-        console.log("No variant found in bogo");
+        
       }
 
       return item;
     })
   );
-  console.log("this is filtered cart items");
-  console.log(filteredCartItems);
+  
+  
   return filteredCartItems;
   // return cartItem;
 };
@@ -147,7 +147,7 @@ export const addCartItemService = async (
   const productVariant = await ProductVariantModel.findOne({
     where: { productVariantId },
   });
-  // console.log(productVariant);
+  // 
 
   if (productVariant.productStock < quantity) {
     throw new Error("There are only " + productVariant.productStock + " stock");

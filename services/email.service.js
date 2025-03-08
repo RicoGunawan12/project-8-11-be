@@ -22,8 +22,6 @@ export const sendEmailService = async (
     },
   });
 
-  console.log(process.env.SEND_TO)
-
   const mailOptions = {
     from: process.env.USER,
     to: process.env.SEND_TO,

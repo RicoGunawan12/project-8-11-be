@@ -394,7 +394,6 @@ export const createProduct = async (req, res) => {
           const sanitizedProductColor = variants[i].productColor.replace(/\//g, "");
           const filename = `${timestamp}-${sanitizedProductName} - ${sanitizedProductColor}.webp`;
 
-          console.log(productName + " - " + variants[i].productColor)
 
           hash.set(
             productName + " - " + variants[i].productColor,
@@ -402,11 +401,9 @@ export const createProduct = async (req, res) => {
           );
         }
 
-        console.log(hash)
-        
-        console.log("this is getting")
+
         variants.forEach((variant) => {
-          console.log(productName + " - " + variant.productColor)
+
           variant.productImage = hash.get(
             productName + " - " + variant.productColor
           );
@@ -433,10 +430,10 @@ export const createProduct = async (req, res) => {
       return res.status(400).json({ message: "There is no such category" });
     }
 
-    console.log(product);
+    
     
 
-    console.log("default image");
+    
     // Process default images if they exist
     if (defaultImage && defaultImage.length > 0) {
       const insertProductCover = defaultImage.map(async (image) => {
@@ -451,7 +448,7 @@ export const createProduct = async (req, res) => {
 
     // Process variants if they exist
 
-    console.log(variants)
+    
 
     if (variants.length > 0) {
       const insertVariantPromise = variants.map(async (variant) => {
@@ -492,7 +489,7 @@ export const updateProduct = async (req, res) => {
     const productId = req.params.id;
 
     const timestamp = req.timestamp
-    console.log(timestamp)
+    
 
     if (!productId) {
       return res.status(400).json({ message: "Product id is required!" });
@@ -628,7 +625,7 @@ export const updateProduct = async (req, res) => {
   
   
     //     // converts image to WebP format
-    //     console.log(timestamp)
+    //     
     //     // const convertedImageData = await convertImageToWebp(
     //       //   "../" + UPLOAD_FOLDER + "product/" + req.body.productName,
     //       //   image,
@@ -679,7 +676,7 @@ export const updateProduct = async (req, res) => {
     }) : [];
     await Promise.all(insertProductCover);
 
-    console.log(variants)
+    
 
     const updatedProduct = await updateProductService(
       productId,
