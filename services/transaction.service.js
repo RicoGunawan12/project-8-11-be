@@ -1,4 +1,4 @@
-import { ProductCategoryModel, ProductCoverModel, ProductModel, ProductVariantModel, TransactionDetailModel, TransactionHeaderModel, UserAddressModel, UserModel } from "../association/association.js"
+import { ProductCategoryModel, ProductCoverModel, ProductModel, ProductVariantModel, TransactionDetailModel, TransactionHeaderModel, UserAddressModel, UserModel, VoucherModel } from "../association/association.js"
 import { createOrderKomship, deliveryDetailKomship, historyAWB, printLabelKomship, requestPickUpKomship } from "../integration/komship.integration.js";
 import { checkOutVATransactionXendit, createCreditCardTransactionXendit, createPlanXendit, createQrisTransactionXendit, getTransactionXendit } from "../integration/xendit.integration.js";
 import { Op, Sequelize, where } from "sequelize";
@@ -81,6 +81,14 @@ export const getAllTransactionsService = async (status, startDate, endDate, sear
         offset: parseInt(offset, 10),
         limit: parseInt(limit, 10),
     });
+
+    for (let transaction of transactions) {
+        const [voucherResults] = await sequelize.query(`
+            SELECT voucher_name, max_discount, discount, voucher_type FROM vouchers
+            WHERE FIND_IN_SET(voucher_id, REPLACE('${transaction.voucherCode}', ';', ','))
+        `);
+        transaction.dataValues.vouchers = voucherResults;
+    }
 
     return transactions;
 };
