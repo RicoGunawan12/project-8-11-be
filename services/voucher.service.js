@@ -68,27 +68,27 @@ export const getVoucherByCodeWithVoucherTypeService = async (voucherCode) => {
   return vouchers
 }
 
-export const getVoucherByIdService = async (voucherId) => {
-  const vouchers = await VoucherModel.findOne({
-    where: {
-      isDeleted: false,
-      voucherId
-    }
-  })
-  return vouchers
-}
+// export const getVoucherByIdService = async (voucherId) => {
+//   const vouchers = await VoucherModel.findOne({
+//     where: {
+//       isDeleted: false,
+//       voucherId
+//     }
+//   })
+//   return vouchers
+// }
 
-export const getVisibleVoucherService = async () => {
-  const vouchers = await VoucherModel.findAll({ 
-    where: { 
-      voucherVisibility: true, 
-      isDeleted: false,
-      voucherStartDate: { [Op.lte]: new Date() },
-      voucherEndDate: { [Op.gte]: new Date().setHours(0, 0, 0, 0) },
-    }
-  });
-  return vouchers;
-}
+// export const getVisibleVoucherService = async () => {
+//   const vouchers = await VoucherModel.findAll({ 
+//     where: { 
+//       voucherVisibility: true, 
+//       isDeleted: false,
+//       voucherStartDate: { [Op.lte]: new Date() },
+//       voucherEndDate: { [Op.gte]: new Date().setHours(0, 0, 0, 0) },
+//     }
+//   });
+//   return vouchers;
+// }
 
 export const getVoucherByIdService = async (voucherId) => {
   const voucher = await VoucherModel.findOne({

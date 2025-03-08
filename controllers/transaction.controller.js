@@ -6,7 +6,7 @@ import { getFreeOngkirService } from "../services/freeOngkir.service.js";
 import { checkPromoService, createPromoHistoryService } from "../services/promo.service.js";
 import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getSearchTransactionService, getTransactionsByIdService, getTransactionsByUserService, getTransactionXenditService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, rollbackTransaction, sendInvoiceByEmailService, trackDeliveryService, updateExpiredTransaction, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
 import { applyVoucherService, getVoucherByCodeWithVoucherTypeService, getVoucherByIdService } from "../services/voucher.service.js";
-import { applyVoucherService, getVoucherByCodeWithVoucherTypeService } from "../services/voucher.service.js";
+// import { applyVoucherService, getVoucherByCodeWithVoucherTypeService } from "../services/voucher.service.js";
 
 
 export const getAllTransactions = async (req, res) => {
@@ -186,31 +186,30 @@ export const createTransaction = async (req, res) => {
                 }
                 else {
                     voucherToInsert+= voucher; // Fix: Use push instead of concat
-                
-            }
-                    if (index === voucherCode.length - 1) {
-                        if (voucher !== "0") {
-                            const temp = voucher;
-                            const getVoucherByCode = await getVoucherByCodeWithVoucherTypeService(voucher);
-                            voucher = getVoucherByCode.voucherId;
-                        }
-                    } else {
-                        voucherToInsert += ";" // Fix: Properly append the separator
-                    }
-                
-                    const voucherHasUsed = await checkTransactionWithVoucher(voucher, userId);
-                    if (voucherHasUsed) {
-                        return res.status(400).json({ message: "Voucher has been used!" });
-                    }
-                    const discount = await applyVoucherService(voucher, totalPrice - deliveryFee + freeOngkir);
-                    totalPrice -= discount.totalDiscount;
-                    
-                
-                    disc.push({
-                        discount: discount.totalDiscount,
-                        name: discount.voucherName,
-                    });
                 }
+                if (index === voucherCode.length - 1) {
+                    if (voucher !== "0") {
+                        const temp = voucher;
+                        const getVoucherByCode = await getVoucherByCodeWithVoucherTypeService(voucher);
+                        voucher = getVoucherByCode.voucherId;
+                    }
+                } else {
+                    voucherToInsert += ";" // Fix: Properly append the separator
+                }
+            
+                const voucherHasUsed = await checkTransactionWithVoucher(voucher, userId);
+                if (voucherHasUsed) {
+                    return res.status(400).json({ message: "Voucher has been used!" });
+                }
+                const discount = await applyVoucherService(voucher, totalPrice - deliveryFee + freeOngkir);
+                totalPrice -= discount.totalDiscount;
+                
+            
+                disc.push({
+                    discount: discount.totalDiscount,
+                    name: discount.voucherName,
+                });
+                
             })
             await Promise.all(checkVoucher)
 
