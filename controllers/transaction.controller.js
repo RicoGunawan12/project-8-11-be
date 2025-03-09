@@ -65,7 +65,11 @@ export const getTransactionById = async (req, res) => {
 
 
 
-        const vouchers = transaction.voucherCode.split(";");
+        var vouchers;
+
+        if (vouchers) {
+            vouchers = transaction.voucherCode.split(";");
+        }
 
         const voucherResult = [];
         for(let i = 0; i < vouchers.length; i++) {
