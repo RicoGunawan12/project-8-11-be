@@ -160,7 +160,7 @@ export const createCustomerXendit = async (userId, fullName, email, phone) => {
         email: email,
         mobile_number: phone
     }
-    console.log(body);
+    
     
     const requestOptions = {
         method: 'POST',
@@ -204,13 +204,15 @@ export const createPlanXendit = async (transaction, productsInCart, disc, freeOn
         failure_return_url: process.env.PRODUCTION_WEB
     }
     const fees = []
-    if (disc != 0) {
-        fees.push({
-            type: "DISCOUNT",
-            value: disc * -1,
-            // quantity: 1,
-            // url: "https://th.bing.com/th/id/OIP.ULq5QQnJfNFuhcLNBVqzAwHaE7?w=250&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
-        })    
+    if (disc.length != 0) {
+        disc.forEach((d) => {
+            fees.push({
+                type: "DISCOUNT - " + d.name,
+                value: d.discount * -1,
+                // quantity: 1,
+                // url: "https://th.bing.com/th/id/OIP.ULq5QQnJfNFuhcLNBVqzAwHaE7?w=250&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+            })    
+        })
     }
 
     items.push({
@@ -230,9 +232,11 @@ export const createPlanXendit = async (transaction, productsInCart, disc, freeOn
         })
     } 
     body.items = items; 
-    console.log(body);
+    
     
     body.fees = fees;
+    console.log(body);
+    
 
     const requestOptions = {
         method: 'POST',
@@ -289,7 +293,7 @@ export const refundXendit = async (transactionId, gatewayResponse, amount) => {
             gatewayResponse.payment_channel != "OVO" &&
             gatewayResponse.payment_channel != "JENIUSPAY"
         ) {
-            console.log("IN EWALLET REFUND");
+            
             
             const requestOptions = {
                 method: 'POST',
@@ -313,7 +317,7 @@ export const refundXendit = async (transactionId, gatewayResponse, amount) => {
             const debitBody = {
                 reason: "REQUESTED_BY_CUSTOMER"
             }
-            console.log("IN DEBIT OR CREDIT REFUND");
+            
             const requestOptions = {
                 method: 'POST',
                 headers: headers,

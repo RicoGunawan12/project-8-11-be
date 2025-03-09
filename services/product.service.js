@@ -642,7 +642,7 @@ export const createProductService = async (
   productHeight,
   mode
 ) => {
-  console.log("checking category");
+  
   const category = await ProductCategoryModel.findOne({ where: { productCategoryName } });
   if (!category) {
     throw new Error("There is no " + productCategoryName + " category");
@@ -752,7 +752,7 @@ export const updateProductService = async (
     // Update existing variants
     for (const variant of variantsToUpdate) {
 
-      console.log(variant)
+      
 
       const existingVariant = existingVariants.find(
         (v) => v.productVariantId === variant.productVariantId
@@ -958,7 +958,11 @@ export const generateUpdateStockExcelService = async () => {
 
 export const getAllVariantService = async() => {
   const variants = await ProductVariantModel.findAll({
-    where: { isDeleted: false }
+    where: { isDeleted: false },
+    include: {
+      model: ProductModel,
+      attributes: ["productName"],
+    }
   })
 
   return variants

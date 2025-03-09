@@ -5,7 +5,8 @@ import { getCartItemsByUserService, removeAllCartItemInUserService } from "../se
 import { getFreeOngkirService } from "../services/freeOngkir.service.js";
 import { checkPromoService, createPromoHistoryService } from "../services/promo.service.js";
 import { allMonthSalesAnalyticService, cancelTransactionService, checkOutCreditTransactionService, checkOutQrisTransactionService, checkOutVATransactionService, checkTransactionWithVoucher, countTransactionsService, createKomshipOrderService, createTransactionDetailService, createTransactionService, deliveryDetailService, fetchSalesByCategoryService, getAllTransactionsService, getSearchTransactionService, getTransactionsByIdService, getTransactionsByUserService, getTransactionXenditService, monthlySalesReportService, onReviewReturnTransactionService, onReviewTransactionService, payTransactionService, printLabelService, requestPickupTransactionService, returnTransactionService, rollbackTransaction, sendInvoiceByEmailService, trackDeliveryService, updateExpiredTransaction, updatePaymentLinkService, updateTransactionDeliveryService, updateTransactionService, updateTransactionStatusService } from "../services/transaction.service.js";
-import { applyVoucherService } from "../services/voucher.service.js";
+import { applyVoucherService, getVoucherByCodeWithVoucherTypeService, getVoucherByIdService } from "../services/voucher.service.js";
+// import { applyVoucherService, getVoucherByCodeWithVoucherTypeService } from "../services/voucher.service.js";
 
 
 export const getAllTransactions = async (req, res) => {
@@ -22,7 +23,7 @@ export const getAllTransactions = async (req, res) => {
         const transactions = await getAllTransactionsService(status, startDate, endDate, search, offset, limit);
         return res.status(200).json({ message: "Transaction fetched successfully", transactions })
     } catch (error) {
-        console.log(error);
+        
         return res.status(500).json({ message: error.message })
     }
 }
@@ -61,6 +62,21 @@ export const getTransactionById = async (req, res) => {
     }
     try {
         const transaction = await getTransactionsByIdService(transactionId);
+
+
+
+        const vouchers = transaction.voucherCode.split(";");
+
+        const voucherResult = [];
+        for(let i = 0; i < vouchers.length; i++) {
+    
+            const vres = await getVoucherByIdService(vouchers[i])
+
+            voucherResult.push(vres)
+
+        }
+
+        transaction.voucherCode = voucherResult;
 
         let delivery = { data: null };
 
@@ -131,7 +147,6 @@ export const createTransaction = async (req, res) => {
         // calculate the total price
         // calculate the total weight
         var totalPrice = deliveryFee;
-                
         await Promise.all(
             productsInCart.map(async (product) => {
                 if (product.quantity === 1) {
@@ -151,7 +166,7 @@ export const createTransaction = async (req, res) => {
             })
         );
 
-        // console.log(totalWeight);
+        // 
         var freeOngkir = 0;
         const freeOngkirData = await getFreeOngkirService();
         if (freeOngkirData.status === "Active" && totalPrice - deliveryFee >= freeOngkirData.minimumPaymentAmount) {
@@ -161,22 +176,49 @@ export const createTransaction = async (req, res) => {
             totalPrice -= freeOngkir;
         }
 
-
-        var disc = 0;
+        var disc = [];
+        var voucherToInsert = "";
         if (voucherCode) {
             // minus the totalprice
-            const voucherHasUsed = await checkTransactionWithVoucher(voucherCode, userId);
-            if (voucherHasUsed) {
-                return res.status(400).json({ message: "Voucher has been used!" });
-            }
-            else {
-                const discount = await applyVoucherService(voucherCode, totalPrice - deliveryFee + freeOngkir);
-                totalPrice -= discount;
-                disc = discount;
+            const checkVoucher = voucherCode.map(async (voucher, index) => {
+                if (voucher === "0") {
+                    
+                }
+                else {
+                    if (index !== voucherCode.length - 1) {
+                        voucherToInsert+= voucher; 
+                    }
+                }
+                if (index === voucherCode.length - 1) {
+                    if (voucher !== "0") {
+                        const temp = voucher;
+                        const getVoucherByCode = await getVoucherByCodeWithVoucherTypeService(voucher);
+                        voucher = getVoucherByCode.voucherId;
+                        voucherToInsert+= voucher;
+                    }
+                } else {
+                    voucherToInsert += ";" // Fix: Properly append the separator
+                }
+            
+                if (voucher !== "0") {
+                    const voucherHasUsed = await checkTransactionWithVoucher(voucher, userId);
+                    if (voucherHasUsed) {
+                        return res.status(400).json({ message: "Voucher has been used!" });
+                    }
+                    const discount = await applyVoucherService(voucher, totalPrice - deliveryFee + freeOngkir);
+                    totalPrice -= discount.totalDiscount;
+                    
                 
-            }
-        }
+                    disc.push({
+                        discount: discount.totalDiscount,
+                        name: discount.voucherName,
+                    });
+                }
+                
+            })
+            await Promise.all(checkVoucher)
 
+        }
 
         // set transaction date to now 
         // set gateway response to null
@@ -186,7 +228,7 @@ export const createTransaction = async (req, res) => {
         const transaction = await createTransactionService(
             userId,
             addressId,
-            voucherCode.length === 0 ? null : voucherCode,
+            voucherToInsert.length === 0 ? null : voucherToInsert,
             // null, 
             new Date(),
             paymentMethod,
@@ -198,7 +240,7 @@ export const createTransaction = async (req, res) => {
             deliveryCashback,
             new Date(Date.now() + 1 * 60 * 60 * 1000),
             notes,
-            totalPrice,
+            totalPrice < 0 ? 0 : totalPrice,
             weight,
             customerNotes,
             freeOngkir
@@ -224,15 +266,21 @@ export const createTransaction = async (req, res) => {
         const insertedTransactionDetails = await createTransactionDetailService(transactionDetails);
         const deletedCartItem = await removeAllCartItemInUserService(userId);
         
+      
+        console.log(paymentMethod, totalPrice);
+        
         if (paymentMethod !== "COD" && totalPrice >= 1000) {
+            console.log("testing masuk")
             const payTransactionResponse = await payTransactionService(transaction, productsInCart, disc, freeOngkir)
-            console.log(payTransactionResponse);
+            
             const updatePaymentLink = await updatePaymentLinkService(transaction, payTransactionResponse.invoice_url);
             await seqTransaction.commit();
             return res.status(200).json({ message: "Transaction created!", payTransactionResponse, transaction, insertedTransactionDetails });
             
         }
         else {
+
+            console.log("testing masuk");
             await seqTransaction.commit();
             return res.status(200).json({ message: "Transaction created!", transaction, insertedTransactionDetails });
         }
@@ -244,7 +292,6 @@ export const createTransaction = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
-
 
 export const checkOutCreditTransaction = async (req, res) => {
     const {
@@ -311,7 +358,6 @@ export const checkOutVATransaction = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
-
 
 // Req body
 // {
@@ -748,7 +794,6 @@ export const changeTransactionStatus = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
-
 
 export const trackDelivery = async () => {
     const { awb, shipping } = req.body;

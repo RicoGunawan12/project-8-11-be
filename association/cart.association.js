@@ -3,8 +3,8 @@ import CartItem from "../models/cartItem.model.js";
 import User from "../models/user.model.js";
 import { ProductVariant } from "./product.association.js";
 
-User.belongsTo(Cart, { foreignKey: 'ref_user_id' });
-Cart.belongsTo(User, { foreignKey: 'ref_user_id' });
+User.hasOne(Cart, { foreignKey: 'ref_user_id' });
+Cart.belongsTo(User, { foreignKey: 'ref_user_id', targetKey: 'userId' });
 
 Cart.hasMany(CartItem, { foreignKey: 'ref_cart_id' });
 CartItem.belongsTo(Cart, { foreignKey: 'ref_cart_id' });

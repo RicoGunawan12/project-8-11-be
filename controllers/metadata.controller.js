@@ -25,7 +25,7 @@ export const getMetadata = async (req,res) =>{
 }
 
 export const insertMetadata = async (req, res) => {
-  console.log(req.body);
+
   const {
     slug,
     title,
