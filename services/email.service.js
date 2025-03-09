@@ -295,6 +295,11 @@ export const sendEmailPostPayment = async (email, name, lang, transaction) => {
 
   const orderDate = new Date(transaction.transactionDate);
   const printedDate = `${orderDate.getDate().toString().padStart(2, "0")}-${(orderDate.getMonth() + 1).toString().padStart(2, "0")}-${orderDate.getFullYear()} ${orderDate.getHours().toString().padStart(2, "0")}:${orderDate.getMinutes().toString().padStart(2,"0")}`;
+
+  const numberFormat = new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR"
+  });
   
   let content =
     (lang === "id"
@@ -303,10 +308,11 @@ export const sendEmailPostPayment = async (email, name, lang, transaction) => {
   content = content.replaceAll("{{ nama }}", name);
   content = content.replaceAll("{{ Order ID }}", transaction.readableId);
   content = content.replaceAll("{{ Tanggal dan waktu pemesanan }}", printedDate);
-  content = content.replaceAll("{{ Harga total transaksi }}", `Rp. ${transaction.totalPrice}`);
+  content = content.replaceAll("{{ Harga total transaksi }}", `${numberFormat.format(transaction.totalPrice)}`);
   content = content.replaceAll("{{ Jasa ekspedisi yang dipakai }}", `${transaction.expedition} - ${transaction.shippingType}`);
 
   let printedProductsHtml = '';
+  let subtotal = 0;
   let discount = 0;
   for (const detail of transaction.transaction_details) {
     let printedProductHtml = '';
@@ -315,16 +321,28 @@ export const sendEmailPostPayment = async (email, name, lang, transaction) => {
     printedProductHtml = printedProductHtml.replaceAll("{{ productname }}", detail.product_variant.product.productName);
     printedProductHtml = printedProductHtml.replaceAll("{{ productvariant }}", `${detail.product_variant.productColor}`);
     printedProductHtml = printedProductHtml.replaceAll("{{ productqty }}", `${detail.quantity}`);
-    printedProductHtml = printedProductHtml.replaceAll("{{ productprice }}", `Rp. ${detail.paidProductPrice}`);
+    printedProductHtml = printedProductHtml.replaceAll("{{ productprice }}", `${numberFormat.format(detail.paidProductPrice)}`);
     printedProductsHtml = printedProductsHtml + printedProductHtml;
 
-    discount += realizedPromo;
+    subtotal += (detail.quantity * detail.paidProductPrice) + detail.realizedPromo; 
+    discount += detail.realizedPromo;
   }
 
+  let discountHtml = `
+    <tr>
+      <td><strong>Discount:</strong></td>
+      <td>{{ Discount }}</td>
+    </tr>
+  `;
+
+  discountHtml = discountHtml.replaceAll("{{ Discount }}", `-${numberFormat.format(discount)}`);
+
+  let grandTotal = transaction.totalPrice;
+
   content = content.replaceAll("{{ products }}", printedProductsHtml);
-  content = content.replaceAll("{{ Subtotal }}", subtotal);
-  content = content.replaceAll("{{ Discount }}", discount);
-  content = content.replaceAll("{{ Grand Total }}", grandTotal);
+  content = content.replaceAll("{{ Subtotal }}", `${numberFormat.format(subtotal)}`);
+  content = content.replaceAll("{{ Discount Placeholder }}", (discount < 1) ? '' : discountHtml);
+  content = content.replaceAll("{{ Grand Total }}", `${numberFormat.format(grandTotal)}`);
   content = content.replaceAll("{{ link }}", `${process.env.PRODUCTION_WEB}/transactions/${transaction.transactionId}`);
 
   const mailOptions = {
