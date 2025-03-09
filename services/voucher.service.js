@@ -34,6 +34,7 @@ export const checkVoucherByCodeService = async (code, totalPrice) => {
 }
 
 export const getVoucherByCodeService = async (code) => {
+  console.log(code)
   const voucher =  await VoucherModel.findOne({
     where: {
       isDeleted: false,
@@ -152,6 +153,7 @@ export const createVouchersService = async (vouchers) => {
   const voucher = vouchers[0]
   if(voucher.voucherType == "product"){
     for(const variant of voucher.variantId){
+      console.log(variant)
       const newVoucher = await VoucherModel.create({
         voucherCode: voucher.voucherCode,
         voucherName: voucher.voucherName,
@@ -162,7 +164,9 @@ export const createVouchersService = async (vouchers) => {
         discount: voucher.discount,
         minimumPayment: voucher.minimumPayment,
         quota: voucher.quota,
-        variantsId: variant.variantsId
+        variantsId: variant.variantsId,
+        voucherVisibility: voucher.voucherVisibility,
+        voucherSpecialEvent: voucher.voucherSpecialEvent
       })
     }
   }
@@ -177,7 +181,9 @@ export const createVouchersService = async (vouchers) => {
       discount: voucher.discount,
       minimumPayment: voucher.minimumPayment,
       quota: voucher.quota,
-      variantsId: null
+      variantsId: null,
+      voucherVisibility: voucher.voucherVisibility,
+      voucherSpecialEvent: voucher.voucherSpecialEvent
     })
   }
 
@@ -203,7 +209,9 @@ export const updateVouchersService = async (vouchers) => {
         discount: voucher.discount,
         minimumPayment: voucher.minimumPayment,
         quota: voucher.quota,
-        variantsId: variant.productVariantId
+        variantsId: variant.productVariantId,
+        voucherVisibility: voucher.voucherVisibility,
+        voucherSpecialEvent: voucher.voucherSpecialEvent
       })
     }
     const del = await VoucherModel.update({
@@ -216,9 +224,6 @@ export const updateVouchersService = async (vouchers) => {
     )
   }
   else{
-
-
-
     const newVoucher = await VoucherModel.update({
       voucherCode: voucher.voucherCode,
       voucherName: voucher.voucherName,
@@ -229,7 +234,9 @@ export const updateVouchersService = async (vouchers) => {
       discount: voucher.discount,
       minimumPayment: voucher.minimumPayment,
       quota: voucher.quota,
-      variantsId: null
+      variantsId: null,
+      voucherVisibility: voucher.voucherVisibility,
+      voucherSpecialEvent: voucher.voucherSpecialEvent
     },{
       where:{
         voucherId: existVoucher.voucherId
