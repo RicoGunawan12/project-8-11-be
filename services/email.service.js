@@ -303,10 +303,11 @@ export const sendEmailPostPayment = async (email, name, lang, transaction) => {
   content = content.replaceAll("{{ nama }}", name);
   content = content.replaceAll("{{ Order ID }}", transaction.readableId);
   content = content.replaceAll("{{ Tanggal dan waktu pemesanan }}", printedDate);
-  content = content.replaceAll("{{ Harga total transaksi }}", transaction.totalPrice);
+  content = content.replaceAll("{{ Harga total transaksi }}", `Rp. ${transaction.totalPrice}`);
   content = content.replaceAll("{{ Jasa ekspedisi yang dipakai }}", `${transaction.expedition} - ${transaction.shippingType}`);
 
   let printedProductsHtml = '';
+  let discount = 0;
   for (const detail of transaction.transaction_details) {
     let printedProductHtml = '';
     printedProductHtml = productHtmlTemplate;
@@ -316,9 +317,14 @@ export const sendEmailPostPayment = async (email, name, lang, transaction) => {
     printedProductHtml = printedProductHtml.replaceAll("{{ productqty }}", `${detail.quantity}`);
     printedProductHtml = printedProductHtml.replaceAll("{{ productprice }}", `Rp. ${detail.paidProductPrice}`);
     printedProductsHtml = printedProductsHtml + printedProductHtml;
+
+    discount += realizedPromo;
   }
 
   content = content.replaceAll("{{ products }}", printedProductsHtml);
+  content = content.replaceAll("{{ Subtotal }}", subtotal);
+  content = content.replaceAll("{{ Discount }}", discount);
+  content = content.replaceAll("{{ Grand Total }}", grandTotal);
   content = content.replaceAll("{{ link }}", `${process.env.PRODUCTION_WEB}/transactions/${transaction.transactionId}`);
 
   const mailOptions = {
