@@ -185,13 +185,16 @@ export const createTransaction = async (req, res) => {
                     
                 }
                 else {
-                    voucherToInsert+= voucher; // Fix: Use push instead of concat
+                    if (index !== voucherCode.length - 1) {
+                        voucherToInsert+= voucher; 
+                    }
                 }
                 if (index === voucherCode.length - 1) {
                     if (voucher !== "0") {
                         const temp = voucher;
                         const getVoucherByCode = await getVoucherByCodeWithVoucherTypeService(voucher);
                         voucher = getVoucherByCode.voucherId;
+                        voucherToInsert+= voucher;
                     }
                 } else {
                     voucherToInsert += ";" // Fix: Properly append the separator

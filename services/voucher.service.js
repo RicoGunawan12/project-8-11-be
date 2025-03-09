@@ -285,7 +285,7 @@ export const calculateVoucherDiscount = async (voucherTypeCode, amount, discount
   switch(voucherTypeCode) {
     case 'FIXED':
         if(discountAmount > amount) amount
-        else return discountAmount
+        else return maxDiscount
     case 'ONGKIR':
         if(discountAmount > amount) amount
         else return discountAmount
