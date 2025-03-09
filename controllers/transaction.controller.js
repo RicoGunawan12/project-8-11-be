@@ -197,18 +197,20 @@ export const createTransaction = async (req, res) => {
                     voucherToInsert += ";" // Fix: Properly append the separator
                 }
             
-                const voucherHasUsed = await checkTransactionWithVoucher(voucher, userId);
-                if (voucherHasUsed) {
-                    return res.status(400).json({ message: "Voucher has been used!" });
-                }
-                const discount = await applyVoucherService(voucher, totalPrice - deliveryFee + freeOngkir);
-                totalPrice -= discount.totalDiscount;
+                if (voucher !== "0") {
+                    const voucherHasUsed = await checkTransactionWithVoucher(voucher, userId);
+                    if (voucherHasUsed) {
+                        return res.status(400).json({ message: "Voucher has been used!" });
+                    }
+                    const discount = await applyVoucherService(voucher, totalPrice - deliveryFee + freeOngkir);
+                    totalPrice -= discount.totalDiscount;
+                    
                 
-            
-                disc.push({
-                    discount: discount.totalDiscount,
-                    name: discount.voucherName,
-                });
+                    disc.push({
+                        discount: discount.totalDiscount,
+                        name: discount.voucherName,
+                    });
+                }
                 
             })
             await Promise.all(checkVoucher)

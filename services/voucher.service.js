@@ -61,9 +61,9 @@ export const getVoucherByCodeWithVoucherTypeService = async (voucherCode) => {
       isDeleted: false,
       voucherCode: voucherCode
     },
-    include:{
-      model: ProductVariantModel
-    }
+    // include:{
+    //   model: ProductVariantModel
+    // }
   })
   return vouchers
 }
