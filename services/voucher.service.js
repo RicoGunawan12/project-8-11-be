@@ -182,7 +182,7 @@ export const createVouchersService = async (vouchers) => {
         discount: voucher.discount,
         minimumPayment: voucher.minimumPayment,
         quota: voucher.quota,
-        variantsId: variant.variantsId,
+        variantsId: variant.productVariantId,
         voucherVisibility: voucher.voucherVisibility,
         voucherSpecialEvent: voucher.voucherSpecialEvent
       })
