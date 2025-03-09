@@ -331,7 +331,7 @@ export const sendEmailPostPayment = async (email, name, lang, transaction) => {
   let discountHtml = `
     <tr>
       <td><strong>Discount:</strong></td>
-      <td>{{ Discount }}</td>
+      <td align="right">{{ Discount }}</td>
     </tr>
   `;
 
