@@ -124,11 +124,14 @@ export const getVoucherByIdService = async (voucherId) => {
 export const getVisibleVoucherService = async (userId) => {
   const vouchers = await VoucherModel.findAll({ 
     where: { 
-      voucherVisibility: true, 
+      voucherVisibility: false, 
       isDeleted: false,
       voucherStartDate: { [Op.lte]: new Date() },
       voucherEndDate: { [Op.gte]: new Date().setHours(0, 0, 0, 0) },
-    }
+    },
+    order:[
+      ['voucherType', 'ASC']
+    ]
   });
   
   const transactionHeaders = await TransactionHeaderModel.findAll({
@@ -144,6 +147,21 @@ export const getVisibleVoucherService = async (userId) => {
   const filteredVouchers = vouchers.filter(voucher => {
     return !refVoucherCodes.some(refCode => refCode.includes(voucher.voucherId.toString()));
   });
+
+  for(const fv of filteredVouchers){
+    console.log(fv)
+
+    const variant = await ProductVariantModel.findOne({
+      where:{
+        productVariantId : fv.variantsId || ""
+      },
+      include:{
+        model: ProductModel,
+      }
+    })
+    fv.dataValues.productVariant = variant
+
+  }
 
   return filteredVouchers;
 }
