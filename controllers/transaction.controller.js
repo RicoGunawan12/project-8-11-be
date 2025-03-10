@@ -65,22 +65,20 @@ export const getTransactionById = async (req, res) => {
 
 
 
-        var vouchers;
+        if(transaction.voucherCode){
+            const vouchers = transaction.voucherCode.split(";");
 
-        if (vouchers) {
-            vouchers = transaction.voucherCode.split(";");
+            const voucherResult = [];
+            for(let i = 0; i < vouchers.length; i++) {
+        
+                const vres = await getVoucherByIdService(vouchers[i])
+
+                voucherResult.push(vres)
+
+            }
+
+            transaction.voucherCode = voucherResult;
         }
-
-        const voucherResult = [];
-        for(let i = 0; i < vouchers.length; i++) {
-    
-            const vres = await getVoucherByIdService(vouchers[i])
-
-            voucherResult.push(vres)
-
-        }
-
-        transaction.voucherCode = voucherResult;
 
         let delivery = { data: null };
 
