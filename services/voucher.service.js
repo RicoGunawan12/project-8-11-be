@@ -1,13 +1,17 @@
-import { Op, where } from "sequelize";
+import { Op, Sequelize, where } from "sequelize";
 import { ProductModel, ProductVariantModel, TransactionHeaderModel, VoucherModel } from "../association/association.js";
 import sequelize from "../config/database.js";
-
 
 // #region GET
 export const getAllVouchersService =  async ()=> {
   const voucher = await VoucherModel.findAll({
     where: { isDeleted: false },
-    order: [['voucher_start_date', 'DESC']]
+    order: [['voucher_start_date', 'DESC']],
+    group: [
+      Sequelize.literal(
+        "CASE WHEN free_product_identifier IS NULL THEN voucher_id ELSE free_product_identifier END"
+      )
+    ],
   })
   return voucher
 }
@@ -170,6 +174,7 @@ export const createVouchersService = async (vouchers) => {
 
   const voucher = vouchers[0]
   if(voucher.voucherType == "product"){
+    const freeProductIdentifier = crypto.randomUUID();
     for(const variant of voucher.variantId){
       console.log(variant)
       const newVoucher = await VoucherModel.create({
@@ -184,7 +189,8 @@ export const createVouchersService = async (vouchers) => {
         quota: voucher.quota,
         variantsId: variant.productVariantId,
         voucherVisibility: voucher.voucherVisibility,
-        voucherSpecialEvent: voucher.voucherSpecialEvent
+        voucherSpecialEvent: voucher.voucherSpecialEvent,
+        freeProductIdentifier: freeProductIdentifier
       })
     }
   }

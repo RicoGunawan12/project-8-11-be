@@ -71,6 +71,12 @@ const Voucher = sequelize.define('vouchers', {
     allowNull: false,
     defaultValue: false
   },
+  freeProductIdentifier: {
+    field: "free_product_identifier",
+    type: DataTypes.TEXT,
+    allowNull: true,
+    defaultValue: null
+  },
   isDeleted: {
     field: "is_deleted",
     type: DataTypes.BOOLEAN,
