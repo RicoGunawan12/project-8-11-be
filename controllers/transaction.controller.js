@@ -21,6 +21,26 @@ export const getAllTransactions = async (req, res) => {
 
     try {
         const transactions = await getAllTransactionsService(status, startDate, endDate, search, offset, limit);
+
+
+        // for(const transaction of transactions){
+        //     if(transaction.voucherCode){
+        //         const vouchers = transaction.voucherCode.split(";");
+    
+        //         const voucherResult = [];
+        //         for(let i = 0; i < vouchers.length; i++) {
+            
+        //             const vres = await getVoucherByIdService(vouchers[i])
+    
+        //             voucherResult.push(vres)
+    
+        //         }
+    
+        //         transaction.voucherCode = voucherResult;
+        //     }
+        // }
+
+
         return res.status(200).json({ message: "Transaction fetched successfully", transactions })
     } catch (error) {
         
@@ -269,10 +289,10 @@ export const createTransaction = async (req, res) => {
         const deletedCartItem = await removeAllCartItemInUserService(userId);
         
       
-        console.log(paymentMethod, totalPrice);
+        // console.log(paymentMethod, totalPrice);
         
         if (paymentMethod !== "COD" && totalPrice >= 1000) {
-            console.log("testing masuk")
+            // console.log("testing masuk")
             const payTransactionResponse = await payTransactionService(transaction, productsInCart, disc, freeOngkir)
             
             const updatePaymentLink = await updatePaymentLinkService(transaction, payTransactionResponse.invoice_url);
@@ -282,7 +302,7 @@ export const createTransaction = async (req, res) => {
         }
         else {
 
-            console.log("testing masuk");
+            // console.log("testing masuk");
             await seqTransaction.commit();
             return res.status(200).json({ message: "Transaction created!", transaction, insertedTransactionDetails });
         }

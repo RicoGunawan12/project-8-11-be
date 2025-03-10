@@ -38,22 +38,38 @@ export const checkVoucherByCodeService = async (code, totalPrice) => {
 }
 
 export const getVoucherByCodeService = async (code) => {
-  console.log(code)
+  // console.log(code)
   const voucher =  await VoucherModel.findOne({
     where: {
       isDeleted: false,
       voucherId: code,
     }
   })
+
+  if(!voucher) return null
+  // console.log("voucher datavalue type: ", voucher.dataValues.voucherType)
+  if(voucher.dataValues.voucherType != "product"){
+    // console.log("product")
+    return voucher
+  } 
+  
+  // console.log("here")
+
+  const vouchersWithSameName = await VoucherModel.findAll({
+    where: {
+      isDeleted: false,
+      freeProductIdentifier: voucher.freeProductIdentifier, 
+    }
+  });
  
-  return voucher
+  return vouchersWithSameName
 }
 
 export const getVoucherByCodeListService = async (voucherCodes) => {
   const vouchers = await VoucherModel.findAll({
     where: {
       isDeleted: false,
-      voucherCode: voucherCodes
+      voucherCode: voucherCodes,
     }
   });
 
@@ -116,8 +132,7 @@ export const getVoucherByIdService = async (voucherId) => {
     })
     voucher.dataValues.productVariant = variant
     if(variant){
-      console.log("variant: ", variant)
-      console.log("price: ", variant.dataValues.productPrice)
+
       voucher.dataValues.discount = variant.dataValues.productPrice
     }
   }
@@ -153,7 +168,6 @@ export const getVisibleVoucherService = async (userId) => {
   });
 
   for(const fv of filteredVouchers){
-    console.log(fv)
 
     const variant = await ProductVariantModel.findOne({
       where:{
@@ -215,65 +229,53 @@ export const createVouchersService = async (vouchers) => {
 };
 
 export const updateVouchersService = async (vouchers) => {
- 
-  const voucher = vouchers[0]
-  const existVoucher = await getVoucherByIdService(vouchers[0].voucherId)
+  // const freeProductIdentifier = crypto.randomUUID();
+  for (const voucher of vouchers) {
+    const existVoucher = await getVoucherByIdService(voucher.voucherId);
 
-  if(voucher.voucherType == "product"){
-    for(const variant of voucher.variantId){
+    console.log(voucher)
+    if (voucher.voucherType === "product") {
+      // console.log(voucher.dataValues.productVariant)
+        const newVoucher = await VoucherModel.update({
+          voucherCode: voucher.voucherCode,
+          voucherName: voucher.voucherName,
+          voucherType: voucher.voucherType,
+          voucherEndDate: voucher.voucherEndDate,
+          voucherStartDate: voucher.voucherStartDate,
+          maxDiscount: 0,
+          discount: 0,
+          minimumPayment: voucher.minimumPayment,
+          quota: voucher.quota,
+          variantsId: voucher.variantId,
+          voucherVisibility: voucher.voucherVisibility,
+          voucherSpecialEvent: voucher.voucherSpecialEvent,
+          freeProductIdentifier: voucher.freeProductIdentifier
+        }, { where: { voucherId: existVoucher.voucherId } });
 
-
-      const newVoucher = await VoucherModel.create({
-        voucherCode: voucher.voucherCode,
-        voucherName: voucher.voucherName,
-        voucherType: voucher.voucherType,
-        voucherEndDate: voucher.voucherEndDate,
-        voucherStartDate: voucher.voucherStartDate,
-        maxDiscount: 0,
-        discount: 0,
-        minimumPayment: voucher.minimumPayment,
-        quota: voucher.quota,
-        variantsId: variant.productVariantId,
-        voucherVisibility: voucher.voucherVisibility,
-        voucherSpecialEvent: voucher.voucherSpecialEvent
-      })
+    } else {
+      const updatedVoucher = await VoucherModel.update(
+        {
+          voucherCode: voucher.voucherCode,
+          voucherName: voucher.voucherName,
+          voucherType: voucher.voucherType,
+          voucherEndDate: voucher.voucherEndDate,
+          voucherStartDate: voucher.voucherStartDate,
+          maxDiscount: voucher.maxDiscount,
+          discount: voucher.voucherType === "product" ? 0 : voucher.discount,
+          minimumPayment: voucher.minimumPayment,
+          quota: voucher.quota,
+          variantsId: null,
+          voucherVisibility: voucher.voucherVisibility,
+          voucherSpecialEvent: voucher.voucherSpecialEvent
+        },
+        { where: { voucherId: existVoucher.voucherId } }
+      );
     }
-    const del = await VoucherModel.update({
-      isDeleted : true
-    },{
-      where: {
-        voucherId : existVoucher.voucherId
-      }
-    }
-    )
   }
-  else{
-    const newVoucher = await VoucherModel.update({
-      voucherCode: voucher.voucherCode,
-      voucherName: voucher.voucherName,
-      voucherType: voucher.voucherType,
-      voucherEndDate: voucher.voucherEndDate,
-      voucherStartDate: voucher.voucherStartDate,
-      maxDiscount: voucher.maxDiscount,
-      discount: voucher.voucherType == "product" ? 0: voucher.discount,
-      minimumPayment: voucher.minimumPayment,
-      quota: voucher.quota,
-      variantsId: null,
-      voucherVisibility: voucher.voucherVisibility,
-      voucherSpecialEvent: voucher.voucherSpecialEvent
-    },{
-      where:{
-        voucherId: existVoucher.voucherId
-      }
-    })
-
-
-
-  }
-
 
   return;
 };
+
 
 export const deleteVoucherByCodeService = async (code) =>{
   

@@ -84,9 +84,12 @@ export const getAllTransactionsService = async (status, startDate, endDate, sear
 
     for (let transaction of transactions) {
         const [voucherResults] = await sequelize.query(`
-            SELECT voucher_name, max_discount, discount, voucher_type FROM vouchers
-            WHERE FIND_IN_SET(voucher_id, REPLACE('${transaction.voucherCode}', ';', ','))
-        `);
+        SELECT v.voucher_name, v.max_discount, v.discount, v.voucher_type, pv.product_price
+        FROM vouchers v
+        LEFT JOIN product_variants pv ON pv.product_variant_id = v.variants_id
+        WHERE FIND_IN_SET(v.voucher_id, REPLACE('${transaction.voucherCode}', ';', ','))
+    `);
+        
         transaction.dataValues.vouchers = voucherResults;
     }
 
