@@ -230,6 +230,17 @@ export const createVouchersService = async (vouchers) => {
 
 export const updateVouchersService = async (vouchers) => {
   // const freeProductIdentifier = crypto.randomUUID();
+  if (vouchers[0].voucherType === "product") {
+    const identifierVoucher = await VoucherModel.findAll({ where: vouchers[0].freeProductIdentifier });
+    const existingVoucherIds = vouchers.map(v => v.voucherId);
+
+    const vouchersToDelete = identifierVoucher.filter(v => !existingVoucherIds.includes(v.voucherId));
+    if (vouchersToDelete.length > 0) {
+        await VoucherModel.destroy({
+            where: { voucherId: vouchersToDelete.map(v => v.voucherId) }
+        });
+    }
+  }
   for (const voucher of vouchers) {
     const existVoucher = await getVoucherByIdService(voucher.voucherId);
 
