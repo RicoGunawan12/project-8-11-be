@@ -229,7 +229,7 @@ export const getCategoryWithProductService = async () => {
             //     attributes: ['rating', 'comment'],
             // }
         ],
-        where: { isDeleted: false },
+        where: { isDeleted: false, isBestSeller: true },
         // group: ["products.product_id"],
         limit: 8
     });
