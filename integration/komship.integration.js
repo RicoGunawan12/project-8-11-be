@@ -115,7 +115,7 @@ export const createOrderKomship = async (transaction, adminAddress, contact) => 
             product_price: det?.product_variant?.productPrice ?? 1,
             product_width: Math.ceil(det?.product_variant?.product?.productWidth / 100) ?? 1,
             product_height: Math.ceil(det?.product_variant?.product?.productHeight / 100) ?? 1,
-            product_weight: Math.ceil(det?.product_variant?.product?.productWeight / 1000) ?? 1,
+            product_weight: (det?.product_variant?.product?.productWeight ?? 1) * det.quantity,
             product_length: Math.ceil(det?.product_variant?.product?.productLength / 100) ?? 1,
             qty: det.quantity,
             subtotal: det.quantity * (det?.product_variant?.productPrice ?? 1)
