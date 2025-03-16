@@ -82,7 +82,7 @@ export const getCartItemsByUserService = async (userId) => {
       
       
 
-      if (promoDetail) {
+      if (promoDetail && !promoDetail?.promo?.isMultipleUse) {
         
         
         

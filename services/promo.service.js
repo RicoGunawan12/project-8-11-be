@@ -30,9 +30,9 @@ export const getPromoService = async () => {
     return promos;
 };
 
-export const createPromoService = async (promoName, promoAmount, startDate, endDate) => {
+export const createPromoService = async (promoName, promoAmount, startDate, endDate, isMultipleUse) => {
     const promo = await PromoModel.create({
-        promoName, promoAmount, startDate, endDate
+        promoName, promoAmount, startDate, endDate, isMultipleUse
     });
     return promo;
 }
@@ -72,18 +72,23 @@ export const checkPromoService = async (productId, userId) => {
             ],
         });
  
+        console.log(promoDetail.promo);
         
         if (promoDetail) {
-            const promoUsed = await PromoHistoryModel.findOne({
-                where: {
-                    productId,
-                    userId,
-                    promoId: promoDetail?.promo?.promoId,
-                },
-            });
-    
-            if (promoUsed) {
-                return null;
+            if (promoDetail?.promo?.isMultipleUse) {
+                return promoDetail
+            }
+            else {
+                const promoUsed = await PromoHistoryModel.findOne({
+                    where: {
+                        productId,
+                        userId,
+                        promoId: promoDetail?.promo?.promoId,
+                    },
+                });
+                if (promoUsed) {
+                    return null;
+                }
             }
         }
         else {
@@ -142,7 +147,7 @@ export const getPromoByIdService = async (promoId) => {
     return promo;
 }
 
-export const updatePromoService = async (promoId, promoName, promoAmount, startDate, endDate, products) => {
+export const updatePromoService = async (promoId, promoName, promoAmount, startDate, endDate, products, isMultipleUse) => {
 
     const existingPromoDetails = await PromoDetailModel.findAll({
         where: { promoId },
@@ -183,6 +188,7 @@ export const updatePromoService = async (promoId, promoName, promoAmount, startD
             promoAmount,
             startDate,
             endDate,
+            isMultipleUse
         },
         {
             where: { promoId },
