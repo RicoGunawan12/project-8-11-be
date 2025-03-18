@@ -88,7 +88,7 @@ export const getPromoById = async (req, res) => {
 
 export const updatePromo = async (req, res) => {
     const promoId = req.params.id;
-    const { promoName, promoAmount, startDate, endDate, products, isMultipleUse } = req.body;
+    const { promoName, promoAmount, startDate, endDate, products } = req.body;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -126,7 +126,7 @@ export const updatePromo = async (req, res) => {
     }
 
     try {
-        await updatePromoService(promoId, promoName, promoAmount, startDate, endDate, products, isMultipleUse);
+        await updatePromoService(promoId, promoName, promoAmount, startDate, endDate, products);
         return res.status(200).json({ message: "Promo updated!" });
     } catch (error) {
         return res.status(500).json({ message: error.message });

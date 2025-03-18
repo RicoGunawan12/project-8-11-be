@@ -147,7 +147,7 @@ export const getPromoByIdService = async (promoId) => {
     return promo;
 }
 
-export const updatePromoService = async (promoId, promoName, promoAmount, startDate, endDate, products, isMultipleUse) => {
+export const updatePromoService = async (promoId, promoName, promoAmount, startDate, endDate, products) => {
 
     const existingPromoDetails = await PromoDetailModel.findAll({
         where: { promoId },
@@ -187,8 +187,7 @@ export const updatePromoService = async (promoId, promoName, promoAmount, startD
             promoName,
             promoAmount,
             startDate,
-            endDate,
-            isMultipleUse
+            endDate
         },
         {
             where: { promoId },
