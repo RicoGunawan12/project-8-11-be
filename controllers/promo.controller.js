@@ -14,7 +14,7 @@ export const getPromo = async (req, res) => {
 
 export const createPromo = async (req, res) => {
 
-    const { promoName, promoAmount, startDate, endDate, products } = req.body;
+    const { promoName, promoAmount, startDate, endDate, products, isMultipleUse } = req.body;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -52,7 +52,7 @@ export const createPromo = async (req, res) => {
     }
 
     try {
-        const promo = await createPromoService(promoName, promoAmount, startDate, endDate);
+        const promo = await createPromoService(promoName, promoAmount, startDate, endDate, isMultipleUse);
         const promoDetail = await createPromoDetailService(promo.promoId, products);
         return res.status(200).json({ message: "Promo created!", promo });
     } catch (error) {

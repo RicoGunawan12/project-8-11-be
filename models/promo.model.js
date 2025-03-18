@@ -30,6 +30,12 @@ const Promo = sequelize.define('promos', {
       type: DataTypes.DATE,
       primaryKey: false
     },
+    isMultipleUse: {
+      field: "is_multiple_use",
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      primaryKey: false
+    },
     createdAt: { 
       field: "created_at",
       type: DataTypes.DATE,
