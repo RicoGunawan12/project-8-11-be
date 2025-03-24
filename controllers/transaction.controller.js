@@ -309,7 +309,7 @@ export const createTransaction = async (req, res) => {
         
 
     } catch (error) {
-
+        console.error(error);
         if (seqTransaction.finished !== 'commit') {
             await seqTransaction.rollback();
         }
