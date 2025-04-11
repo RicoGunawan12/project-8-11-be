@@ -13,16 +13,22 @@ export const getCarousel = async (req, res) => {
 }
 
 export const createCarousel = async (req, res) => {
-    const {
+    var {
         titleEng,
         titleIndo,
         contentEng,
         contentIndo,
         buttonEng,
         buttonIndo,
-        link
+        link,
+        desktopFontSize,
+        mobileFontSize,
+        titleFontColor,
+        buttonColor,
+        buttonFontColor,
     } = req.body;
-
+    desktopFontSize = parseInt(desktopFontSize)
+    mobileFontSize = parseInt(mobileFontSize)
     const image = req.files['carouselImage'];
     const imageMobile = req.files['carouselImageMobile'];
     if (typeof titleEng !== 'string' || titleEng.trim() === '') {
@@ -42,6 +48,21 @@ export const createCarousel = async (req, res) => {
     }
     if (typeof buttonIndo !== 'string' || buttonIndo.trim() === '') {
         return res.status(400).json({ message: 'Indonesian button text is required' });
+    }
+    if (typeof desktopFontSize !== "number" || desktopFontSize <= 0) {
+        return res.status(400).json({ message: 'Desktop font size must be a positive integer' });
+    }
+    if (typeof mobileFontSize !== "number" || mobileFontSize <= 0) {
+        return res.status(400).json({ message: 'Mobile font size must be a positive integer' });
+    }
+    if (typeof titleFontColor !== 'string' && !isValidHexColor(titleFontColor)) {
+        return res.status(400).json({ message: 'Title font color must be a valid hex color' });
+    }
+    if (typeof buttonColor !== 'string' && !isValidHexColor(buttonColor)) {
+        return res.status(400).json({ message: 'Button color must be a valid hex color' });
+    }
+    if (typeof buttonFontColor !== 'string' && !isValidHexColor(buttonFontColor)) {
+        return res.status(400).json({ message: 'Button font color must be a valid hex color' });
     }
 
     // Validate link
@@ -74,7 +95,12 @@ export const createCarousel = async (req, res) => {
             contentIndo,
             buttonEng,
             buttonIndo,
-            link
+            link,
+            desktopFontSize,
+            mobileFontSize,
+            titleFontColor,
+            buttonColor,
+            buttonFontColor,
         );
         return res.status(200).json({ message: "Carousel created!", carousel })
     } catch (error) {
@@ -92,7 +118,12 @@ export const updateCarousel = async (req, res) => {
         contentIndo,
         buttonEng,
         buttonIndo,
-        link
+        link,
+        desktopFontSize,
+        mobileFontSize,
+        titleFontColor,
+        buttonColor,
+        buttonFontColor,
     } = req.body;
 
     const image = req.files['carouselImage'];
@@ -119,6 +150,21 @@ export const updateCarousel = async (req, res) => {
     }
     if (typeof buttonIndo !== 'string' || buttonIndo.trim() === '') {
         return res.status(400).json({ message: 'Indonesian button text is required' });
+    }
+    if (typeof desktopFontSize !== "number" || desktopFontSize <= 0) {
+        return res.status(400).json({ message: 'Desktop font size must be a positive integer' });
+    }
+    if (typeof mobileFontSize !== "number" || mobileFontSize <= 0) {
+        return res.status(400).json({ message: 'Mobile font size must be a positive integer' });
+    }
+    if (typeof titleFontColor !== 'string' && !isValidHexColor(titleFontColor)) {
+        return res.status(400).json({ message: 'Title font color must be a valid hex color' });
+    }
+    if (typeof buttonColor !== 'string' && !isValidHexColor(buttonColor)) {
+        return res.status(400).json({ message: 'Button color must be a valid hex color' });
+    }
+    if (typeof buttonFontColor !== 'string' && !isValidHexColor(buttonFontColor)) {
+        return res.status(400).json({ message: 'Button font color must be a valid hex color' });
     }
 
     // Validate link
@@ -152,7 +198,12 @@ export const updateCarousel = async (req, res) => {
             contentIndo,
             buttonEng,
             buttonIndo,
-            link
+            link,
+            desktopFontSize,
+            mobileFontSize,
+            titleFontColor,
+            buttonColor,
+            buttonFontColor,
         );
         return res.status(200).json({ message: "Carousel updated!", carousel })
     } catch (error) {

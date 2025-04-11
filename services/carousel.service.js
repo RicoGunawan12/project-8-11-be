@@ -14,7 +14,12 @@ export const createCarouselService = async (
     contentIndo,
     buttonEng,
     buttonIndo,
-    link
+    link,
+    desktopFontSize,
+    mobileFontSize,
+    titleFontColor,
+    buttonColor,
+    buttonFontColor,
 ) => {
     const carousel = await Carousel.create({
         carouselImage,
@@ -25,7 +30,12 @@ export const createCarouselService = async (
         contentIndo,
         buttonEng,
         buttonIndo,
-        link
+        link,
+        desktopFontSize,
+        mobileFontSize,
+        titleFontColor,
+        buttonColor,
+        buttonFontColor
     });
     return carousel;
 }
@@ -40,7 +50,12 @@ export const updateCarouselService = async (
     contentIndo,
     buttonEng,
     buttonIndo,
-    link
+    link,
+    desktopFontSize,
+    mobileFontSize,
+    titleFontColor,
+    buttonColor,
+    buttonFontColor,
 ) => {
     const updatedCarousel = await Carousel.update(
         {
@@ -52,7 +67,12 @@ export const updateCarouselService = async (
             contentIndo: contentIndo,
             buttonEng: buttonEng,
             buttonIndo: buttonIndo,
-            link: link
+            link: link,
+            desktopFontSize: desktopFontSize,
+            mobileFontSize: mobileFontSize,
+            titleFontColor: titleFontColor,
+            buttonColor: buttonColor,
+            buttonFontColor: buttonFontColor,
         },
         { where: { carouselId } }
     )

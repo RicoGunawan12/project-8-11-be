@@ -46,3 +46,7 @@ export const generateReadableId = () => {
 export function isValidNumber(value) {
   return !isNaN(value) && value !== null && value !== '';
 }
+
+export function isValidHexColor(value) {
+  return typeof value === 'string' && /^#([0-9A-F]{3}){1,2}$/i.test(value);
+}

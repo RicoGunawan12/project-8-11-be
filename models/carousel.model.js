@@ -53,6 +53,31 @@ const Carousel = sequelize.define('carousels', {
         field: "link",
         type: DataTypes.STRING,
         length: 100
+    },
+    desktopFontSize: {
+        field: "desktop_font_size",
+        type: DataTypes.INTEGER,
+        defaultValue: 48
+    },
+    mobileFontSize: {
+        field: "mobile_font_size",
+        type: DataTypes.INTEGER,
+        defaultValue: 30
+    },
+    titleFontColor: {
+        field: "title_font_color",
+        type: DataTypes.STRING,
+        defaultValue: "#ffffff"
+    },
+    buttonColor: {
+        field: "button_color",
+        type: DataTypes.STRING,
+        defaultValue: "#ffffff"
+    },
+    buttonFontColor: {
+        field: "button_font_color",
+        type: DataTypes.STRING,
+        defaultValue: "#ffffff"
     }
 }, {
     timestamps: false
